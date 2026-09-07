@@ -1,12 +1,47 @@
 {
-  "name": "OmniStore",
+  "name": "OmniStore — Open-source app discovery",
   "short_name": "OmniStore",
-  "description": "Discover open-source apps for every device.",
+  "description": "Discover, compare and download open-source apps for iOS, Android, Windows, macOS and Linux. Powered by OmniSource.",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0d12",
-  "theme_color": "#0f7a62",
+  "orientation": "any",
+  "background_color": "#0b0f16",
+  "theme_color": "#0d8a74",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["utilities", "productivity", "developer"],
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/omnistore.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search apps",
+      "short_name": "Search",
+      "url": "/search",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Trending",
+      "short_name": "Trending",
+      "url": "/trending",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Compare apps",
+      "short_name": "Compare",
+      "url": "/compare",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Favorites",
+      "short_name": "Favorites",
+      "url": "/favorites",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }

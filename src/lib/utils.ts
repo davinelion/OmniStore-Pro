@@ -1,54 +1,28 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+/** Tailwind-aware class name merging. */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatBytes(bytes?: number) {
-  if (bytes == null) return "Not available";
-  const units = ["B", "KB", "MB", "GB"];
-  let n = bytes;
-  let i = 0;
-  while (n >= 1024 && i < units.length - 1) {
-    n /= 1024;
-    i++;
-  }
-  return `${n.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+/** Stable slug for generated anchors and ids. */
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-export function formatDate(iso?: string) {
-  if (!iso) return "Not available";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "Not available";
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
 }
 
-export function relativeTime(iso?: string) {
-  if (!iso) return "Not available";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "Not available";
-  const diff = Date.now() - d.getTime();
-  const hours = Math.round(diff / 36e5);
-  if (hours < 1) return "Updated just now";
-  if (hours < 24) return `Updated ${hours} hour${hours === 1 ? "" : "s"} ago`;
-  const days = Math.round(hours / 24);
-  if (days < 30) return `Updated ${days} day${days === 1 ? "" : "s"} ago`;
-  return formatDate(iso);
-}
-
-export function platformLabel(p: string) {
-  const map: Record<string, string> = {
-    ios: "iOS",
-    ipados: "iPadOS",
-    android: "Android",
-    windows: "Windows",
-    macos: "macOS",
-    linux: "Linux",
-  };
-  return map[p] ?? p;
+/** Splits an array into chunks — used for balanced column layouts. */
+export function chunk<T>(items: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
+  return out;
 }

@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
-import { getAppBySlug } from "@/lib/api/catalog";
+import { getProvider } from "@/lib/api";
+import { json, notFound } from "@/lib/api/http";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const app = await getAppBySlug(params.id);
-  if (!app) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  return NextResponse.json({ items: app.releases ?? [] });
+export const dynamic = "force-dynamic";
+
+/** GET /api/v1/apps/{id}/releases — full release history, newest first. */
+export async function GET(_request: Request, { params }: { params: { id: string } }) {
+  const provider = getProvider();
+  const app = await provider.getApp(params.id);
+  if (!app) return notFound("App not found");
+  return json({ items: await provider.getReleases(params.id) }, { cacheSeconds: 300 });
 }

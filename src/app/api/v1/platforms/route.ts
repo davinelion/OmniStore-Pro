@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
-import { PLATFORMS } from "@/config/site";
+import { getProvider } from "@/lib/api";
+import { json } from "@/lib/api/http";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
+/** GET /api/v1/platforms — supported platforms with live counts and install hints. */
 export async function GET() {
-  return NextResponse.json({ items: PLATFORMS });
+  const items = await getProvider().getPlatforms();
+  return json({ items }, { cacheSeconds: 3600 });
 }
