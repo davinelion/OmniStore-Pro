@@ -1,0 +1,50 @@
+export const en = {
+  nav: {
+    discover: "Discover",
+    apps: "Apps",
+    categories: "Categories",
+    platforms: "Platforms",
+    trending: "Trending",
+    latest: "Latest",
+    collections: "Collections",
+    search: "Search",
+    about: "About",
+    compare: "Compare",
+    home: "Home",
+    more: "More",
+  },
+  hero: {
+    title: "Discover Open-Source Apps",
+    subtitle: "Find trusted open-source software for all your devices.",
+    cta: "Explore Apps",
+    secondary: "Browse Platforms",
+  },
+  common: {
+    notAvailable: "Not available",
+    tryAgain: "Try Again",
+    unableToLoad: "Unable to load apps.",
+    noResults: "No apps found. Try another search or remove some filters.",
+    descriptionUnavailable: "Description unavailable",
+    verificationUnavailable: "Verification unavailable",
+    openSource: "Open Source",
+    activeDev: "Active Development",
+    getApp: "Get App",
+    view: "View",
+    download: "Download",
+    follow: "Follow",
+    following: "Following",
+    favorite: "Favorite",
+    favorited: "Saved",
+    share: "Share",
+    report: "Report an Issue",
+    whyScore: "Why this score?",
+    disclaimer:
+      "OmniStore will open the upstream download. Installation is handled by your operating system.",
+    ownership:
+      "OmniStore is a discovery and distribution interface. Applications are provided by their respective upstream projects.",
+    apiUnavailable: "OmniSource API unavailable",
+    offline: "You appear to be offline. Showing cached information when possible.",
+  },
+};
+
+export type Messages = typeof en;

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f6f7f8;
+  --fg: #0f141b;
+  --muted: #5b6573;
+  --card: #ffffff;
+  --line: #d5dbe1;
+}
+
+.dark {
+  --bg: #0a0d12;
+  --fg: #eef2f6;
+  --muted: #9aa3b0;
+  --card: #121821;
+  --line: #243041;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+*:focus-visible {
+  outline: 2px solid #0f7a62;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
