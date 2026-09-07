@@ -188,11 +188,14 @@ These are product requirements, not preferences:
 
 ## Known limitations
 
-- The bundled feed is a **snapshot**. Freshness is shown on every page, and
-  `npm run ingest` refreshes it; there is no automatic scheduler in this repo
-  (wire it to a cron job or CI schedule).
+- The bundled feed is a **snapshot** (110 sources, refreshed by `npm run ingest`,
+  which the included `Ingest` workflow can schedule weekly). Every page shows
+  when the data was generated, and `/api/v1/health` reports it.
 - iPadOS coverage is thin because upstream projects rarely publish iPad-only
   artefacts; the platform is supported end-to-end and will populate as OmniSource does.
+- A handful of upstream tag formats stay unnormalised on purpose (experimental
+  nightlies, monorepo tags like `core@13.2.0`, commit-based builds): OmniStore
+  shows the tag upstream published rather than inventing a version.
 - Search is a high-quality in-process index over the current snapshot. It is not
   a distributed search engine; extremely large catalogs should move ranking into
   OmniSource behind the same contract.

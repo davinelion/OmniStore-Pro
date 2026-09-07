@@ -1,250 +1,13 @@
 {
-  "generated_at": "2026-09-07T21:59:31.736Z",
-  "api_requests": 218,
-  "apps": 51,
-  "skipped": [
-    {
-      "repo": "borgbackup/borg",
-      "reason": "401 Unauthorized for https://api.github.com/repos/borgbackup/borg/readme"
-    },
-    {
-      "repo": "RustDesk/rustdesk",
-      "reason": "401 Unauthorized for https://api.github.com/repos/RustDesk/rustdesk"
-    },
-    {
-      "repo": "filebrowser/filebrowser",
-      "reason": "401 Unauthorized for https://api.github.com/repos/filebrowser/filebrowser"
-    },
-    {
-      "repo": "balena-io/etcher",
-      "reason": "401 Unauthorized for https://api.github.com/repos/balena-io/etcher"
-    },
-    {
-      "repo": "pbatard/rufus",
-      "reason": "401 Unauthorized for https://api.github.com/repos/pbatard/rufus"
-    },
-    {
-      "repo": "flameshot-org/flameshot",
-      "reason": "401 Unauthorized for https://api.github.com/repos/flameshot-org/flameshot"
-    },
-    {
-      "repo": "FreeCAD/FreeCAD",
-      "reason": "401 Unauthorized for https://api.github.com/repos/FreeCAD/FreeCAD"
-    },
-    {
-      "repo": "openscad/openscad",
-      "reason": "401 Unauthorized for https://api.github.com/repos/openscad/openscad"
-    },
-    {
-      "repo": "prusa3d/PrusaSlicer",
-      "reason": "401 Unauthorized for https://api.github.com/repos/prusa3d/PrusaSlicer"
-    },
-    {
-      "repo": "SoftFever/OrcaSlicer",
-      "reason": "401 Unauthorized for https://api.github.com/repos/SoftFever/OrcaSlicer"
-    },
-    {
-      "repo": "Ultimaker/Cura",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Ultimaker/Cura"
-    },
-    {
-      "repo": "godotengine/godot",
-      "reason": "401 Unauthorized for https://api.github.com/repos/godotengine/godot"
-    },
-    {
-      "repo": "pcsx2/pcsx2",
-      "reason": "401 Unauthorized for https://api.github.com/repos/pcsx2/pcsx2"
-    },
-    {
-      "repo": "hrydgard/ppsspp",
-      "reason": "401 Unauthorized for https://api.github.com/repos/hrydgard/ppsspp"
-    },
-    {
-      "repo": "kopia/kopia",
-      "reason": "401 Unauthorized for https://api.github.com/repos/kopia/kopia/readme"
-    },
-    {
-      "repo": "luanti-org/luanti",
-      "reason": "401 Unauthorized for https://api.github.com/repos/luanti-org/luanti"
-    },
-    {
-      "repo": "endless-sky/endless-sky",
-      "reason": "401 Unauthorized for https://api.github.com/repos/endless-sky/endless-sky"
-    },
-    {
-      "repo": "OpenRCT2/OpenRCT2",
-      "reason": "401 Unauthorized for https://api.github.com/repos/OpenRCT2/OpenRCT2"
-    },
-    {
-      "repo": "supertux/supertux",
-      "reason": "401 Unauthorized for https://api.github.com/repos/supertux/supertux"
-    },
-    {
-      "repo": "CleverRaven/Cataclysm-DDA",
-      "reason": "401 Unauthorized for https://api.github.com/repos/CleverRaven/Cataclysm-DDA"
-    },
-    {
-      "repo": "telegramdesktop/tdesktop",
-      "reason": "401 Unauthorized for https://api.github.com/repos/telegramdesktop/tdesktop"
-    },
-    {
-      "repo": "mumble-voip/mumble",
-      "reason": "401 Unauthorized for https://api.github.com/repos/mumble-voip/mumble"
-    },
-    {
-      "repo": "Foundry376/Mailspring",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Foundry376/Mailspring"
-    },
-    {
-      "repo": "thunderbird/thunderbird-android",
-      "reason": "401 Unauthorized for https://api.github.com/repos/thunderbird/thunderbird-android"
-    },
-    {
-      "repo": "Floorp-Projects/Floorp",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Floorp-Projects/Floorp"
-    },
-    {
-      "repo": "owncloud/client",
-      "reason": "401 Unauthorized for https://api.github.com/repos/owncloud/client"
-    },
-    {
-      "repo": "ggml-org/llama.cpp",
-      "reason": "401 Unauthorized for https://api.github.com/repos/ggml-org/llama.cpp"
-    },
-    {
-      "repo": "nomic-ai/gpt4all",
-      "reason": "401 Unauthorized for https://api.github.com/repos/nomic-ai/gpt4all"
-    },
-    {
-      "repo": "upscayl/upscayl",
-      "reason": "401 Unauthorized for https://api.github.com/repos/upscayl/upscayl"
-    },
-    {
-      "repo": "chidiwilliams/buzz",
-      "reason": "401 Unauthorized for https://api.github.com/repos/chidiwilliams/buzz"
-    },
-    {
-      "repo": "janhq/jan",
-      "reason": "401 Unauthorized for https://api.github.com/repos/janhq/jan"
-    },
-    {
-      "repo": "Mintplex-Labs/anything-llm",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Mintplex-Labs/anything-llm"
-    },
-    {
-      "repo": "duplicati/duplicati",
-      "reason": "401 Unauthorized for https://api.github.com/repos/duplicati/duplicati/readme"
-    },
-    {
-      "repo": "PrismLauncher/PrismLauncher",
-      "reason": "401 Unauthorized for https://api.github.com/repos/PrismLauncher/PrismLauncher"
-    },
-    {
-      "repo": "shadps4-emu/shadPS4",
-      "reason": "401 Unauthorized for https://api.github.com/repos/shadps4-emu/shadPS4"
-    },
-    {
-      "repo": "moonlight-stream/moonlight-qt",
-      "reason": "401 Unauthorized for https://api.github.com/repos/moonlight-stream/moonlight-qt"
-    },
-    {
-      "repo": "LizardByte/Sunshine",
-      "reason": "401 Unauthorized for https://api.github.com/repos/LizardByte/Sunshine"
-    },
-    {
-      "repo": "streetpea/chiaki-ng",
-      "reason": "401 Unauthorized for https://api.github.com/repos/streetpea/chiaki-ng"
-    },
-    {
-      "repo": "Heroic-Games-Launcher/HeroicGamesLauncher",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Heroic-Games-Launcher/HeroicGamesLauncher"
-    },
-    {
-      "repo": "utmapp/UTM",
-      "reason": "401 Unauthorized for https://api.github.com/repos/utmapp/UTM"
-    },
-    {
-      "repo": "SideStore/SideStore",
-      "reason": "401 Unauthorized for https://api.github.com/repos/SideStore/SideStore"
-    },
-    {
-      "repo": "iina/iina",
-      "reason": "401 Unauthorized for https://api.github.com/repos/iina/iina"
-    },
-    {
-      "repo": "tutao/tutanota",
-      "reason": "401 Unauthorized for https://api.github.com/repos/tutao/tutanota"
-    },
-    {
-      "repo": "exelban/stats",
-      "reason": "401 Unauthorized for https://api.github.com/repos/exelban/stats"
-    },
-    {
-      "repo": "nextcloud/android",
-      "reason": "401 Unauthorized for https://api.github.com/repos/nextcloud/android"
-    },
-    {
-      "repo": "Martchus/syncthingtray",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Martchus/syncthingtray"
-    },
-    {
-      "repo": "ImranR98/Obtainium",
-      "reason": "401 Unauthorized for https://api.github.com/repos/ImranR98/Obtainium"
-    },
-    {
-      "repo": "Orange-OpenSource/hurl",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Orange-OpenSource/hurl"
-    },
-    {
-      "repo": "JunkFood02/Seal",
-      "reason": "401 Unauthorized for https://api.github.com/repos/JunkFood02/Seal"
-    },
-    {
-      "repo": "Kunzisoft/KeePassDX",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Kunzisoft/KeePassDX"
-    },
-    {
-      "repo": "Helium314/HeliBoard",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Helium314/HeliBoard"
-    },
-    {
-      "repo": "termux/termux-app",
-      "reason": "401 Unauthorized for https://api.github.com/repos/termux/termux-app"
-    },
-    {
-      "repo": "tuskyapp/Tusky",
-      "reason": "401 Unauthorized for https://api.github.com/repos/tuskyapp/Tusky"
-    },
-    {
-      "repo": "xournalpp/xournalpp",
-      "reason": "401 Unauthorized for https://api.github.com/repos/xournalpp/xournalpp"
-    },
-    {
-      "repo": "PintaProject/Pinta",
-      "reason": "401 Unauthorized for https://api.github.com/repos/PintaProject/Pinta"
-    },
-    {
-      "repo": "helix-editor/helix",
-      "reason": "401 Unauthorized for https://api.github.com/repos/helix-editor/helix"
-    },
-    {
-      "repo": "lapce/lapce",
-      "reason": "401 Unauthorized for https://api.github.com/repos/lapce/lapce"
-    },
-    {
-      "repo": "rotki/rotki",
-      "reason": "401 Unauthorized for https://api.github.com/repos/rotki/rotki"
-    },
-    {
-      "repo": "Mullvad/mullvadvpn-app",
-      "reason": "401 Unauthorized for https://api.github.com/repos/Mullvad/mullvadvpn-app"
-    }
-  ],
-  "categories": 11,
+  "generated_at": "2026-09-07T23:24:58.982Z",
+  "api_requests": 3,
+  "apps": 110,
+  "skipped": [],
+  "categories": 19,
   "platforms": [
     {
       "slug": "ios",
-      "app_count": 1
+      "app_count": 4
     },
     {
       "slug": "ipados",
@@ -252,21 +15,21 @@
     },
     {
       "slug": "android",
-      "app_count": 12
+      "app_count": 27
     },
     {
       "slug": "windows",
-      "app_count": 45
+      "app_count": 86
     },
     {
       "slug": "macos",
-      "app_count": 44
+      "app_count": 89
     },
     {
       "slug": "linux",
-      "app_count": 42
+      "app_count": 80
     }
   ],
-  "apps_without_checksums": 51,
-  "apps_without_screenshots": 51
+  "apps_without_checksums": 110,
+  "apps_without_screenshots": 110
 }

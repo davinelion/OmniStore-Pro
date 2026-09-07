@@ -332,14 +332,24 @@ export function versionFromTag(tag: string | null | undefined, appName?: string 
   let version = tag.trim();
 
   // `v1.2.3` / `v.1.2.3` — but never eat a leading `v` that is part of a word.
-  version = version.replace(/^[vV](?=[.-]?\d)/, "").replace(/^[vV]\.(?=\d)/, "");
+  // `v.1.2.3` first, then `v1.2.3`: never eat a `v` that starts a word.
+  version = version.replace(/^[vV]\.(?=\d)/, "").replace(/^[vV](?=\d)/, "");
   // `version_2.9.6`, `release-5.2.3`, `stable-34.1.1`
   version = version.replace(/^(?:version|release|stable|final)[-_.]?(?=\d)/i, "");
   // `Audacity-4.0.0`, `jq_1.8.2` — a tag that repeats the project name.
   if (appName) {
-    const prefix = appName.trim().replace(/[\s._]+/g, "[\s._-]?");
+    // Escape regex metacharacters: names like "Xournal++" or "C++" would
+    // otherwise build an invalid pattern and break ingest.
+    const prefix = appName
+      .trim()
+      .replace(/[\s._]+/g, "[\s._-]?")
+      .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     if (prefix) {
-      version = version.replace(new RegExp(`^${prefix}[-_.]?(?=\d)`, "i"), "");
+      try {
+        version = version.replace(new RegExp(`^${prefix}[-_.]?(?=\\d)`, "i"), "");
+      } catch {
+        // An unparseable pattern must never break ingest: keep the raw tag.
+      }
     }
   }
 

@@ -201,10 +201,30 @@ describe("dedupeAssets", () => {
   });
 });
 
+describe("versionFromTag with a project name", () => {
+  it("strips a repeated project name", () => {
+    expect(versionFromTag("Audacity-4.0.0", "Audacity")).toBe("4.0.0");
+    expect(versionFromTag("jq_1.8.2", "jq")).toBe("1.8.2");
+  });
+
+  it("survives names containing regex metacharacters", () => {
+    // "Xournal++" once produced "Nothing to repeat" and broke ingest.
+    expect(() => versionFromTag("Xournal++1.2.1", "Xournal++")).not.toThrow();
+    expect(versionFromTag("Xournal++-1.2.1", "Xournal++")).toBe("1.2.1");
+    expect(() => versionFromTag("v1.0", "C++ (Tools)")).not.toThrow();
+  });
+
+  it("keeps tags it cannot parse", () => {
+    expect(versionFromTag("cdda-experimental-2026-09-07", "Cataclysm")).toBe("cdda-experimental-2026-09-07");
+  });
+});
+
 describe("versionFromTag", () => {
   it("strips the v prefix", () => {
     expect(versionFromTag("v1.18.2")).toBe("1.18.2");
     expect(versionFromTag("1.18.2")).toBe("1.18.2");
+    // Upstream tags such as `v.0.18.0` must not leave a leading dot.
+    expect(versionFromTag("v.0.18.0")).toBe("0.18.0");
   });
 
   it("falls back to the raw tag", () => {

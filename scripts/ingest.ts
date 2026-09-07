@@ -622,8 +622,22 @@ async function main() {
     if (apps.length === 0) process.exit(1);
   }
 
-  apps.sort((a, b) => a.name.localeCompare(b.name));
-  computeRelationships(apps);
+  // `--only` updates sources inside the existing feed; a full run replaces it.
+  // Without this, `--only=owner/repo` would silently write a one-app feed.
+  let previous: App[] = [];
+  if (only) {
+    try {
+      const existing = JSON.parse(await readFile(outArg ? path.resolve(ROOT, outArg) : FEED_FILE, "utf8"));
+      previous = (existing.apps ?? []).filter((app: App) => !apps.some((next: App) => next.id === app.id));
+      console.log(`\nMerging into the existing feed (${previous.length} untouched apps).`);
+    } catch {
+      console.log("\nNo readable existing feed — writing fresh.");
+    }
+  }
+
+  const all = [...previous, ...apps];
+  all.sort((a, b) => a.name.localeCompare(b.name));
+  computeRelationships(all);
 
   const feed = {
     meta: {
@@ -631,11 +645,11 @@ async function main() {
       generated_at: new Date().toISOString(),
       generator: "omnisource-ingest/1.0.0 (github)",
       upstream: "github",
-      app_count: apps.length,
+      app_count: all.length,
     },
-    apps,
-    categories: buildCategories(apps),
-    platforms: buildPlatforms(apps),
+    apps: all,
+    categories: buildCategories(all),
+    platforms: buildPlatforms(all),
     collections: COLLECTIONS,
   };
 
@@ -653,12 +667,12 @@ async function main() {
   // Safety net: a partial ingest (expired credentials, network failure) must
   // never replace a good feed with a smaller one. Override with --force.
   const previousCount = await readAppCount(outFile);
-  const shrank = previousCount !== null && apps.length < previousCount;
+  const shrank = previousCount !== null && all.length < previousCount;
   const failedFetches = skipped.filter((s) => !/no distributable|not found|moved/i.test(s.reason));
   if (shrank && failedFetches.length > 0 && !forceArg) {
     console.error(
       `\nRefusing to overwrite ${path.relative(ROOT, outFile)}: it holds ${previousCount} apps, ` +
-        `this run produced ${apps.length} with ${failedFetches.length} failed fetches.`,
+        `this run produced ${all.length} with ${failedFetches.length} failed fetches.`,
     );
     console.error("Fix the upstream problem, or re-run with --force to accept the smaller feed.");
     process.exit(2);
@@ -669,16 +683,16 @@ async function main() {
   const report = {
     generated_at: feed.meta.generated_at,
     api_requests: requestCount,
-    apps: apps.length,
+    apps: all.length,
     skipped,
     categories: feed.categories.length,
     platforms: feed.platforms.map((p) => ({ slug: p.slug, app_count: p.app_count })),
-    apps_without_checksums: apps.filter((a) => a.releases.every((r) => r.assets.every((s) => !s.sha256))).length,
-    apps_without_screenshots: apps.filter((a) => a.screenshots.length === 0).length,
+    apps_without_checksums: all.filter((a) => a.releases.every((r) => r.assets.every((s) => !s.sha256))).length,
+    apps_without_screenshots: all.filter((a) => a.screenshots.length === 0).length,
   };
   await writeFile(REPORT_FILE, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
-  console.log(`\nWrote ${apps.length} apps to ${path.relative(ROOT, outFile)}`);
+  console.log(`\nWrote ${all.length} apps to ${path.relative(ROOT, outFile)}`);
   console.log(`API requests: ${requestCount} · skipped: ${skipped.length}`);
   if (skipped.length) {
     console.log("\nSkipped sources:");
