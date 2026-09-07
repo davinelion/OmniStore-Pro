@@ -16,11 +16,14 @@ const INSTALL: Record<string, string> = {
 };
 
 export function DownloadPanel({ app }: { app: App }) {
-  const assets = app.latest_release?.assets ?? [];
-  const platforms = Array.from(new Set(assets.map((a) => a.platform)));
+  const assets = app.latest_release?.assets;
+  const platforms = Array.from(new Set((assets ?? []).map((a) => a.platform)));
   const [platform, setPlatform] = useState<Platform | "">(platforms[0] ?? "");
   const filtered = useMemo(
-    () => assets.filter((a) => (!platform || a.platform === platform) && a.status !== "INVALID" && a.status !== "QUARANTINED"),
+    () =>
+      (assets ?? []).filter(
+        (a) => (!platform || a.platform === platform) && a.status !== "INVALID" && a.status !== "QUARANTINED"
+      ),
     [assets, platform]
   );
 
