@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
-import { getAppBySlug, getRelated } from "@/lib/api/catalog";
+import { getProvider } from "@/lib/api";
+import { json } from "@/lib/api/http";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const app = await getAppBySlug(params.id);
-  if (!app) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  const items = await getRelated(app.alternatives ?? []);
-  return NextResponse.json({ items });
+export const dynamic = "force-dynamic";
+
+/** GET /api/v1/apps/{id}/alternatives — relationships computed by OmniSource. */
+export async function GET(_request: Request, { params }: { params: { id: string } }) {
+  const items = await getProvider().getAlternatives(params.id);
+  return json({ items }, { cacheSeconds: 600 });
 }

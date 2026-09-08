@@ -1,5 +1,8 @@
 node_modules
+tsconfig.tsbuildinfo
+*.tsbuildinfo
 .next
+.next-integration
 out
 dist
 coverage

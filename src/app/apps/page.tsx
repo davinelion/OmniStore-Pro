@@ -1,19 +1,60 @@
-import { queryApps } from "@/lib/api/catalog";
-import { AppCard } from "@/components/app/AppCard";
+import type { Metadata } from "next";
 
-export const metadata = { title: "Apps" };
+import { getProvider } from "@/lib/api";
+import { AppBrowser } from "@/components/app/AppBrowser";
+import { parseFilters } from "@/lib/search/query";
+import { formatNumber } from "@/lib/formatters";
 
-export default async function AppsPage() {
-  const { items } = await queryApps({ sort: "name" });
+export const dynamic = "force-dynamic";
+
+type SearchParams = Record<string, string | string[] | undefined>;
+
+export const metadata: Metadata = {
+  title: "Apps",
+  description:
+    "Browse open-source applications across iOS, Android, Windows, macOS and Linux, with platform-aware packages and transparent scores.",
+  alternates: { canonical: "/apps" },
+};
+
+export default async function AppsPage({ searchParams }: { searchParams: SearchParams }) {
+  const provider = getProvider();
+  const filters = parseFilters(searchParams);
+
+  const [result, categories, platforms, licenses] = await Promise.all([
+    provider.getApps(filters),
+    provider.getCategories(),
+    provider.getPlatforms(),
+    provider.getLicenses(),
+  ]);
+
   return (
-    <div>
-      <h1 className="font-display text-3xl font-semibold">Apps</h1>
-      <p className="mt-2 text-[var(--muted)]">{items.length} applications from OmniSource.</p>
-      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {items.map((a) => (
-          <AppCard key={a.id} app={a} />
-        ))}
-      </div>
+    <div className="space-y-8">
+      <header className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Apps</h1>
+        <p className="text-muted">
+          {formatNumber(result.pagination.total)} open-source applications indexed by OmniSource from
+          upstream repositories.
+        </p>
+      </header>
+
+      <AppBrowser
+        result={result}
+        filters={filters}
+        basePath="/apps"
+        facets={{
+          categories: categories.map((category) => ({
+            value: category.slug,
+            label: category.name,
+            count: category.app_count,
+          })),
+          platforms: platforms.map((platform) => ({
+            value: platform.slug,
+            label: platform.name,
+            count: platform.app_count,
+          })),
+          licenses: licenses.map((license) => ({ value: license.id, label: license.name, count: license.count })),
+        }}
+      />
     </div>
   );
 }

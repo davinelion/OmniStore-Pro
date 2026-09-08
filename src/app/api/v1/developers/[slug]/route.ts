@@ -1,8 +1,11 @@
-import { NextResponse } from "next/server";
-import { getDeveloper } from "@/lib/api/catalog";
+import { getProvider } from "@/lib/api";
+import { json, notFound } from "@/lib/api/http";
 
-export async function GET(_: Request, { params }: { params: { slug: string } }) {
-  const data = await getDeveloper(params.slug);
-  if (!data) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  return NextResponse.json(data);
+export const dynamic = "force-dynamic";
+
+/** GET /api/v1/developers/{slug} — developer profile, apps and latest releases. */
+export async function GET(_request: Request, { params }: { params: { slug: string } }) {
+  const result = await getProvider().getDeveloper(params.slug);
+  if (!result) return notFound("Developer not found");
+  return json(result, { cacheSeconds: 600 });
 }

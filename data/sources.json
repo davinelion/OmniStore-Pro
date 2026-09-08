@@ -1,0 +1,1394 @@
+{
+  "$comment": "Curated OmniSource seed registry. Each entry points at a REAL upstream repository; OmniStore ingests live metadata from it. Categories are OmniStore's vocabulary; tags are merged with the upstream repository topics. No app metadata (versions, sizes, dates, scores) is authored here.",
+  "sources": [
+    {
+      "repo": "localsend/localsend",
+      "categories": [
+        "utilities",
+        "networking"
+      ],
+      "tags": [
+        "file-transfer",
+        "lan",
+        "privacy"
+      ],
+      "name": "LocalSend"
+    },
+    {
+      "repo": "syncthing/syncthing",
+      "categories": [
+        "utilities",
+        "networking",
+        "system-tools"
+      ],
+      "tags": [
+        "sync",
+        "backup",
+        "p2p"
+      ],
+      "name": "Syncthing"
+    },
+    {
+      "repo": "keepassxreboot/keepassxc",
+      "categories": [
+        "security",
+        "utilities"
+      ],
+      "tags": [
+        "password",
+        "vault",
+        "encryption"
+      ],
+      "name": "KeePassXC"
+    },
+    {
+      "repo": "cryptomator/cryptomator",
+      "categories": [
+        "security",
+        "utilities"
+      ],
+      "tags": [
+        "encryption",
+        "cloud",
+        "privacy"
+      ],
+      "name": "Cryptomator"
+    },
+    {
+      "repo": "beemdevelopment/Aegis",
+      "categories": [
+        "security"
+      ],
+      "tags": [
+        "2fa",
+        "password",
+        "authenticator"
+      ],
+      "name": "Aegis Authenticator"
+    },
+    {
+      "repo": "VSCodium/vscodium",
+      "categories": [
+        "developer-tools"
+      ],
+      "tags": [
+        "editor",
+        "ide",
+        "code"
+      ],
+      "name": "VSCodium"
+    },
+    {
+      "repo": "neovim/neovim",
+      "categories": [
+        "developer-tools"
+      ],
+      "tags": [
+        "editor",
+        "vim",
+        "terminal"
+      ],
+      "name": "Neovim"
+    },
+    {
+      "repo": "wez/wezterm",
+      "categories": [
+        "developer-tools",
+        "system-tools"
+      ],
+      "tags": [
+        "terminal",
+        "emulator",
+        "gpu"
+      ],
+      "name": "WezTerm"
+    },
+    {
+      "repo": "alacritty/alacritty",
+      "categories": [
+        "developer-tools",
+        "system-tools"
+      ],
+      "tags": [
+        "terminal",
+        "emulator"
+      ],
+      "name": "Alacritty"
+    },
+    {
+      "repo": "sharkdp/bat",
+      "categories": [
+        "developer-tools",
+        "utilities"
+      ],
+      "tags": [
+        "cli",
+        "cat",
+        "syntax"
+      ],
+      "name": "bat"
+    },
+    {
+      "repo": "sharkdp/fd",
+      "categories": [
+        "developer-tools",
+        "utilities"
+      ],
+      "tags": [
+        "cli",
+        "find",
+        "search"
+      ],
+      "name": "fd"
+    },
+    {
+      "repo": "BurntSushi/ripgrep",
+      "categories": [
+        "developer-tools",
+        "utilities"
+      ],
+      "tags": [
+        "cli",
+        "search",
+        "grep"
+      ],
+      "name": "ripgrep"
+    },
+    {
+      "repo": "junegunn/fzf",
+      "categories": [
+        "developer-tools",
+        "utilities"
+      ],
+      "tags": [
+        "cli",
+        "fuzzy",
+        "search"
+      ],
+      "name": "fzf"
+    },
+    {
+      "repo": "eza-community/eza",
+      "categories": [
+        "developer-tools",
+        "system-tools"
+      ],
+      "tags": [
+        "cli",
+        "ls",
+        "files"
+      ],
+      "name": "eza"
+    },
+    {
+      "repo": "jqlang/jq",
+      "categories": [
+        "developer-tools"
+      ],
+      "tags": [
+        "cli",
+        "json",
+        "parser"
+      ],
+      "name": "jq"
+    },
+    {
+      "repo": "sqlitebrowser/sqlitebrowser",
+      "categories": [
+        "developer-tools"
+      ],
+      "tags": [
+        "database",
+        "sql",
+        "gui"
+      ],
+      "name": "DB Browser for SQLite"
+    },
+    {
+      "repo": "usebruno/bruno",
+      "categories": [
+        "developer-tools",
+        "internet"
+      ],
+      "tags": [
+        "api",
+        "http",
+        "client"
+      ],
+      "name": "Bruno"
+    },
+    {
+      "repo": "Kong/insomnia",
+      "categories": [
+        "developer-tools",
+        "internet"
+      ],
+      "tags": [
+        "api",
+        "rest",
+        "client"
+      ],
+      "name": "Insomnia"
+    },
+    {
+      "repo": "gohugoio/hugo",
+      "categories": [
+        "developer-tools",
+        "internet"
+      ],
+      "tags": [
+        "static-site",
+        "generator",
+        "web"
+      ],
+      "name": "Hugo"
+    },
+    {
+      "repo": "starship/starship",
+      "categories": [
+        "developer-tools",
+        "system-tools"
+      ],
+      "tags": [
+        "shell",
+        "prompt",
+        "cli"
+      ],
+      "name": "Starship"
+    },
+    {
+      "repo": "ClementTsang/bottom",
+      "categories": [
+        "system-tools",
+        "developer-tools"
+      ],
+      "tags": [
+        "monitor",
+        "cli",
+        "process"
+      ],
+      "name": "bottom"
+    },
+    {
+      "repo": "laurent22/joplin",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "notes",
+        "markdown",
+        "sync"
+      ],
+      "name": "Joplin"
+    },
+    {
+      "repo": "siyuan-note/siyuan",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "notes",
+        "knowledge",
+        "markdown"
+      ],
+      "name": "SiYuan"
+    },
+    {
+      "repo": "zadam/trilium",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "notes",
+        "knowledge",
+        "hierarchy"
+      ],
+      "name": "Trilium Notes"
+    },
+    {
+      "repo": "logseq/logseq",
+      "categories": [
+        "productivity",
+        "education"
+      ],
+      "tags": [
+        "notes",
+        "outliner",
+        "markdown"
+      ],
+      "name": "Logseq"
+    },
+    {
+      "repo": "AppFlowy-IO/AppFlowy",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "notes",
+        "collaboration",
+        "workspace"
+      ],
+      "name": "AppFlowy"
+    },
+    {
+      "repo": "johannesjo/super-productivity",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "tasks",
+        "time-tracking",
+        "todo"
+      ],
+      "name": "Super Productivity"
+    },
+    {
+      "repo": "jgraph/drawio-desktop",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "diagram",
+        "chart",
+        "drawing"
+      ],
+      "name": "draw.io Desktop"
+    },
+    {
+      "repo": "Zettlr/Zettlr",
+      "categories": [
+        "productivity",
+        "education"
+      ],
+      "tags": [
+        "writing",
+        "markdown",
+        "academic"
+      ],
+      "name": "Zettlr"
+    },
+    {
+      "repo": "pbek/QOwnNotes",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "notes",
+        "markdown",
+        "owncloud"
+      ],
+      "name": "QOwnNotes"
+    },
+    {
+      "repo": "marktext/marktext",
+      "categories": [
+        "productivity"
+      ],
+      "tags": [
+        "editor",
+        "markdown",
+        "writing"
+      ],
+      "name": "MarkText"
+    },
+    {
+      "repo": "ankitects/anki",
+      "categories": [
+        "education"
+      ],
+      "tags": [
+        "flashcards",
+        "spaced-repetition",
+        "learning"
+      ],
+      "name": "Anki"
+    },
+    {
+      "repo": "JabRef/jabref",
+      "categories": [
+        "education",
+        "books"
+      ],
+      "tags": [
+        "reference",
+        "bibtex",
+        "citation"
+      ],
+      "name": "JabRef"
+    },
+    {
+      "repo": "kovidgoyal/calibre",
+      "categories": [
+        "books",
+        "productivity"
+      ],
+      "tags": [
+        "ebooks",
+        "library",
+        "reader"
+      ],
+      "name": "calibre"
+    },
+    {
+      "repo": "koreader/koreader",
+      "categories": [
+        "books"
+      ],
+      "tags": [
+        "reader",
+        "ebooks",
+        "eink"
+      ],
+      "name": "KOReader"
+    },
+    {
+      "repo": "edrlab/thorium-reader",
+      "categories": [
+        "books"
+      ],
+      "tags": [
+        "reader",
+        "epub",
+        "accessibility"
+      ],
+      "name": "Thorium Reader"
+    },
+    {
+      "repo": "obsproject/obs-studio",
+      "categories": [
+        "video"
+      ],
+      "tags": [
+        "streaming",
+        "recording",
+        "capture"
+      ],
+      "name": "OBS Studio"
+    },
+    {
+      "repo": "mltframework/shotcut",
+      "categories": [
+        "video"
+      ],
+      "tags": [
+        "editing",
+        "video-editor",
+        "ffmpeg"
+      ],
+      "name": "Shotcut"
+    },
+    {
+      "repo": "HandBrake/HandBrake",
+      "categories": [
+        "video"
+      ],
+      "tags": [
+        "transcode",
+        "convert",
+        "video"
+      ],
+      "name": "HandBrake"
+    },
+    {
+      "repo": "mifi/lossless-cut",
+      "categories": [
+        "video",
+        "utilities"
+      ],
+      "tags": [
+        "editing",
+        "ffmpeg",
+        "trim"
+      ],
+      "name": "LosslessCut"
+    },
+    {
+      "repo": "FreeTubeApp/FreeTube",
+      "categories": [
+        "video",
+        "internet"
+      ],
+      "tags": [
+        "youtube",
+        "privacy",
+        "client"
+      ],
+      "include_prerelease": true,
+      "name": "FreeTube"
+    },
+    {
+      "repo": "TeamNewPipe/NewPipe",
+      "categories": [
+        "video",
+        "internet"
+      ],
+      "tags": [
+        "youtube",
+        "android",
+        "privacy"
+      ],
+      "name": "NewPipe"
+    },
+    {
+      "repo": "libre-tube/LibreTube",
+      "categories": [
+        "video",
+        "internet"
+      ],
+      "tags": [
+        "youtube",
+        "piped",
+        "privacy"
+      ],
+      "name": "LibreTube"
+    },
+    {
+      "repo": "yt-dlp/yt-dlp",
+      "categories": [
+        "internet",
+        "video",
+        "utilities"
+      ],
+      "tags": [
+        "download",
+        "youtube",
+        "cli"
+      ],
+      "name": "yt-dlp"
+    },
+    {
+      "repo": "qbittorrent/qBittorrent",
+      "categories": [
+        "internet",
+        "networking"
+      ],
+      "tags": [
+        "torrent",
+        "p2p",
+        "download"
+      ],
+      "name": "qBittorrent"
+    },
+    {
+      "repo": "transmission/transmission",
+      "categories": [
+        "internet",
+        "networking"
+      ],
+      "tags": [
+        "torrent",
+        "p2p",
+        "client"
+      ],
+      "name": "Transmission"
+    },
+    {
+      "repo": "audacity/audacity",
+      "categories": [
+        "audio"
+      ],
+      "tags": [
+        "editor",
+        "recording",
+        "daw"
+      ],
+      "name": "Audacity"
+    },
+    {
+      "repo": "navidrome/navidrome",
+      "categories": [
+        "audio",
+        "internet"
+      ],
+      "tags": [
+        "music",
+        "server",
+        "streaming"
+      ],
+      "name": "Navidrome"
+    },
+    {
+      "repo": "KRTirtho/spotube",
+      "categories": [
+        "audio"
+      ],
+      "tags": [
+        "music",
+        "spotify",
+        "client"
+      ],
+      "name": "Spotube"
+    },
+    {
+      "repo": "rclone/rclone",
+      "categories": [
+        "utilities",
+        "networking",
+        "system-tools"
+      ],
+      "tags": [
+        "cloud",
+        "sync",
+        "cli"
+      ],
+      "name": "rclone"
+    },
+    {
+      "repo": "restic/restic",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "backup",
+        "encryption",
+        "cli"
+      ],
+      "name": "restic"
+    },
+    {
+      "repo": "borgbackup/borg",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "backup",
+        "deduplication",
+        "cli"
+      ],
+      "name": "Borg"
+    },
+    {
+      "repo": "kopia/kopia",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "backup",
+        "snapshot",
+        "encryption"
+      ],
+      "name": "Kopia"
+    },
+    {
+      "repo": "duplicati/duplicati",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "backup",
+        "cloud",
+        "encryption"
+      ],
+      "name": "Duplicati"
+    },
+    {
+      "repo": "RustDesk/rustdesk",
+      "categories": [
+        "utilities",
+        "networking"
+      ],
+      "tags": [
+        "remote-desktop",
+        "rdp",
+        "self-hosted"
+      ],
+      "name": "RustDesk"
+    },
+    {
+      "repo": "filebrowser/filebrowser",
+      "categories": [
+        "utilities",
+        "internet"
+      ],
+      "tags": [
+        "file-manager",
+        "web",
+        "self-hosted"
+      ],
+      "name": "File Browser"
+    },
+    {
+      "repo": "balena-io/etcher",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "usb",
+        "imaging",
+        "burn"
+      ],
+      "name": "balenaEtcher"
+    },
+    {
+      "repo": "pbatard/rufus",
+      "categories": [
+        "system-tools",
+        "utilities"
+      ],
+      "tags": [
+        "usb",
+        "bootable",
+        "windows"
+      ],
+      "name": "Rufus"
+    },
+    {
+      "repo": "flameshot-org/flameshot",
+      "categories": [
+        "photography",
+        "utilities"
+      ],
+      "tags": [
+        "screenshot",
+        "capture",
+        "annotation"
+      ],
+      "name": "Flameshot"
+    },
+    {
+      "repo": "FreeCAD/FreeCAD",
+      "categories": [
+        "science"
+      ],
+      "tags": [
+        "cad",
+        "3d",
+        "engineering"
+      ],
+      "name": "FreeCAD"
+    },
+    {
+      "repo": "openscad/openscad",
+      "categories": [
+        "science"
+      ],
+      "tags": [
+        "cad",
+        "3d",
+        "scripting"
+      ],
+      "name": "OpenSCAD"
+    },
+    {
+      "repo": "prusa3d/PrusaSlicer",
+      "categories": [
+        "science",
+        "utilities"
+      ],
+      "tags": [
+        "3d-printing",
+        "slicer",
+        "gcode"
+      ],
+      "name": "PrusaSlicer"
+    },
+    {
+      "repo": "SoftFever/OrcaSlicer",
+      "categories": [
+        "science",
+        "utilities"
+      ],
+      "tags": [
+        "3d-printing",
+        "slicer",
+        "gcode"
+      ],
+      "name": "OrcaSlicer"
+    },
+    {
+      "repo": "Ultimaker/Cura",
+      "categories": [
+        "science",
+        "utilities"
+      ],
+      "tags": [
+        "3d-printing",
+        "slicer",
+        "gcode"
+      ],
+      "name": "Ultimaker Cura"
+    },
+    {
+      "repo": "godotengine/godot",
+      "categories": [
+        "gaming",
+        "developer-tools"
+      ],
+      "tags": [
+        "game-engine",
+        "3d",
+        "2d"
+      ],
+      "name": "Godot"
+    },
+    {
+      "repo": "pcsx2/pcsx2",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "emulator",
+        "playstation",
+        "retro"
+      ],
+      "name": "PCSX2"
+    },
+    {
+      "repo": "hrydgard/ppsspp",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "emulator",
+        "psp",
+        "retro"
+      ],
+      "name": "PPSSPP"
+    },
+    {
+      "repo": "luanti-org/luanti",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "voxel",
+        "sandbox",
+        "minetest"
+      ],
+      "name": "Luanti"
+    },
+    {
+      "repo": "endless-sky/endless-sky",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "space",
+        "rpg",
+        "open-world"
+      ],
+      "name": "Endless Sky"
+    },
+    {
+      "repo": "OpenRCT2/OpenRCT2",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "simulation",
+        "roller-coaster",
+        "remake"
+      ],
+      "name": "OpenRCT2"
+    },
+    {
+      "repo": "supertux/supertux",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "platformer",
+        "arcade",
+        "2d"
+      ],
+      "name": "SuperTux"
+    },
+    {
+      "repo": "CleverRaven/Cataclysm-DDA",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "roguelike",
+        "survival",
+        "rpg"
+      ],
+      "include_prerelease": true,
+      "name": "Cataclysm: Dark Days Ahead"
+    },
+    {
+      "repo": "telegramdesktop/tdesktop",
+      "categories": [
+        "communication",
+        "social"
+      ],
+      "tags": [
+        "messaging",
+        "chat",
+        "telegram"
+      ],
+      "name": "Telegram Desktop"
+    },
+    {
+      "repo": "mumble-voip/mumble",
+      "categories": [
+        "communication"
+      ],
+      "tags": [
+        "voip",
+        "voice",
+        "chat"
+      ],
+      "name": "Mumble"
+    },
+    {
+      "repo": "Foundry376/Mailspring",
+      "categories": [
+        "communication",
+        "productivity"
+      ],
+      "tags": [
+        "email",
+        "mail",
+        "client"
+      ]
+    },
+    {
+      "repo": "thunderbird/thunderbird-android",
+      "categories": [
+        "communication"
+      ],
+      "tags": [
+        "email",
+        "k9",
+        "android"
+      ],
+      "name": "Thunderbird for Android"
+    },
+    {
+      "repo": "Floorp-Projects/Floorp",
+      "categories": [
+        "browsers",
+        "internet"
+      ],
+      "tags": [
+        "browser",
+        "firefox",
+        "privacy"
+      ],
+      "name": "Floorp"
+    },
+    {
+      "repo": "owncloud/client",
+      "categories": [
+        "productivity",
+        "utilities"
+      ],
+      "tags": [
+        "sync",
+        "cloud",
+        "desktop"
+      ],
+      "name": "ownCloud Desktop"
+    },
+    {
+      "repo": "ggml-org/llama.cpp",
+      "categories": [
+        "ai",
+        "developer-tools"
+      ],
+      "tags": [
+        "llm",
+        "inference",
+        "local"
+      ],
+      "include_prerelease": true,
+      "name": "llama.cpp"
+    },
+    {
+      "repo": "nomic-ai/gpt4all",
+      "categories": [
+        "ai"
+      ],
+      "tags": [
+        "llm",
+        "chat",
+        "local"
+      ],
+      "name": "GPT4All"
+    },
+    {
+      "repo": "upscayl/upscayl",
+      "categories": [
+        "ai",
+        "photography"
+      ],
+      "tags": [
+        "upscaling",
+        "image",
+        "esrgan"
+      ],
+      "name": "Upscayl"
+    },
+    {
+      "repo": "chidiwilliams/buzz",
+      "categories": [
+        "ai",
+        "audio"
+      ],
+      "tags": [
+        "transcription",
+        "whisper",
+        "speech"
+      ],
+      "name": "Buzz"
+    },
+    {
+      "repo": "janhq/jan",
+      "categories": [
+        "ai"
+      ],
+      "tags": [
+        "llm",
+        "chat",
+        "local"
+      ],
+      "name": "Jan"
+    },
+    {
+      "repo": "Mintplex-Labs/anything-llm",
+      "categories": [
+        "ai",
+        "productivity"
+      ],
+      "tags": [
+        "rag",
+        "llm",
+        "documents"
+      ],
+      "name": "AnythingLLM"
+    },
+    {
+      "repo": "PrismLauncher/PrismLauncher",
+      "categories": [
+        "gaming",
+        "utilities"
+      ],
+      "tags": [
+        "minecraft",
+        "launcher",
+        "mods"
+      ],
+      "name": "PrismLauncher"
+    },
+    {
+      "repo": "Heroic-Games-Launcher/HeroicGamesLauncher",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "epic",
+        "gog",
+        "launcher"
+      ],
+      "name": "Heroic Games Launcher"
+    },
+    {
+      "repo": "shadps4-emu/shadPS4",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "emulator",
+        "playstation",
+        "ps4"
+      ],
+      "name": "shadPS4"
+    },
+    {
+      "repo": "moonlight-stream/moonlight-qt",
+      "categories": [
+        "gaming",
+        "utilities"
+      ],
+      "tags": [
+        "streaming",
+        "gamestream",
+        "remote"
+      ],
+      "name": "Moonlight"
+    },
+    {
+      "repo": "LizardByte/Sunshine",
+      "categories": [
+        "gaming",
+        "utilities"
+      ],
+      "tags": [
+        "streaming",
+        "host",
+        "gamestream"
+      ],
+      "name": "Sunshine"
+    },
+    {
+      "repo": "streetpea/chiaki-ng",
+      "categories": [
+        "gaming"
+      ],
+      "tags": [
+        "playstation",
+        "remote-play",
+        "streaming"
+      ],
+      "name": "Chiaki-ng"
+    },
+    {
+      "repo": "utmapp/UTM",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "virtualization",
+        "qemu",
+        "ios"
+      ],
+      "name": "UTM"
+    },
+    {
+      "repo": "SideStore/SideStore",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "sideload",
+        "ios",
+        "ipa"
+      ],
+      "name": "SideStore"
+    },
+    {
+      "repo": "iina/iina",
+      "categories": [
+        "video"
+      ],
+      "tags": [
+        "player",
+        "macos",
+        "mpv"
+      ],
+      "name": "IINA"
+    },
+    {
+      "repo": "exelban/stats",
+      "categories": [
+        "system-tools",
+        "utilities"
+      ],
+      "tags": [
+        "monitor",
+        "menubar",
+        "macos"
+      ],
+      "name": "Stats"
+    },
+    {
+      "repo": "tutao/tutanota",
+      "categories": [
+        "communication",
+        "security"
+      ],
+      "tags": [
+        "email",
+        "encryption",
+        "privacy"
+      ],
+      "name": "Tutanota"
+    },
+    {
+      "repo": "nextcloud/android",
+      "categories": [
+        "productivity",
+        "utilities"
+      ],
+      "tags": [
+        "cloud",
+        "sync",
+        "android"
+      ],
+      "name": "Nextcloud"
+    },
+    {
+      "repo": "Martchus/syncthingtray",
+      "categories": [
+        "utilities",
+        "system-tools"
+      ],
+      "tags": [
+        "sync",
+        "tray",
+        "gui"
+      ],
+      "name": "Syncthing Tray"
+    },
+    {
+      "repo": "Orange-OpenSource/hurl",
+      "categories": [
+        "developer-tools",
+        "internet"
+      ],
+      "tags": [
+        "http",
+        "testing",
+        "cli"
+      ],
+      "name": "Hurl"
+    },
+    {
+      "repo": "ImranR98/Obtainium",
+      "categories": [
+        "internet",
+        "utilities"
+      ],
+      "tags": [
+        "android",
+        "updater",
+        "installer"
+      ],
+      "name": "Obtainium"
+    },
+    {
+      "repo": "JunkFood02/Seal",
+      "categories": [
+        "video",
+        "internet"
+      ],
+      "tags": [
+        "youtube",
+        "download",
+        "android"
+      ],
+      "name": "Seal"
+    },
+    {
+      "repo": "Kunzisoft/KeePassDX",
+      "categories": [
+        "security"
+      ],
+      "tags": [
+        "password",
+        "vault",
+        "android"
+      ],
+      "name": "KeePassDX"
+    },
+    {
+      "repo": "Helium314/HeliBoard",
+      "categories": [
+        "utilities"
+      ],
+      "tags": [
+        "keyboard",
+        "android",
+        "privacy"
+      ],
+      "name": "HeliBoard"
+    },
+    {
+      "repo": "tuskyapp/Tusky",
+      "categories": [
+        "social"
+      ],
+      "tags": [
+        "mastodon",
+        "fediverse",
+        "android"
+      ],
+      "name": "Tusky"
+    },
+    {
+      "repo": "termux/termux-app",
+      "categories": [
+        "developer-tools",
+        "system-tools"
+      ],
+      "tags": [
+        "terminal",
+        "android",
+        "linux"
+      ],
+      "name": "Termux"
+    },
+    {
+      "repo": "xournalpp/xournalpp",
+      "categories": [
+        "productivity",
+        "education"
+      ],
+      "tags": [
+        "notes",
+        "handwriting",
+        "pdf"
+      ],
+      "name": "Xournal++"
+    },
+    {
+      "repo": "PintaProject/Pinta",
+      "categories": [
+        "photography"
+      ],
+      "tags": [
+        "paint",
+        "editor",
+        "drawing"
+      ],
+      "name": "Pinta"
+    },
+    {
+      "repo": "helix-editor/helix",
+      "categories": [
+        "developer-tools"
+      ],
+      "tags": [
+        "editor",
+        "vim",
+        "terminal"
+      ],
+      "name": "Helix"
+    },
+    {
+      "repo": "lapce/lapce",
+      "categories": [
+        "developer-tools"
+      ],
+      "tags": [
+        "editor",
+        "ide",
+        "rust"
+      ],
+      "name": "Lapce"
+    },
+    {
+      "repo": "rotki/rotki",
+      "categories": [
+        "finance"
+      ],
+      "tags": [
+        "accounting",
+        "crypto",
+        "portfolio"
+      ],
+      "name": "rotki"
+    },
+    {
+      "repo": "Mullvad/mullvadvpn-app",
+      "categories": [
+        "networking",
+        "security"
+      ],
+      "tags": [
+        "vpn",
+        "privacy",
+        "wireguard"
+      ],
+      "name": "Mullvad VPN"
+    }
+  ]
+}

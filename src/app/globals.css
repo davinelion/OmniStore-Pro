@@ -2,36 +2,274 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                       */
+/* ------------------------------------------------------------------ */
+
 :root {
-  --bg: #f6f7f8;
-  --fg: #0f141b;
-  --muted: #5b6573;
-  --card: #ffffff;
-  --line: #d5dbe1;
+  color-scheme: light;
+
+  --bg: 250 250 249;
+  --surface: 255 255 255;
+  --surface-2: 244 245 247;
+  --surface-3: 236 238 242;
+  --line: 226 229 234;
+  --line-strong: 205 210 218;
+
+  --fg: 17 22 30;
+  --fg-muted: 95 105 120;
+  --fg-subtle: 130 140 155;
+
+  --accent: 12 138 116;
+  --accent-hover: 10 118 100;
+  --accent-soft: 224 246 241;
+  --accent-fg: 255 255 255;
+
+  --info: 37 99 235;
+  --success: 21 128 61;
+  --warning: 180 83 9;
+  --danger: 190 40 45;
+
+  --ring: 12 138 116;
+  --shadow-color: 15 23 42;
+
+  --header-height: 4rem;
 }
 
 .dark {
-  --bg: #0a0d12;
-  --fg: #eef2f6;
-  --muted: #9aa3b0;
-  --card: #121821;
-  --line: #243041;
+  color-scheme: dark;
+
+  --bg: 9 11 16;
+  --surface: 17 21 29;
+  --surface-2: 23 28 38;
+  --surface-3: 31 37 49;
+  --line: 38 45 58;
+  --line-strong: 55 64 80;
+
+  --fg: 238 242 248;
+  --fg-muted: 156 168 185;
+  --fg-subtle: 122 134 152;
+
+  --accent: 45 212 191;
+  --accent-hover: 94 234 212;
+  --accent-soft: 19 58 54;
+  --accent-fg: 4 16 15;
+
+  --info: 96 165 250;
+  --success: 74 222 128;
+  --warning: 251 191 36;
+  --danger: 248 113 113;
+
+  --ring: 45 212 191;
 }
 
-html,
-body {
-  background: var(--bg);
-  color: var(--fg);
-}
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
 
-*:focus-visible {
-  outline: 2px solid #0f7a62;
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
+@layer base {
   * {
-    animation: none !important;
-    transition: none !important;
+    border-color: rgb(var(--line));
   }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--fg));
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Consistent, always-visible focus indicator (WCAG 2.4.7 / 2.4.11). */
+  :focus-visible {
+    outline: 2px solid rgb(var(--ring));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background-color: rgb(var(--accent) / 0.25);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Respect the user's motion preference everywhere, including CSS animation. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Components                                                          */
+/* ------------------------------------------------------------------ */
+
+@layer components {
+  .skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: -3rem;
+    z-index: 100;
+    border-radius: 999px;
+    background-color: rgb(var(--accent));
+    color: rgb(var(--accent-fg));
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    transition: top 150ms ease;
+  }
+
+  .skip-link:focus {
+    top: 0.5rem;
+  }
+
+  .surface {
+    background-color: rgb(var(--surface));
+    border-color: rgb(var(--line));
+  }
+
+  .card {
+    background-color: rgb(var(--surface));
+    border: 1px solid rgb(var(--line));
+    border-radius: 1rem;
+  }
+
+  .card-interactive {
+    transition:
+      border-color 150ms ease,
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .card-interactive:hover {
+    border-color: rgb(var(--accent) / 0.45);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 999px;
+    border: 1px solid rgb(var(--line));
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+    color: rgb(var(--fg-muted));
+    white-space: nowrap;
+  }
+
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: rgb(var(--surface-2));
+    border-radius: 0.75rem;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent 0,
+      rgb(var(--surface-3) / 0.8) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.6s infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+      animation: none;
+    }
+  }
+
+  /* Safe rendering of upstream release notes: never raw HTML. */
+  .release-notes {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgb(var(--fg-muted));
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .grid-fade {
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  }
+}
+
+@layer utilities {
+  .text-muted {
+    color: rgb(var(--fg-muted));
+  }
+
+  .text-subtle {
+    color: rgb(var(--fg-subtle));
+  }
+
+  .bg-accent {
+    background-color: rgb(var(--accent));
+  }
+
+  .text-accent {
+    color: rgb(var(--accent));
+  }
+
+  .border-accent {
+    border-color: rgb(var(--accent));
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 220ms ease-out both;
 }

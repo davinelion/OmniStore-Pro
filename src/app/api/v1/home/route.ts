@@ -1,6 +1,10 @@
-import { NextResponse } from "next/server";
-import { getHome } from "@/lib/api/catalog";
+import { getProvider } from "@/lib/api";
+import { json } from "@/lib/api/http";
 
+export const dynamic = "force-dynamic";
+
+/** GET /api/v1/home — homepage payload in a single round trip. */
 export async function GET() {
-  return NextResponse.json(await getHome());
+  const result = await getProvider().getHome();
+  return json(result, { cacheSeconds: 300 });
 }
