@@ -43,14 +43,16 @@ export function CompareView({
 
   // A shared link wins once: adopt ids resolved by the server.
   useEffect(() => {
-    if (seeded || initialIds.length === 0) return;
-    comparison.clear();
-    initialIds.slice(0, MAX_COMPARE).forEach((id) => comparison.add(id));
+    if (seeded) return;
+    if (initialIds.length > 0) {
+      comparison.clear();
+      initialIds.slice(0, MAX_COMPARE).forEach((id) => comparison.add(id));
+    }
     setSeeded(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIds.join(","), seeded]);
 
-  const ids = seeded && comparison.ids.length > 0 ? comparison.ids : initialIds.slice(0, MAX_COMPARE);
+  const ids = seeded ? comparison.ids : initialIds.slice(0, MAX_COMPARE);
 
   // Keep the URL in step with the selection.
   useEffect(() => {

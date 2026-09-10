@@ -49,7 +49,7 @@ export function Footer() {
   return (
     <footer className="mt-20 border-t border-line bg-surface/40">
       <div className="mx-auto max-w-content px-4 py-12">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
             <p className="font-semibold">OmniStore</p>
             <p className="mt-2 max-w-sm text-sm text-muted">{t("footer.disclaimer")}</p>

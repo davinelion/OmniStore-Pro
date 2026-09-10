@@ -11,7 +11,7 @@ test.describe("home", () => {
   test("loads and exposes search, browse and taxonomy navigation", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: /omni/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Discover Open-Source Apps", level: 1 }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: /^apps$/i }).first()).toBeVisible();
 
     const search = page.getByRole("searchbox").or(page.getByPlaceholder(/search/i)).first();
@@ -105,9 +105,9 @@ test.describe("app pages", () => {
 test.describe("comparison", () => {
   test("lets you add apps and compare them side by side", async ({ page }) => {
     await page.goto("/apps/localsend");
-    await page.getByRole("button", { name: /compare/i }).first().click();
+    await page.getByRole("button", { name: /add .* to comparison/i }).first().click();
     await page.goto("/apps/syncthing");
-    await page.getByRole("button", { name: /compare/i }).first().click();
+    await page.getByRole("button", { name: /add .* to comparison/i }).first().click();
 
     await page.goto("/compare");
     await expect(page.getByRole("table")).toBeVisible();
@@ -148,7 +148,10 @@ test.describe("theme and responsive layout", () => {
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
-    expect(overflow).toBeLessThanOrEqual(2);
+    const overflowing = await page.locator("body *").evaluateAll(elements => elements
+      .filter(el => el.getBoundingClientRect().right > document.documentElement.clientWidth + 2)
+      .slice(0, 12).map(el => ({ tag: el.tagName, class: el.className, right: el.getBoundingClientRect().right })));
+    expect(overflow, JSON.stringify(overflowing)).toBeLessThanOrEqual(2);
   });
 
   test("works on a desktop viewport", async ({ page }) => {
@@ -191,6 +194,11 @@ test.describe("error and offline states", () => {
 
   test("the offline page renders when the network is unavailable", async ({ page, context }) => {
     await page.goto("/");
+    // A load event does not mean the service worker has installed and claimed
+    // this page. Wait for the actual offline capability before cutting network.
+    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+    await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+    await expect.poll(() => page.evaluate(async () => !!(await caches.match("/offline")))).toBe(true);
     await context.setOffline(true);
     await page.goto("/offline");
     await expect(page.getByText(/offline/i).first()).toBeVisible();

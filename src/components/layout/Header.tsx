@@ -92,7 +92,7 @@ export function Header() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("hero.searchPlaceholder")}
               aria-label={t("hero.searchLabel")}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-fg-subtle"
+              className="min-w-0 w-full bg-transparent text-sm outline-none placeholder:text-fg-subtle"
             />
           </div>
         </form>

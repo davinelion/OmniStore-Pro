@@ -38,7 +38,7 @@ export default async function HomePage() {
     <div className="space-y-16">
       <nav
         aria-label="Discovery workspace"
-        className="grid gap-3 sm:grid-cols-3"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-3"
       >
         {[
           {
@@ -75,7 +75,7 @@ export default async function HomePage() {
           aria-hidden
           className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl"
         />
-        <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="relative grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1 text-2xs uppercase tracking-[0.18em] text-fg-muted">
               <Layers className="h-3 w-3 text-accent" aria-hidden />
@@ -109,7 +109,7 @@ export default async function HomePage() {
             </dl>
           </div>
 
-          <form action="/search" role="search" className="card p-6">
+          <form action="/search" role="search" className="card min-w-0 p-6">
             <label htmlFor="home-query" className="text-sm font-medium">
               Search across every platform
             </label>
@@ -120,7 +120,7 @@ export default async function HomePage() {
                 name="q"
                 autoComplete="off"
                 placeholder="music, password, maps…"
-                className="w-full bg-transparent outline-none placeholder:text-fg-subtle"
+                className="min-w-0 w-full bg-transparent outline-none placeholder:text-fg-subtle"
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -164,12 +164,12 @@ export default async function HomePage() {
             </Link>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {home.featured.slice(0, 4).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {home.featured.slice(4, 8).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
@@ -179,7 +179,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Popular + Recently updated                                        */}
       {/* ---------------------------------------------------------------- */}
-      <section className="grid gap-10 lg:grid-cols-2">
+      <section className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="space-y-5">
           <SectionHeading
             title="Popular Now"
@@ -238,7 +238,7 @@ export default async function HomePage() {
               </Link>
             }
           />
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {home.updated.slice(0, 4).map((app) => (
               <AppCard key={app.id} app={app} />
             ))}
@@ -322,7 +322,7 @@ export default async function HomePage() {
             </Link>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {home.newest.slice(0, 6).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
@@ -334,7 +334,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section aria-labelledby="platforms-heading" className="space-y-5">
         <SectionHeading id="platforms-heading" title="Explore by Platform" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {platforms.map((platform) => (
             <Link
               key={platform.slug}
@@ -358,7 +358,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Trust explainer                                                   */}
       {/* ---------------------------------------------------------------- */}
-      <section className="grid gap-4 sm:grid-cols-2">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="card p-5">
           <ShieldCheck className="h-5 w-5 text-accent" aria-hidden />
           <h2 className="mt-3 font-semibold">Explainable Trust Score</h2>
