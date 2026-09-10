@@ -298,7 +298,7 @@ export default async function HomePage() {
             </Link>
           }
         />
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {home.crossPlatform.slice(0, 4).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
