@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Layers, Search, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Layers,
+  Search,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 import { getProvider } from "@/lib/api";
 import { AppCard } from "@/components/app/AppCard";
@@ -18,13 +24,49 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const provider = getProvider();
-  const [home, platforms] = await Promise.all([provider.getHome(), provider.getPlatforms()]);
+  const [home, platforms] = await Promise.all([
+    provider.getHome(),
+    provider.getPlatforms(),
+  ]);
   const { stats } = home;
 
-  const categories = home.categories.filter((category) => category.app_count > 0).slice(0, 8);
+  const categories = home.categories
+    .filter((category) => category.app_count > 0)
+    .slice(0, 8);
 
   return (
     <div className="space-y-16">
+      <nav
+        aria-label="Discovery workspace"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-3"
+      >
+        {[
+          {
+            href: "/alternatives",
+            title: "Find an alternative",
+            text: "Switch with evidence, not guesswork.",
+          },
+          {
+            href: "/updates",
+            title: "Your update inbox",
+            text: "New releases from apps you follow.",
+          },
+          {
+            href: "/library",
+            title: "Build your toolkit",
+            text: "Personal collections, notes, and sharing.",
+          },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="card p-4 transition-colors hover:border-accent"
+          >
+            <span className="font-semibold">{item.title} →</span>
+            <span className="mt-1 block text-sm text-muted">{item.text}</span>
+          </Link>
+        ))}
+      </nav>
       {/* ---------------------------------------------------------------- */}
       {/* Hero                                                              */}
       {/* ---------------------------------------------------------------- */}
@@ -33,7 +75,7 @@ export default async function HomePage() {
           aria-hidden
           className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl"
         />
-        <div className="relative grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <div className="relative grid grid-cols-1 gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1 text-2xs uppercase tracking-[0.18em] text-fg-muted">
               <Layers className="h-3 w-3 text-accent" aria-hidden />
@@ -59,12 +101,15 @@ export default async function HomePage() {
             <dl className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
               <Stat label="Applications" value={formatNumber(stats.apps)} />
               <Stat label="Releases" value={formatNumber(stats.releases)} />
-              <Stat label="Verified packages" value={formatNumber(stats.validatedAssets)} />
+              <Stat
+                label="Verified packages"
+                value={formatNumber(stats.validatedAssets)}
+              />
               <Stat label="Platforms" value={formatNumber(stats.platforms)} />
             </dl>
           </div>
 
-          <form action="/search" role="search" className="card p-6">
+          <form action="/search" role="search" className="card min-w-0 p-6">
             <label htmlFor="home-query" className="text-sm font-medium">
               Search across every platform
             </label>
@@ -75,21 +120,27 @@ export default async function HomePage() {
                 name="q"
                 autoComplete="off"
                 placeholder="music, password, maps…"
-                className="w-full bg-transparent outline-none placeholder:text-fg-subtle"
+                className="min-w-0 w-full bg-transparent outline-none placeholder:text-fg-subtle"
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {["music", "password", "editor", "vpn", "player"].map((suggestion) => (
-                <Link
-                  key={suggestion}
-                  href={`/search?q=${encodeURIComponent(suggestion)}`}
-                  className="chip transition-colors hover:border-accent/50 hover:text-accent"
-                >
-                  {suggestion}
-                </Link>
-              ))}
+              {["music", "password", "editor", "vpn", "player"].map(
+                (suggestion) => (
+                  <Link
+                    key={suggestion}
+                    href={`/search?q=${encodeURIComponent(suggestion)}`}
+                    className="chip transition-colors hover:border-accent/50 hover:text-accent"
+                  >
+                    {suggestion}
+                  </Link>
+                ),
+              )}
             </div>
-            <ButtonLink href="/search" variant="secondary" className="mt-4 w-full">
+            <ButtonLink
+              href="/search"
+              variant="secondary"
+              className="mt-4 w-full"
+            >
               Open universal search
             </ButtonLink>
           </form>
@@ -105,17 +156,20 @@ export default async function HomePage() {
           title="Featured Apps"
           description="Highest Trust Score in the catalog, computed from upstream signals."
           action={
-            <Link href="/apps?sort=trust" className="text-sm text-accent hover:underline">
+            <Link
+              href="/apps?sort=trust"
+              className="text-sm text-accent hover:underline"
+            >
               View all
             </Link>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {home.featured.slice(0, 4).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {home.featured.slice(4, 8).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
@@ -125,13 +179,16 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Popular + Recently updated                                        */}
       {/* ---------------------------------------------------------------- */}
-      <section className="grid gap-10 lg:grid-cols-2">
+      <section className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="space-y-5">
           <SectionHeading
             title="Popular Now"
             description="Ranked by upstream stars, forks, watchers and release recency."
             action={
-              <Link href="/trending" className="text-sm text-accent hover:underline">
+              <Link
+                href="/trending"
+                className="text-sm text-accent hover:underline"
+              >
                 Trending
               </Link>
             }
@@ -143,7 +200,9 @@ export default async function HomePage() {
                   href={`/apps/${app.slug}`}
                   className="card card-interactive flex items-center gap-3 p-3"
                 >
-                  <span className="w-5 shrink-0 text-center text-sm tabular-nums text-fg-subtle">{index + 1}</span>
+                  <span className="w-5 shrink-0 text-center text-sm tabular-nums text-fg-subtle">
+                    {index + 1}
+                  </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{app.name}</p>
                     <p className="truncate text-2xs text-fg-subtle">
@@ -152,7 +211,12 @@ export default async function HomePage() {
                   </div>
                   <div className="hidden shrink-0 gap-1 sm:flex">
                     {app.platforms.slice(0, 3).map((platform) => (
-                      <PlatformBadge key={platform} platform={platform} size="xs" withIcon={false} />
+                      <PlatformBadge
+                        key={platform}
+                        platform={platform}
+                        size="xs"
+                        withIcon={false}
+                      />
                     ))}
                   </div>
                 </Link>
@@ -166,12 +230,15 @@ export default async function HomePage() {
             title="Recently Updated"
             description="Apps whose upstream metadata or releases changed most recently."
             action={
-              <Link href="/latest" className="text-sm text-accent hover:underline">
+              <Link
+                href="/latest"
+                className="text-sm text-accent hover:underline"
+              >
                 Latest
               </Link>
             }
           />
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {home.updated.slice(0, 4).map((app) => (
               <AppCard key={app.id} app={app} />
             ))}
@@ -187,7 +254,10 @@ export default async function HomePage() {
           id="categories-heading"
           title="Popular Categories"
           action={
-            <Link href="/categories" className="text-sm text-accent hover:underline">
+            <Link
+              href="/categories"
+              className="text-sm text-accent hover:underline"
+            >
               All categories
             </Link>
           }
@@ -220,12 +290,15 @@ export default async function HomePage() {
           title="Cross-Platform Apps"
           description="One app identity across phones and desktops — OmniStore's signature view."
           action={
-            <Link href="/discover/cross-platform" className="text-sm text-accent hover:underline">
+            <Link
+              href="/discover/cross-platform"
+              className="text-sm text-accent hover:underline"
+            >
               Filter by platform set
             </Link>
           }
         />
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {home.crossPlatform.slice(0, 4).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
@@ -241,12 +314,15 @@ export default async function HomePage() {
           title="New Releases"
           description="The most recent upstream releases in the catalog."
           action={
-            <Link href="/latest" className="text-sm text-accent hover:underline">
+            <Link
+              href="/latest"
+              className="text-sm text-accent hover:underline"
+            >
               See all
             </Link>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {home.newest.slice(0, 6).map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
@@ -258,7 +334,7 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       <section aria-labelledby="platforms-heading" className="space-y-5">
         <SectionHeading id="platforms-heading" title="Explore by Platform" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {platforms.map((platform) => (
             <Link
               key={platform.slug}
@@ -267,7 +343,9 @@ export default async function HomePage() {
             >
               <div>
                 <p className="font-medium">{platform.name}</p>
-                <p className="mt-0.5 text-sm text-muted">{platform.description}</p>
+                <p className="mt-0.5 text-sm text-muted">
+                  {platform.description}
+                </p>
               </div>
               <span className="shrink-0 rounded-full border border-line px-2.5 py-1 text-xs tabular-nums text-fg-muted">
                 {platform.app_count}
@@ -280,16 +358,20 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- */}
       {/* Trust explainer                                                   */}
       {/* ---------------------------------------------------------------- */}
-      <section className="grid gap-4 sm:grid-cols-2">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="card p-5">
           <ShieldCheck className="h-5 w-5 text-accent" aria-hidden />
           <h2 className="mt-3 font-semibold">Explainable Trust Score</h2>
           <p className="mt-2 text-sm text-muted">
-            Every score is computed from public upstream signals — licence, release recency, asset
-            validation, repository activity — and you can open the full breakdown on any app page. It
-            is not a security guarantee and not a malware scan.
+            Every score is computed from public upstream signals — licence,
+            release recency, asset validation, repository activity — and you can
+            open the full breakdown on any app page. It is not a security
+            guarantee and not a malware scan.
           </p>
-          <Link href="/docs#trust" className="mt-3 inline-block text-sm text-accent hover:underline">
+          <Link
+            href="/docs#trust"
+            className="mt-3 inline-block text-sm text-accent hover:underline"
+          >
             How scoring works
           </Link>
         </div>
@@ -297,19 +379,27 @@ export default async function HomePage() {
           <Sparkles className="h-5 w-5 text-accent" aria-hidden />
           <h2 className="mt-3 font-semibold">Data comes from upstream</h2>
           <p className="mt-2 text-sm text-muted">
-            OmniStore is a discovery and distribution interface. Versions, packages, licences and
-            download links come from OmniSource and the upstream projects themselves — nothing is
-            invented, and missing data is shown as “Not available”.
+            OmniStore is a discovery and distribution interface. Versions,
+            packages, licences and download links come from OmniSource and the
+            upstream projects themselves — nothing is invented, and missing data
+            is shown as “Not available”.
           </p>
-          <Link href="/docs" className="mt-3 inline-block text-sm text-accent hover:underline">
+          <Link
+            href="/docs"
+            className="mt-3 inline-block text-sm text-accent hover:underline"
+          >
             Read the documentation
           </Link>
         </div>
       </section>
 
       <p className="text-center text-2xs text-fg-subtle">
-        Catalog snapshot {home.freshness ? `updated ${relativeTime(home.freshness)}` : "unavailable"} ·{" "}
-        {formatNumber(stats.apps)} apps from {formatNumber(stats.developers)} upstream developers
+        Catalog snapshot{" "}
+        {home.freshness
+          ? `updated ${relativeTime(home.freshness)}`
+          : "unavailable"}{" "}
+        · {formatNumber(stats.apps)} apps from {formatNumber(stats.developers)}{" "}
+        upstream developers
       </p>
     </div>
   );
@@ -318,7 +408,9 @@ export default async function HomePage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-2xs uppercase tracking-wide text-fg-subtle">{label}</dt>
+      <dt className="text-2xs uppercase tracking-wide text-fg-subtle">
+        {label}
+      </dt>
       <dd className="text-xl font-semibold tabular-nums">{value}</dd>
     </div>
   );

@@ -13,10 +13,11 @@ import { safeHref } from "@/lib/security/urls";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const result = await getProvider().getDeveloper(params.slug);
+  const resolvedParams = await params;
+  const result = await getProvider().getDeveloper(resolvedParams.slug);
   if (!result) return { title: "Developer not found" };
   return {
     title: result.developer.name,
@@ -26,7 +27,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function DeveloperPage({ params }: Params) {
-  const result = await getProvider().getDeveloper(params.slug);
+  const resolvedParams = await params;
+  const result = await getProvider().getDeveloper(resolvedParams.slug);
   if (!result) notFound();
 
   const { developer, apps, platforms, licenses, latestReleases } = result;

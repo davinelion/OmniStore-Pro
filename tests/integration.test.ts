@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createServer } from "node:net";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 /**
  * End-to-end integration against a real Next.js server.
@@ -23,6 +23,9 @@ async function freePort(): Promise<number> {
     });
   });
 }
+
+// Cold App Router route compilation can exceed Vitest’s five-second unit default.
+vi.setConfig({ testTimeout: 90_000 });
 
 const PORT = process.env.OMNISTORE_TEST_PORT ? Number(process.env.OMNISTORE_TEST_PORT) : 0;
 let BASE = "http://127.0.0.1";
@@ -110,7 +113,7 @@ type AppListResponse = {
   pagination: { total: number; page: number; per_page: number; total_pages: number };
 };
 
-describe("pages render", () => {
+describe("pages render", { timeout: 90_000 }, () => {
   const pages = [
     "/",
     "/apps",
@@ -122,6 +125,11 @@ describe("pages render", () => {
     "/latest",
     "/compare",
     "/favorites",
+    "/library",
+    "/updates",
+    "/alternatives",
+    "/catalog-health",
+    "/contribute",
     "/search",
     "/discover/cross-platform",
     "/about",

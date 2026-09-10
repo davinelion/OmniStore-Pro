@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
 
 jobs:
   quality:
@@ -43,7 +43,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: .next
+          # .next is hidden, so upload-artifact excludes it by default.
+          # Upload only build output; do not opt the entire workspace into hidden files.
+          path: |
+            .next
+            !.next/cache
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 3
 
   integration:
@@ -86,6 +92,9 @@ jobs:
           name: next-build
           path: .next
 
+      - name: Verify downloaded production build
+        run: test -s .next/BUILD_ID && test -s .next/build-manifest.json
+
       - name: End-to-end tests
         run: npx playwright test --project=chromium
         env:
@@ -96,7 +105,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report
+          path: |
+            playwright-report
+            test-results
           retention-days: 7
 
   data:

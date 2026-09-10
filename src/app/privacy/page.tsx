@@ -1,3 +1,4 @@
+import { AnalyticsConsent } from "@/components/layout/AnalyticsConsent";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -14,7 +15,7 @@ export default function PrivacyPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight">Privacy</h1>
-        <p className="text-muted">Last updated {new Date("2026-09-08").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+        <p className="text-muted">Last updated {new Date("2026-09-11").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
       </header>
 
       <section className="space-y-3">
@@ -30,8 +31,9 @@ export default function PrivacyPage() {
         <ul className="list-disc space-y-2 pl-5 text-muted">
           <li>
             <strong>Favorites and followed apps</strong> — saved in your browser’s local storage. They
-            never leave your device and are not synchronised.
+            are not synchronised. App IDs are sent to the catalog API to load their current metadata.
           </li>
+          <li><strong>Personal library and inbox</strong> — collection names, private notes, read state, and preferences stay in local storage. Share links include names and app IDs but exclude notes. JSON backups include notes; share them carefully. Importing a backup adds lists without replacing existing ones.</li>
           <li>
             <strong>Comparison selection</strong> — stored locally so the comparison tray survives
             navigation.
@@ -46,12 +48,14 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Analytics</h2>
         <p className="text-muted">
-          Analytics are disabled by default. When a deployment enables them, OmniStore records
+          Analytics require deployment enablement and your explicit opt-in below. OmniStore records
           anonymous, aggregated product events only — for example that a search was performed or a
           download button was clicked. No cookies, no advertising identifiers, no personal data, no
           cross-site tracking, and no third-party analytics scripts.
         </p>
       </section>
+
+      <AnalyticsConsent />
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Downloads go upstream</h2>
@@ -72,7 +76,7 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Your choices</h2>
         <p className="text-muted">
-          Clearing site data in your browser removes favorites, follows, theme and language
+          Clearing site data in your browser removes personal lists, notes, inbox read state, consent, favorites, follows, theme and language
           preferences immediately. You can use OmniStore fully without ever saving anything.
         </p>
       </section>

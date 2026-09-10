@@ -7,6 +7,9 @@ import type { Messages } from "./en";
  */
 export const bn: Messages = {
   nav: {
+    alternatives: "বিকল্প",
+    updates: "আপডেট",
+    library: "লাইব্রেরি",
     discover: "আবিষ্কার",
     apps: "অ্যাপস",
     categories: "ক্যাটাগরি",

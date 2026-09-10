@@ -48,9 +48,11 @@ export default function FavoritesPage() {
           Favorites
         </h1>
         <p className="text-muted">
-          Saved on this device. No account required, and nothing leaves your browser.
+          Saved on this device. No account required. App IDs are sent to the catalog API to load current metadata.
         </p>
       </header>
+
+      <div className="flex flex-wrap gap-4"><Link className="text-accent underline" href="/updates">Open update inbox</Link><Link className="text-accent underline" href="/library">Organize personal collections</Link></div>
 
       <section aria-labelledby="saved-heading" className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">

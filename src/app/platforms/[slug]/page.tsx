@@ -11,11 +11,12 @@ import { pluralize } from "@/lib/formatters";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const resolvedParams = await params;
   const platforms = await getProvider().getPlatforms();
-  const platform = platforms.find((entry) => entry.slug === params.slug);
+  const platform = platforms.find((entry) => entry.slug === resolvedParams.slug);
   if (!platform) return { title: "Platform not found" };
   return {
     title: `${platform.name} apps`,
@@ -27,9 +28,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function PlatformPage({ params }: Params) {
+  const resolvedParams = await params;
   const provider = getProvider();
   const platforms = await provider.getPlatforms();
-  const platform = platforms.find((entry) => entry.slug === params.slug);
+  const platform = platforms.find((entry) => entry.slug === resolvedParams.slug);
   if (!platform) notFound();
 
   const filters = parseFilters({ platform: platform.slug, per_page: "12" });

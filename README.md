@@ -9,6 +9,14 @@ indexed, installable, accessible, and ready for native clients to reuse its
 
 ---
 
+## Advanced store upgrade
+
+New: [update inbox](/updates), personal library with private notes and portable
+backups, shareable lists, editorial alternatives, catalog transparency, RSS,
+reviewed metadata enrichment, contribution forms and opt-in count-only telemetry.
+See [advanced store guide](docs/ADVANCED_STORE.md) for setup, limits, and the
+external-service work that remains. Requires **Node 22.12+**.
+
 ## Quick start
 
 ```bash
@@ -143,7 +151,7 @@ browser.
 **Vercel / Netlify / any Node host**
 
 ```bash
-npm ci && npm run build && npm start     # Node ≥ 20
+npm ci && npm run build && npm start     # Node ≥ 22.12
 ```
 
 Set `NEXT_PUBLIC_SITE_URL` to the public origin so canonical URLs and the

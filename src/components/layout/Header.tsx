@@ -15,9 +15,9 @@ const NAV = [
   { key: "nav.apps", href: "/apps" },
   { key: "nav.categories", href: "/categories" },
   { key: "nav.platforms", href: "/platforms" },
-  { key: "nav.trending", href: "/trending" },
-  { key: "nav.latest", href: "/latest" },
-  { key: "nav.collections", href: "/collections" },
+  { key: "nav.alternatives", href: "/alternatives" },
+  { key: "nav.updates", href: "/updates" },
+  { key: "nav.library", href: "/library" },
   { key: "nav.compare", href: "/compare" },
 ] as const;
 
@@ -92,7 +92,7 @@ export function Header() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("hero.searchPlaceholder")}
               aria-label={t("hero.searchLabel")}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-fg-subtle"
+              className="min-w-0 w-full bg-transparent text-sm outline-none placeholder:text-fg-subtle"
             />
           </div>
         </form>

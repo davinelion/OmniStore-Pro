@@ -24,9 +24,10 @@ export const metadata: Metadata = {
 export default async function ComparePage({
   searchParams,
 }: {
-  searchParams: { ids?: string | string[] };
+  searchParams: Promise<{ ids?: string | string[] }>;
 }) {
-  const raw = Array.isArray(searchParams.ids) ? searchParams.ids.join(",") : searchParams.ids ?? "";
+  const resolvedSearchParams = await searchParams;
+  const raw = Array.isArray(resolvedSearchParams.ids) ? resolvedSearchParams.ids.join(",") : resolvedSearchParams.ids ?? "";
   const requested = raw
     .split(",")
     .map((id) => id.trim())

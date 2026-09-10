@@ -7,12 +7,13 @@ import { parseFilters, withFilterChange } from "@/lib/search/query";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 type SearchParams = Record<string, string | string[] | undefined>;
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const resolvedParams = await params;
   const categories = await getProvider().getCategories();
-  const category = categories.find((entry) => entry.slug === params.slug);
+  const category = categories.find((entry) => entry.slug === resolvedParams.slug);
   if (!category) return { title: "Category not found" };
   return {
     title: `${category.name} apps`,
@@ -27,16 +28,18 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams: SearchParams;
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const provider = getProvider();
   const categories = await provider.getCategories();
-  const category = categories.find((entry) => entry.slug === params.slug);
+  const category = categories.find((entry) => entry.slug === resolvedParams.slug);
   if (!category) notFound();
 
   // The category is part of the URL, so it is forced into the filter set.
-  const filters = withFilterChange(parseFilters(searchParams), { categories: [category.slug] });
+  const filters = withFilterChange(parseFilters(resolvedSearchParams), { categories: [category.slug] });
 
   const [result, platforms, licenses] = await Promise.all([
     provider.getApps(filters),

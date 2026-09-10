@@ -1,0 +1,27 @@
+name: Deployment health
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "43 */6 * * *"
+permissions:
+  contents: read
+jobs:
+  check:
+    if: ${{ vars.OMNISTORE_MONITOR_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployed health and feed freshness
+        env:
+          SITE: ${{ vars.OMNISTORE_MONITOR_URL }}
+        run: |
+          case "$SITE" in https://*) ;; *) echo "Monitor URL must use HTTPS"; exit 1 ;; esac
+          curl --fail --silent --show-error --max-time 30 "$SITE/api/v1/health" > health.json
+          node - <<'JS'
+          const fs = require('fs');
+          const h = JSON.parse(fs.readFileSync('health.json', 'utf8'));
+          const age = Date.now() - Date.parse(h.meta?.generated_at);
+          if (h.status !== 'ok' || !Number.isFinite(age) || age > 14 * 86400000 || age < -86400000) {
+            console.error('Deployment is unhealthy or snapshot freshness is invalid/stale.'); process.exit(1);
+          }
+          console.log('Deployment healthy; feed age in days:', (age / 86400000).toFixed(1));
+          JS

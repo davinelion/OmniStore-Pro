@@ -53,13 +53,13 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-function resolveLocale(): Locale {
-  const cookie = cookies().get("omnistore_locale")?.value;
+async function resolveLocale(): Promise<Locale> {
+  const cookie = (await cookies()).get("omnistore_locale")?.value;
   return isLocale(cookie) ? cookie : "en";
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = resolveLocale();
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await resolveLocale();
 
   return (
     <html lang={locale} suppressHydrationWarning>

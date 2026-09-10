@@ -239,7 +239,12 @@ export const AppSchema = z.object({
   active_development: z.boolean().nullable(),
   icon_url: SafeUrlSchema.nullable(),
   /** Empty when upstream publishes none. Never fabricated. */
-  screenshots: z.array(z.object({ url: SafeUrlSchema, alt: z.string().nullable() })).default([]),
+  screenshots: z.array(z.object({ url: SafeUrlSchema, alt: z.string().nullable(), source_url: SafeUrlSchema.optional(), attribution: z.string().optional(), permission: z.string().optional() })).default([]),
+  metadata_evidence: z.object({ url: SafeUrlSchema, reviewed_at: IsoDateSchema }).optional(),
+  installation: z.array(z.object({
+    platform: PlatformSchema, manager: z.enum(["winget", "brew", "flatpak", "snap"]),
+    package_id: z.string().min(1).max(150).regex(/^[A-Za-z0-9][A-Za-z0-9._+/-]*$/), source_url: SafeUrlSchema,
+  }).refine(r => ({ winget: "windows", brew: "macos", flatpak: "linux", snap: "linux" }[r.manager]) === r.platform)).optional(),
   scores: ScoresSchema,
   signals: SignalsSchema,
   links: LinksSchema,

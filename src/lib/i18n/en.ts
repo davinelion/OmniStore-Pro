@@ -7,6 +7,9 @@
 
 export const en = {
   nav: {
+    alternatives: "Alternatives",
+    updates: "Updates",
+    library: "Library",
     discover: "Discover",
     apps: "Apps",
     categories: "Categories",

@@ -14,6 +14,8 @@ export function Footer() {
     {
       title: "OmniStore",
       links: [
+        { label: "Your library", href: "/library" },
+        { label: "Update inbox", href: "/updates" },
         { label: t("footer.about"), href: "/about" },
         { label: t("footer.documentation"), href: "/docs" },
         { label: t("nav.developers"), href: "/developers" },
@@ -26,6 +28,7 @@ export function Footer() {
         { label: t("nav.trending"), href: "/trending" },
         { label: t("nav.latest"), href: "/latest" },
         { label: t("nav.compare"), href: "/compare" },
+        { label: "Alternatives", href: "/alternatives" },
         { label: "Cross-Platform", href: "/discover/cross-platform" },
       ],
     },
@@ -34,6 +37,8 @@ export function Footer() {
       links: [
         { label: t("footer.github"), href: site.repoUrl, external: true },
         { label: t("footer.omnisource"), href: site.omnisourceRepoUrl, external: true },
+        { label: "Contribute", href: "/contribute" },
+        { label: "Catalog transparency", href: "/catalog-health" },
         { label: t("footer.report"), href: "/report" },
         { label: t("footer.privacy"), href: "/privacy" },
         { label: t("footer.terms"), href: "/terms" },
@@ -44,7 +49,7 @@ export function Footer() {
   return (
     <footer className="mt-20 border-t border-line bg-surface/40">
       <div className="mx-auto max-w-content px-4 py-12">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
             <p className="font-semibold">OmniStore</p>
             <p className="mt-2 max-w-sm text-sm text-muted">{t("footer.disclaimer")}</p>
