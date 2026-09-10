@@ -45,7 +45,7 @@ jobs:
           fi
 
       - name: Open a pull request with the refreshed feed
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore(data): refresh OmniSource feed"
           title: "chore(data): refresh OmniSource feed"
