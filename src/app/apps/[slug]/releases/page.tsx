@@ -10,10 +10,11 @@ import { formatDate, relativeTime } from "@/lib/formatters";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const app = await getProvider().getApp(params.slug);
+  const resolvedParams = await params;
+  const app = await getProvider().getApp(resolvedParams.slug);
   if (!app) return { title: "App not found" };
   return {
     title: `${app.name} releases`,
@@ -23,8 +24,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function ReleasesPage({ params }: Params) {
+  const resolvedParams = await params;
   const provider = getProvider();
-  const app = await provider.getApp(params.slug);
+  const app = await provider.getApp(resolvedParams.slug);
   if (!app) notFound();
 
   const releases = app.releases;

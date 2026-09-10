@@ -21,9 +21,9 @@ const call = (handler: (request: Request) => Promise<Response>, path: string, in
 
 /** Route handlers that read a dynamic segment take (request, { params }). */
 const callWithParams = (
-  handler: (request: Request, context: { params: { id: string } }) => Promise<Response>,
+  handler: (request: Request, context: { params: Promise<{ id: string }> }) => Promise<Response>,
   id: string,
-) => handler(new Request(`https://omnistore.test/api/v1/apps/${id}`), { params: { id } });
+) => handler(new Request(`https://omnistore.test/api/v1/apps/${id}`), { params: Promise.resolve({ id }) });
 
 async function jsonOf(response: Response) {
   return response.json();

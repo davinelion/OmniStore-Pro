@@ -15,9 +15,9 @@ const NAV = [
   { key: "nav.apps", href: "/apps" },
   { key: "nav.categories", href: "/categories" },
   { key: "nav.platforms", href: "/platforms" },
-  { key: "nav.trending", href: "/trending" },
-  { key: "nav.latest", href: "/latest" },
-  { key: "nav.collections", href: "/collections" },
+  { key: "nav.alternatives", href: "/alternatives" },
+  { key: "nav.updates", href: "/updates" },
+  { key: "nav.library", href: "/library" },
   { key: "nav.compare", href: "/compare" },
 ] as const;
 

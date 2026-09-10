@@ -1,3 +1,4 @@
+import { VerificationPanel } from "@/components/app/VerificationPanel";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -24,7 +25,7 @@ import type { App } from "@/lib/schemas/omnisource";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 
 /**
  * App detail page.
@@ -33,7 +34,8 @@ type Params = { params: { slug: string } };
  * publish are shown as "Not available" rather than filled with placeholders.
  */
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const app = await getProvider().getApp(params.slug);
+  const resolvedParams = await params;
+  const app = await getProvider().getApp(resolvedParams.slug);
   if (!app) return { title: "App not found" };
 
   const description =
@@ -63,8 +65,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function AppPage({ params }: Params) {
+  const resolvedParams = await params;
   const provider = getProvider();
-  const app = await provider.getApp(params.slug);
+  const app = await provider.getApp(resolvedParams.slug);
   if (!app) notFound();
 
   const [alternatives, similar] = await Promise.all([
@@ -274,6 +277,8 @@ export default async function AppPage({ params }: Params) {
         <aside className="space-y-6 lg:sticky lg:top-24">
           <DownloadPanel app={app} />
           <InstallationPanel app={app} platforms={platforms} />
+          <VerificationPanel app={app} />
+          <a className="text-sm text-accent underline" href={`/api/v1/feed?app=${encodeURIComponent(app.id)}`}>Subscribe to release RSS</a>
           <SourcePanel app={app} />
           <StatisticsPanel app={app} />
           <ReportIssueCard app={app} />

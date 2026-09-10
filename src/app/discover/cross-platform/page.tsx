@@ -28,9 +28,10 @@ export const metadata: Metadata = {
  * Selecting platforms means "available on ALL of these", which is the question
  * a user with a mixed device setup actually has.
  */
-export default async function CrossPlatformPage({ searchParams }: { searchParams: SearchParams }) {
-  const selected = (searchParams.all ?? "").split(",").map((value) => value.trim()).filter(Boolean);
-  const sort = searchParams.sort ?? "trust";
+export default async function CrossPlatformPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const resolvedSearchParams = await searchParams;
+  const selected = (resolvedSearchParams.all ?? "").split(",").map((value) => value.trim()).filter(Boolean);
+  const sort = resolvedSearchParams.sort ?? "trust";
 
   const provider = getProvider();
   const filters = withFilterChange(DEFAULT_FILTERS, {

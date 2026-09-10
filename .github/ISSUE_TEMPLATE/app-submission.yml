@@ -1,0 +1,27 @@
+name: "Suggest an app"
+description: "Propose an upstream open-source application."
+body:
+  - type: textarea
+    id: repository
+    attributes:
+      label: "Official repository URL"
+    validations:
+      required: true
+  - type: textarea
+    id: license
+    attributes:
+      label: "SPDX license and evidence URL"
+    validations:
+      required: true
+  - type: textarea
+    id: platforms
+    attributes:
+      label: "Supported platforms and release URLs"
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: "What does this app do?"
+    validations:
+      required: true

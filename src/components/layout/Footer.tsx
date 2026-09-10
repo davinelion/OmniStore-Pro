@@ -14,6 +14,8 @@ export function Footer() {
     {
       title: "OmniStore",
       links: [
+        { label: "Your library", href: "/library" },
+        { label: "Update inbox", href: "/updates" },
         { label: t("footer.about"), href: "/about" },
         { label: t("footer.documentation"), href: "/docs" },
         { label: t("nav.developers"), href: "/developers" },
@@ -26,6 +28,7 @@ export function Footer() {
         { label: t("nav.trending"), href: "/trending" },
         { label: t("nav.latest"), href: "/latest" },
         { label: t("nav.compare"), href: "/compare" },
+        { label: "Alternatives", href: "/alternatives" },
         { label: "Cross-Platform", href: "/discover/cross-platform" },
       ],
     },
@@ -34,6 +37,8 @@ export function Footer() {
       links: [
         { label: t("footer.github"), href: site.repoUrl, external: true },
         { label: t("footer.omnisource"), href: site.omnisourceRepoUrl, external: true },
+        { label: "Contribute", href: "/contribute" },
+        { label: "Catalog transparency", href: "/catalog-health" },
         { label: t("footer.report"), href: "/report" },
         { label: t("footer.privacy"), href: "/privacy" },
         { label: t("footer.terms"), href: "/terms" },

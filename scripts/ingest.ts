@@ -1,3 +1,4 @@
+import { EnrichmentsSchema, enrichApp, publishedSha256 } from "../src/lib/omnisource/enrichment";
 /**
  * OmniSource ingestion pipeline.
  *
@@ -108,7 +109,7 @@ type GhRelease = {
   prerelease: boolean;
   published_at: string | null;
   html_url: string;
-  assets: Array<{ id: number; name: string; size: number; browser_download_url: string; content_type: string }>;
+  assets: Array<{ id: number; name: string; size: number; browser_download_url: string; content_type: string; digest?: string | null }>;
 };
 
 /** Fetches a raw (non-JSON) response, e.g. a README rendered as plain text. */
@@ -281,8 +282,8 @@ function buildAssets(release: GhRelease, version: string): Asset[] {
         version,
         filename: normalised.filename,
         size_bytes: raw.size ?? null,
-        // Upstream does not publish checksums in the releases API. Never invent one.
-        sha256: null,
+        // GitHub may publish a digest; retain only well-formed SHA-256, never infer one.
+        sha256: publishedSha256(raw.digest),
         source: "GitHub Release",
         url: raw.browser_download_url,
         status: validation.status,
@@ -635,7 +636,9 @@ async function main() {
     }
   }
 
-  const all = [...previous, ...apps];
+  const evidence = EnrichmentsSchema.parse(JSON.parse(await readFile(path.join(ROOT, "data", "enrichments.json"), "utf8")));
+  const byRepo = new Map(evidence.map(row => [row.repository.toLowerCase(), row]));
+  const all = [...previous, ...apps].map(app => enrichApp(app, byRepo.get(app.source.repo?.toLowerCase() ?? "")));
   all.sort((a, b) => a.name.localeCompare(b.name));
   computeRelationships(all);
 

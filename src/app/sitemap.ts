@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getProvider } from "@/lib/api";
-import { DEFAULT_FILTERS } from "@/lib/search/query";
+import { catalogApps } from "@/lib/catalog/quality";
 import { absoluteUrl } from "@/config/site";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const provider = getProvider();
   const [apps, categories, platforms, collections, developers] = await Promise.all([
-    provider.getApps({ ...DEFAULT_FILTERS, perPage: 500, sort: "name" }),
+    catalogApps(provider),
     provider.getCategories(),
     provider.getPlatforms(),
     provider.getCollections(),
@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const safeModified = Number.isNaN(lastModified.getTime()) ? new Date() : lastModified;
 
   return [
+    ...["/alternatives", "/catalog-health", "/contribute"].map(path => ({ url: absoluteUrl(path), lastModified: safeModified })),
     { url: absoluteUrl("/"), lastModified: safeModified, changeFrequency: "daily", priority: 1 },
     { url: absoluteUrl("/apps"), lastModified: safeModified, changeFrequency: "daily", priority: 0.9 },
     { url: absoluteUrl("/categories"), lastModified: safeModified, changeFrequency: "weekly", priority: 0.8 },
@@ -46,13 +47,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absoluteUrl("/privacy"), lastModified: safeModified, changeFrequency: "yearly", priority: 0.3 },
     { url: absoluteUrl("/terms"), lastModified: safeModified, changeFrequency: "yearly", priority: 0.3 },
 
-    ...apps.items.map((app) => ({
+    ...apps.map((app) => ({
       url: absoluteUrl(`/apps/${app.slug}`),
       lastModified: app.updated_at ? new Date(app.updated_at) : safeModified,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
-    ...apps.items.map((app) => ({
+    ...apps.map((app) => ({
       url: absoluteUrl(`/apps/${app.slug}/releases`),
       lastModified: app.latest_release?.released_at ? new Date(app.latest_release.released_at) : safeModified,
       changeFrequency: "weekly" as const,

@@ -20,7 +20,8 @@ export type AnalyticsEvent =
   | "follow"
   | "unfollow"
   | "share"
-  | "report_submit";
+  | "report_submit"
+  | "route_error";
 
 type Payload = Record<string, string | number | boolean | undefined>;
 
@@ -32,14 +33,13 @@ export function track(event: AnalyticsEvent, payload: Payload = {}): void {
   if (!site.analyticsEnabled) return;
   if (typeof window === "undefined") return;
 
-  // Structured console output is the default sink: deployers can forward it to
-  // any privacy-respecting collector without adding third-party scripts.
+  // Both deployment opt-in and a visitor's explicit consent are required.
+  // Payload is deliberately discarded: search terms and IDs must not leave here.
+  void payload;
   try {
-    // eslint-disable-next-line no-console
-    console.debug("[omnistore:analytics]", event, payload);
-  } catch {
-    /* console unavailable */
-  }
+    if (navigator.doNotTrack === "1" || localStorage.getItem("omnistore:analytics-consent") !== "yes") return;
+    void fetch("/api/v1/events", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ event }), keepalive: true }).catch(() => undefined);
+  } catch { /* Analytics must never interrupt browsing. */ }
 }
 
 /** Fires an app_view event safely from a client component. */

@@ -1,0 +1,21 @@
+name: "Broken download"
+description: "Report an unavailable upstream asset without uploading binaries."
+body:
+  - type: textarea
+    id: app
+    attributes:
+      label: "App and version"
+    validations:
+      required: true
+  - type: textarea
+    id: asset
+    attributes:
+      label: "Asset URL and platform / architecture"
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: "Observed error and time (no private data)"
+    validations:
+      required: true

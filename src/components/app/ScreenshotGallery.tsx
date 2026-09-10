@@ -16,7 +16,13 @@ export function ScreenshotGallery({
   screenshots,
   appName,
 }: {
-  screenshots: Array<{ url: string; alt: string | null }>;
+  screenshots: Array<{
+    url: string;
+    alt: string | null;
+    attribution?: string;
+    source_url?: string;
+    permission?: string;
+  }>;
   appName: string;
 }) {
   const [active, setActive] = useState(0);
@@ -24,7 +30,7 @@ export function ScreenshotGallery({
 
   const images = screenshots
     .map((shot, index) => ({ ...shot, index, safeUrl: safeImageUrl(shot.url) }))
-    .filter((shot): shot is { url: string; alt: string | null; index: number; safeUrl: string } =>
+    .filter((shot): shot is typeof shot & { safeUrl: string } =>
       Boolean(shot.safeUrl),
     );
 
@@ -36,7 +42,8 @@ export function ScreenshotGallery({
         </h2>
         <p className="mt-2 flex items-center gap-2 rounded-xl border border-dashed border-line px-4 py-6 text-sm text-muted">
           <ImageOff className="h-4 w-4" aria-hidden />
-          Screenshots not available — upstream does not publish any through OmniSource.
+          Screenshots not available — upstream does not publish any through
+          OmniSource.
         </p>
       </section>
     );
@@ -50,8 +57,31 @@ export function ScreenshotGallery({
         Screenshots
       </h2>
 
+      <ul className="mt-2 space-y-1 text-xs text-muted">
+        {images
+          .filter((shot) => shot.attribution)
+          .map((shot) => (
+            <li key={shot.url}>
+              {shot.attribution}{" "}
+              {shot.source_url && safeImageUrl(shot.source_url) ? (
+                <a
+                  className="text-accent underline"
+                  href={shot.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Source
+                </a>
+              ) : null}
+              {shot.permission ? ` · ${shot.permission}` : ""}
+            </li>
+          ))}
+      </ul>
       {/* Mobile: horizontal scrolling strip. Desktop: preview + thumbnails. */}
-      <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar md:hidden" role="list">
+      <div
+        className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar md:hidden"
+        role="list"
+      >
         {images.map((shot) => (
           <div
             key={shot.url}
@@ -83,7 +113,9 @@ export function ScreenshotGallery({
               alt={current.alt ?? `${appName} screenshot ${current.index + 1}`}
               loading="lazy"
               decoding="async"
-              onError={() => setFailed((prev) => new Set(prev).add(current.index))}
+              onError={() =>
+                setFailed((prev) => new Set(prev).add(current.index))
+              }
               className="h-full w-full object-contain"
             />
           )}
@@ -100,7 +132,9 @@ export function ScreenshotGallery({
                 aria-current={index === active}
                 className={cn(
                   "h-16 w-28 shrink-0 overflow-hidden rounded-lg border transition-colors",
-                  index === active ? "border-accent" : "border-line hover:border-line-strong",
+                  index === active
+                    ? "border-accent"
+                    : "border-line hover:border-line-strong",
                 )}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

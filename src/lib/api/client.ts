@@ -72,7 +72,7 @@ export function userFacingError(error: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-async function request<T>(path: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, schema: z.ZodType<T, z.ZodTypeDef, unknown>, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
     res = await fetch(path, {
@@ -194,8 +194,17 @@ export const omniClient = {
 
   getApp: (idOrSlug: string) => request(`/api/v1/apps/${encodeURIComponent(idOrSlug)}`, AppSchema) as Promise<App>,
 
-  getAppsByIds: (ids: string[]) =>
-    request(`/api/v1/apps?ids=${ids.map(encodeURIComponent).join(",")}`, AppListEnvelope) as Promise<AppListResult>,
+  getAppsByIds: async (ids: string[]): Promise<AppListResult> => {
+    const unique = [...new Set(ids)];
+    const items: App[] = [];
+    // The API intentionally limits each request to eight IDs. Batch rather than
+    // silently dropping the ninth favorite or requesting the entire catalog for [].
+    for (let i = 0; i < unique.length; i += 8) {
+      const result = await request(`/api/v1/apps?ids=${unique.slice(i, i + 8).map(encodeURIComponent).join(",")}`, AppListEnvelope);
+      items.push(...result.items);
+    }
+    return { items, freshness: null, pagination: { page: 1, per_page: unique.length || 1, total: items.length, total_pages: items.length ? 1 : 0 } };
+  },
 
   getCategories: () =>
     request(`/api/v1/categories`, z.object({ items: z.array(CategorySchema) })).then((r) => r.items) as Promise<Category[]>,

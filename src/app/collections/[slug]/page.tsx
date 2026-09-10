@@ -7,10 +7,11 @@ import { Badge, EmptyState } from "@/components/ui/primitives";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { slug: string } };
+type Params = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const result = await getProvider().getCollection(params.slug);
+  const resolvedParams = await params;
+  const result = await getProvider().getCollection(resolvedParams.slug);
   if (!result) return { title: "Collection not found" };
   return {
     title: result.collection.name,
@@ -20,7 +21,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 export default async function CollectionPage({ params }: Params) {
-  const result = await getProvider().getCollection(params.slug);
+  const resolvedParams = await params;
+  const result = await getProvider().getCollection(resolvedParams.slug);
   if (!result) notFound();
 
   const { collection, apps } = result;

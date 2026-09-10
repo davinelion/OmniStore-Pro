@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
 
       - run: npm ci
@@ -36,9 +36,10 @@ jobs:
       - name: Ingest upstream data
         env:
           GITHUB_TOKEN: ${{ secrets.INGEST_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          ONLY_SOURCE: ${{ github.event.inputs.only }}
         run: |
-          if [ -n "${{ github.event.inputs.only }}" ]; then
-            npm run ingest -- --only=${{ github.event.inputs.only }}
+          if [ -n "$ONLY_SOURCE" ]; then
+            npm run ingest -- "--only=$ONLY_SOURCE"
           else
             npm run ingest
           fi

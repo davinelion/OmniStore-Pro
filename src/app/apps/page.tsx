@@ -16,9 +16,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/apps" },
 };
 
-export default async function AppsPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function AppsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const resolvedSearchParams = await searchParams;
   const provider = getProvider();
-  const filters = parseFilters(searchParams);
+  const filters = parseFilters(resolvedSearchParams);
 
   const [result, categories, platforms, licenses] = await Promise.all([
     provider.getApps(filters),

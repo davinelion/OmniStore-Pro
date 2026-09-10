@@ -1,0 +1,27 @@
+name: "Metadata correction"
+description: "Provide sourced corrections or a new alternative guide."
+body:
+  - type: textarea
+    id: app
+    attributes:
+      label: "App or guide"
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: "Proposed correction"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Official HTTPS evidence URLs"
+    validations:
+      required: true
+  - type: textarea
+    id: permission
+    attributes:
+      label: "Screenshot attribution and license / permission (if applicable)"
+    validations:
+      required: false

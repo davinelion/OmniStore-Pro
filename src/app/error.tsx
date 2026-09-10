@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
+import { track } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -21,6 +23,7 @@ export default function ErrorBoundary({
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.error("[omnistore] route error", error);
+    track("route_error");
   }, [error]);
 
   return (
@@ -37,12 +40,12 @@ export default function ErrorBoundary({
           <RotateCcw className="h-4 w-4" aria-hidden />
           Try Again
         </Button>
-        <a
+        <Link
           href="/"
           className="inline-flex h-10 items-center rounded-full border border-line px-4 text-sm transition-colors hover:bg-surface-2"
         >
           Back to home
-        </a>
+        </Link>
       </div>
     </div>
   );
