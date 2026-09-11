@@ -109,6 +109,33 @@ test.describe("library", () => {
 
     await page.goto("/favorites");
     await expect(page.getByRole("heading", { level: 1, name: /My library/i })).toBeVisible();
+
+    // TEMPORARY DIAGNOSTICS (remove once the library e2e is green):
+    const diagnostics = await page.evaluate(async () => {
+      const readIdb = () =>
+        new Promise<string>((resolve) => {
+          const open = indexedDB.open("omnistore-library");
+          open.onsuccess = () => {
+            const db = open.result;
+            const tx = db.transaction("lists", "readonly");
+            const req = tx.objectStore("lists").get("favorites");
+            req.onsuccess = () => {
+              resolve(JSON.stringify(req.result ?? null));
+              db.close();
+            };
+            req.onerror = () => {
+              resolve("idb-error");
+              db.close();
+            };
+          };
+          open.onerror = () => resolve("idb-open-error");
+        });
+      const proxy = await fetch("/api/v1/apps/keepassxc").then((r) => ({ status: r.status }));
+      const mainText = (document.querySelector("main")?.textContent ?? "").slice(0, 400);
+      return JSON.stringify({ idbFavorites: await readIdb(), proxyStatus: proxy.status, mainText });
+    });
+    throw new Error(`LIBRARY DIAGNOSTICS >>> ${diagnostics}`);
+
     await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible();
   });
 });
