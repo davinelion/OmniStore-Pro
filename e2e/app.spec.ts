@@ -97,6 +97,14 @@ test.describe("collections and taxonomy", () => {
 test.describe("library", () => {
 
   test("favorites added on the app page persist to the library", async ({ page }) => {
+    // TEMPORARY DIAGNOSTICS: capture client-side crashes during hydration.
+    const pageErrors: string[] = [];
+    const consoleErrors: string[] = [];
+    page.on("pageerror", (error) => pageErrors.push(String(error)));
+    page.on("console", (message) => {
+      if (message.type() === "error") consoleErrors.push(message.text().slice(0, 300));
+    });
+
     await page.goto("/app/keepassxc");
 
     const favorite = page.getByRole("button", { name: /favorite/i });
@@ -111,7 +119,19 @@ test.describe("library", () => {
     await page.goto("/favorites");
     await expect(page.getByRole("heading", { level: 1, name: /My library/i })).toBeVisible();
 
-    await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible();
+    try {
+      await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible({
+        timeout: 8000,
+      });
+    } catch {
+      const state = await page.evaluate(() => ({
+        hasReactRoot: document.querySelector("main")?.children.length ?? 0,
+        mainText: (document.querySelector("main")?.textContent ?? "").slice(0, 200),
+      }));
+      throw new Error(
+        `LIBRARY DIAGNOSTICS >>> pageErrors=${JSON.stringify(pageErrors)} consoleErrors=${JSON.stringify(consoleErrors)} state=${JSON.stringify(state)}`,
+      );
+    }
   });
 
   test("categories index and category detail work", async ({ page }) => {
