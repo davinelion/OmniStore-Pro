@@ -12,7 +12,7 @@ import {
   type App,
 } from "@omnistore/shared-models";
 import { z } from "zod";
-import type { OmniSourceClient, RequestOptions } from "./client";
+import { OmniSourceError, type OmniSourceClient, type RequestOptions } from "./client";
 import { filtersToSearchParams } from "./params";
 
 export interface AppListParams {
@@ -74,12 +74,17 @@ export class AppsApi {
 
   /** A single app by id or slug. `null` when OmniSource does not know it. */
   async get(id: string, options: RequestOptions = {}): Promise<App | null> {
-    const dto = await this.client.request(
-      `/apps/${encodeURIComponent(id)}`,
-      AppDtoSchema,
-      { tags: ["apps", `app:${id}`], revalidate: 120, ...options },
-    );
-    return mapApp(dto);
+    try {
+      const dto = await this.client.request(
+        `/apps/${encodeURIComponent(id)}`,
+        AppDtoSchema,
+        { tags: ["apps", `app:${id}`], revalidate: 120, ...options },
+      );
+      return mapApp(dto);
+    } catch (error) {
+      if (error instanceof OmniSourceError && error.status === 404) return null;
+      throw error;
+    }
   }
 
   /** OmniSource trending — popularity signals computed upstream. */

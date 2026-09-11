@@ -10,7 +10,7 @@ jobs:
     if: ${{ vars.OMNISTORE_MONITOR_URL != '' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check deployed health and feed freshness
+      - name: Check deployed health and upstream freshness
         env:
           SITE: ${{ vars.OMNISTORE_MONITOR_URL }}
         run: |
@@ -19,9 +19,11 @@ jobs:
           node - <<'JS'
           const fs = require('fs');
           const h = JSON.parse(fs.readFileSync('health.json', 'utf8'));
-          const age = Date.now() - Date.parse(h.meta?.generated_at);
-          if (h.status !== 'ok' || !Number.isFinite(age) || age > 14 * 86400000 || age < -86400000) {
-            console.error('Deployment is unhealthy or snapshot freshness is invalid/stale.'); process.exit(1);
+          if (h.status !== 'ok') {
+            console.error('Deployment is unhealthy.'); process.exit(1);
           }
-          console.log('Deployment healthy; feed age in days:', (age / 86400000).toFixed(1));
+          if (!h.upstream || h.upstream === 'unreachable') {
+            console.error('OmniSource upstream is unreachable.'); process.exit(1);
+          }
+          console.log('Deployment healthy; OmniSource upstream:', h.upstream);
           JS

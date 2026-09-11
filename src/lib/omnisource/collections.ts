@@ -12,7 +12,7 @@ import {
   type Collection,
 } from "@omnistore/shared-models";
 import { z } from "zod";
-import type { OmniSourceClient, RequestOptions } from "./client";
+import { OmniSourceError, type OmniSourceClient, type RequestOptions } from "./client";
 
 const ListSchema = z.object({
   items: z.array(CollectionDtoSchema).catch([]).default([]),
@@ -55,12 +55,17 @@ export class CollectionsApi {
     );
     const summary = index.items.find((item) => item.slug === slug);
     if (!summary) return null;
-    const dto = await this.client.request(
-      `/collections/${encodeURIComponent(summary.id)}`,
-      CollectionDtoSchema,
-      { tags: ["collections", `collection:${slug}`], ...options },
-    );
-    return mapCollection(dto);
+    try {
+      const dto = await this.client.request(
+        `/collections/${encodeURIComponent(summary.id)}`,
+        CollectionDtoSchema,
+        { tags: ["collections", `collection:${slug}`], ...options },
+      );
+      return mapCollection(dto);
+    } catch (error) {
+      if (error instanceof OmniSourceError && error.status === 404) return null;
+      throw error;
+    }
   }
 
   /** Well-known homepage collections, resolved through OmniSource only. */
