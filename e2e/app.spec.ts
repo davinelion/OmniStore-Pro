@@ -95,6 +95,33 @@ test.describe("collections and taxonomy", () => {
 });
 
 test.describe("library", () => {
+  test.beforeEach(async ({ page }) => {
+    // Log every fetch (and unhandled rejection) from before first app code.
+    await page.addInitScript(() => {
+      const log: unknown[] = [];
+      (window as unknown as { __sdkLog: unknown[] }).__sdkLog = log;
+      const original = window.fetch.bind(window);
+      window.fetch = async (...args: Parameters<typeof fetch>) => {
+        const started = Date.now();
+        try {
+          const response = await original(...args);
+          log.push({
+            url: String(args[0]),
+            status: response.status,
+            ms: Date.now() - started,
+          });
+          return response;
+        } catch (error) {
+          log.push({ url: String(args[0]), error: String(error) });
+          throw error;
+        }
+      };
+      window.addEventListener("unhandledrejection", (event) => {
+        log.push({ unhandledRejection: String(event.reason) });
+      });
+    });
+  });
+
   test("favorites added on the app page persist to the library", async ({ page }) => {
     await page.goto("/app/keepassxc");
 
@@ -132,19 +159,10 @@ test.describe("library", () => {
         });
       const proxyResponse = await fetch("/api/v1/apps/keepassxc");
       const bodyHead = (await proxyResponse.text()).slice(0, 260);
-      const sw = await navigator.serviceWorker
-        .getRegistration()
-        .then((r) => (r ? { active: Boolean(r.active), scope: r.scope } : null))
-        .catch((error) => `sw-error: ${String(error)}`);
       await new Promise((resolve) => setTimeout(resolve, 3000));
-      const mainText = (document.querySelector("main")?.textContent ?? "").slice(0, 400);
-      return JSON.stringify({
-        idbFavorites: await readIdb(),
-        proxyStatus: proxyResponse.status,
-        bodyHead,
-        sw,
-        mainText,
-      });
+      const mainText = (document.querySelector("main")?.textContent ?? "").slice(0, 300);
+      const sdkLog = (window as unknown as { __sdkLog: unknown[] }).__sdkLog ?? [];
+      return JSON.stringify({ sdkLog, mainText });
     });
     throw new Error(`LIBRARY DIAGNOSTICS >>> ${diagnostics}`);
 
