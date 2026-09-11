@@ -60,15 +60,6 @@ export function LibraryTabs() {
     [ids, appsById],
   );
 
-  // TEMPORARY e2e diagnostics (remove once the library spec is green).
-  if (typeof window !== "undefined") {
-    (window as unknown as Record<string, unknown>).__libraryDebug = {
-      ids: [...ids],
-      resolved: [...appsById.keys()],
-      requested: [...requestedRef.current],
-      rendered: apps.map((app) => app.id),
-    };
-  }
 
   const TABS: Array<{ kind: ListKind; label: string; icon: typeof Heart }> = [
     { kind: "favorites", label: t("favorites"), icon: Heart },

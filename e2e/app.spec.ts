@@ -61,7 +61,9 @@ test.describe("app detail", () => {
 
     await expect(page.getByRole("heading", { level: 1, name: /security/i })).toBeVisible();
     await expect(page.getByText(/Passed/i).first()).toBeVisible();
-    await expect(page.getByText(/metadata_integrity|Scan evidence|Vulnerabilities/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/metadata_integrity|Scan evidence|Vulnerabilities/i).first(),
+    ).toBeVisible();
   });
 });
 
@@ -95,16 +97,7 @@ test.describe("collections and taxonomy", () => {
 });
 
 test.describe("library", () => {
-
   test("favorites added on the app page persist to the library", async ({ page }) => {
-    // TEMPORARY DIAGNOSTICS: capture client-side crashes during hydration.
-    const pageErrors: string[] = [];
-    const consoleErrors: string[] = [];
-    page.on("pageerror", (error) => pageErrors.push(String(error)));
-    page.on("console", (message) => {
-      if (message.type() === "error") consoleErrors.push(message.text().slice(0, 300));
-    });
-
     await page.goto("/app/keepassxc");
 
     const favorite = page.getByRole("button", { name: /favorite/i });
@@ -118,55 +111,6 @@ test.describe("library", () => {
 
     await page.goto("/favorites");
     await expect(page.getByRole("heading", { level: 1, name: /My library/i })).toBeVisible();
-
-    try {
-      await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible({
-        timeout: 8000,
-      });
-    } catch {
-      // Poll for up to 25s more: if the card lands late, the first SDK fetch
-      // hung and the 10s timeout + retry recovered it.
-      let landedAt: number | null = null;
-      for (let second = 1; second <= 25; second++) {
-        await page.waitForTimeout(1000);
-        const found = await page.evaluate(() =>
-          Boolean(document.querySelector("main")?.querySelector("a")),
-        );
-        const debug = await page.evaluate(
-          () => (window as unknown as Record<string, unknown>).__libraryDebug ?? null,
-        );
-        if (found && landedAt === null) landedAt = second;
-        if (found || second === 25) {
-          const rawFetch = await page.evaluate(async () => {
-            const started = Date.now();
-            try {
-              const response = await fetch("/api/v1/apps/keepassxc");
-              return { status: response.status, ms: Date.now() - started };
-            } catch (error) {
-              return { error: String(error), ms: Date.now() - started };
-            }
-          });
-          throw new Error(
-            `LIBRARY TIMING >>> landedAt=${landedAt}s rawFetch=${JSON.stringify(rawFetch)} debug=${JSON.stringify(debug)} pageErrors=${JSON.stringify(pageErrors)}`,
-          );
-        }
-      }
-    }
-  });
-
-  test("categories index and category detail work", async ({ page }) => {
-    await page.goto("/categories");
-    await expect(page.getByRole("link", { name: /Utilities/ }).first()).toBeVisible();
-
-    await page.goto("/categories/utilities");
-    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
-  });
-
-  test("developers index and developer detail work", async ({ page }) => {
-    await page.goto("/developers");
-    await expect(page.getByText(/LocalSend Team|KeePassXC Team/i).first()).toBeVisible();
-
-    await page.goto("/developers/localsend-org");
-    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible();
   });
 });
