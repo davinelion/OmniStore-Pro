@@ -124,14 +124,33 @@ test.describe("library", () => {
         timeout: 8000,
       });
     } catch {
-      const state = await page.evaluate(() => ({
-        hasReactRoot: document.querySelector("main")?.children.length ?? 0,
-        mainText: (document.querySelector("main")?.textContent ?? "").slice(0, 250),
-        libraryDebug: (window as unknown as Record<string, unknown>).__libraryDebug ?? null,
-      }));
-      throw new Error(
-        `LIBRARY DIAGNOSTICS >>> pageErrors=${JSON.stringify(pageErrors)} consoleErrors=${JSON.stringify(consoleErrors)} state=${JSON.stringify(state)}`,
-      );
+      // Poll for up to 25s more: if the card lands late, the first SDK fetch
+      // hung and the 10s timeout + retry recovered it.
+      let landedAt: number | null = null;
+      for (let second = 1; second <= 25; second++) {
+        await page.waitForTimeout(1000);
+        const found = await page.evaluate(() =>
+          Boolean(document.querySelector("main")?.querySelector("a")),
+        );
+        const debug = await page.evaluate(
+          () => (window as unknown as Record<string, unknown>).__libraryDebug ?? null,
+        );
+        if (found && landedAt === null) landedAt = second;
+        if (found || second === 25) {
+          const rawFetch = await page.evaluate(async () => {
+            const started = Date.now();
+            try {
+              const response = await fetch("/api/v1/apps/keepassxc");
+              return { status: response.status, ms: Date.now() - started };
+            } catch (error) {
+              return { error: String(error), ms: Date.now() - started };
+            }
+          });
+          throw new Error(
+            `LIBRARY TIMING >>> landedAt=${landedAt}s rawFetch=${JSON.stringify(rawFetch)} debug=${JSON.stringify(debug)} pageErrors=${JSON.stringify(pageErrors)}`,
+          );
+        }
+      }
     }
   });
 
