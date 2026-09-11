@@ -8,11 +8,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Query-driven and personal pages: crawlable but not worth indexing.
-        disallow: ["/api/", "/search", "/compare", "/favorites", "/offline", "/report"],
+        disallow: ["/api/", "/favorites", "/collections/mine"],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
-    host: absoluteUrl("/"),
   };
 }

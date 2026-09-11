@@ -1,129 +1,200 @@
-import Link from "next/link";
-import { ArrowUpRight, ShieldCheck } from "lucide-react";
+"use client";
 
-import type { App } from "@/lib/schemas/omnisource";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Download } from "lucide-react";
+
+import type { App, TrustBadge } from "@omnistore/shared-models";
+import { formatCompactNumber, relativeTime } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
-import { freshnessLabel, NOT_AVAILABLE, packageTypeLabel } from "@/lib/formatters";
 import { AppIcon } from "./AppIcon";
-import { PlatformBadge } from "@/components/platform/PlatformBadge";
-import { FavoriteButton } from "./LocalActions";
-import { categoryName } from "@/config/site";
+import { TrustBadgeList } from "./TrustBadges";
+import { PlatformBadgeRow } from "@/components/platform/PlatformBadges";
+
+export type AppCardLayout = "grid" | "list" | "compact" | "hero";
 
 /**
- * The canonical app summary card.
- *
- * Deliberately restrained: icon, identity, one line of description, platform
- * availability and a single primary action. No fake ratings, no counters we
- * cannot measure.
+ * The AppCard — one card, four layouts, used on every surface (home,
+ * search, collections, category, developer, library). Sizing is explicit at
+ * every breakpoint so rows never shift or overflow.
  */
-export function AppCard({ app, className }: { app: App; className?: string }) {
-  const summary = app.summary ?? "Description unavailable";
-  const updated = freshnessLabel(app.updated_at);
-  const primaryCategory = app.categories[0];
+export function AppCard({
+  app,
+  layout = "grid",
+  badges = [],
+  showScores = true,
+  priority = false,
+  className,
+}: {
+  app: App;
+  layout?: AppCardLayout;
+  /** Pre-fetched trust badges (server components pass these in). */
+  badges?: readonly TrustBadge[];
+  showScores?: boolean;
+  priority?: boolean;
+  className?: string;
+}) {
+  const t = useTranslations("app");
+  const href = `/app/${app.slug}`;
 
+  if (layout === "compact") {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "group flex items-center gap-3 rounded-xl border border-transparent p-2 transition-colors hover:border-line hover:bg-surface-2",
+          className,
+        )}
+      >
+        <AppIcon name={app.name} src={app.icon} size="sm" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium group-hover:text-accent">
+            {app.name}
+          </span>
+          <span className="block truncate text-xs text-muted">
+            {app.shortDescription ?? app.developer}
+          </span>
+        </span>
+        {showScores && app.trustScore != null ? (
+          <span className="text-xs tabular-nums text-muted" title={t("trustScore")}>
+            {app.trustScore}
+          </span>
+        ) : null}
+      </Link>
+    );
+  }
+
+  if (layout === "list") {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "card card-interactive flex items-center gap-4 p-3 hover:shadow-card sm:p-4",
+          className,
+        )}
+      >
+        <AppIcon name={app.name} src={app.icon} size="lg" />
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2">
+            <span className="truncate text-base font-semibold">{app.name}</span>
+            <TrustBadgeList badges={badges} size="sm" />
+          </span>
+          <span className="mt-0.5 line-clamp-2 block text-sm text-muted">
+            {app.shortDescription || app.description || t("notAvailable")}
+          </span>
+          <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle">
+            <PlatformBadgeRow platforms={app.platforms ?? []} />
+            {app.updatedAt ? <span>{relativeTime(app.updatedAt)}</span> : null}
+            {app.version ? <span>v{app.version}</span> : null}
+          </span>
+        </span>
+      </Link>
+    );
+  }
+
+  if (layout === "hero") {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "card card-interactive group relative flex min-h-[15rem] flex-col justify-end overflow-hidden p-5 hover:shadow-card sm:min-h-[17rem] sm:p-6",
+          className,
+        )}
+      >
+        {app.banner ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={app.banner}
+            alt=""
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover opacity-25 transition-opacity group-hover:opacity-35"
+          />
+        ) : null}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/30"
+        />
+        <div className="relative flex items-end gap-4">
+          <AppIcon name={app.name} src={app.icon} size="xl" />
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-lg font-semibold sm:text-xl">{app.name}</h3>
+            <p className="mt-0.5 line-clamp-2 text-sm text-muted">
+              {app.shortDescription || app.description}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <TrustBadgeList badges={badges} size="sm" />
+              <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface/70 px-2 py-0.5 text-2xs text-muted">
+                <Download className="h-3 w-3" aria-hidden />
+                {app.downloadCount != null
+                  ? formatCompactNumber(app.downloadCount)
+                  : app.version ?? ""}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // grid (default)
   return (
-    <article
+    <Link
+      href={href}
       className={cn(
-        "card card-interactive group relative flex flex-col gap-3 p-4 focus-within:border-accent/60",
+        "card card-interactive flex flex-col gap-3 p-4 hover:shadow-card",
         className,
       )}
     >
-      <div className="flex gap-3">
-        <AppIcon name={app.name} src={app.icon_url} size="md" />
-
+      <div className="flex items-start gap-3">
+        <AppIcon name={app.name} src={app.icon} size="lg" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="truncate font-semibold leading-tight">
-              {/* Stretched link: the whole card is clickable, actions stay reachable. */}
-              <Link href={`/apps/${app.slug}`} className="after:absolute after:inset-0 focus:outline-none">
-                {app.name}
-              </Link>
-            </h3>
-            {app.scores.trust.value != null ? (
-              <span
-                className="relative z-10 inline-flex shrink-0 items-center gap-1 rounded-full border border-line px-1.5 py-0.5 text-2xs text-fg-muted"
-                title={`Trust Score ${app.scores.trust.value} / 100`}
-              >
-                <ShieldCheck className="h-3 w-3 text-accent" aria-hidden />
-                <span className="tabular-nums">{app.scores.trust.value}</span>
-                <span className="sr-only">Trust Score {app.scores.trust.value} out of 100</span>
-              </span>
-            ) : null}
-          </div>
-
-          <p className="mt-1 line-clamp-2 text-sm text-muted">{summary}</p>
-
-          <p className="mt-1.5 truncate text-2xs text-fg-subtle">
-            {primaryCategory ? categoryName(primaryCategory) : "Uncategorized"}
-            {app.latest_release?.version ? ` · v${app.latest_release.version}` : ""}
-            {updated ? ` · ${updated}` : ""}
-          </p>
+          <h3 className="truncate text-[0.95rem] font-semibold leading-snug">{app.name}</h3>
+          <p className="truncate text-xs text-muted">{app.developer}</p>
         </div>
       </div>
-
-      <div className="flex flex-wrap items-center gap-1">
-        {app.platforms.slice(0, 6).map((platform) => (
-          <PlatformBadge key={platform} platform={platform} />
-        ))}
-        {app.platforms.length > 6 ? (
-          <span className="chip">+{app.platforms.length - 6}</span>
+      <p className="line-clamp-2 min-h-[2.4em] text-sm text-muted">
+        {app.shortDescription || app.description || t("notAvailable")}
+      </p>
+      <div className="mt-auto flex items-center justify-between gap-2">
+        <TrustBadgeList badges={badges} size="sm" />
+        {showScores && app.trustScore != null ? (
+          <span
+            className={cn(
+              "rounded-full px-2 py-0.5 text-2xs font-semibold tabular-nums",
+              app.trustScore >= 80
+                ? "bg-success/10 text-success"
+                : app.trustScore >= 50
+                  ? "bg-warning/10 text-warning"
+                  : "bg-surface-3 text-muted",
+            )}
+          >
+            {app.trustScore}
+          </span>
         ) : null}
       </div>
-
-      {/* Desktop affordances. On mobile the whole card is the tap target. */}
-      <div className="mt-auto hidden gap-2 pt-1 md:flex">
-        <Link
-          href={`/apps/${app.slug}`}
-          className="relative z-10 inline-flex h-8 items-center gap-1 rounded-full border border-line px-3 text-sm transition-colors hover:bg-surface-2"
-        >
-          View
-        </Link>
-        <Link
-          href={`/apps/${app.slug}#get`}
-          className="relative z-10 inline-flex h-8 items-center gap-1 rounded-full bg-accent px-3 text-sm text-accent-fg transition-colors hover:bg-accent-hover"
-        >
-          Get
-          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
-        </Link>
-        <FavoriteButton appId={app.id} name={app.name} className="ml-auto" />
-      </div>
-    </article>
+    </Link>
   );
 }
 
-/** Compact row used in compare pickers, search suggestions and sidebars. */
-export function AppRow({ app, action }: { app: App; action?: React.ReactNode }) {
+/** Responsive grid of AppCards with stable sizing (no CLS). */
+export function AppGrid({
+  apps,
+  className,
+}: {
+  apps: App[];
+  className?: string;
+}) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-line bg-surface p-2.5">
-      <AppIcon name={app.name} src={app.icon_url} size="sm" />
-      <div className="min-w-0 flex-1">
-        <Link href={`/apps/${app.slug}`} className="truncate text-sm font-medium hover:text-accent">
-          {app.name}
-        </Link>
-        <p className="truncate text-2xs text-fg-subtle">
-          {app.platforms.length} platforms
-          {app.latest_release ? ` · ${packageTypeLabel(app.latest_release.assets[0]?.package_type ?? "OTHER")}` : ""}
-          {app.scores.trust.value != null ? ` · Trust ${app.scores.trust.value}` : ""}
-        </p>
-      </div>
-      {action}
-    </div>
-  );
-}
-
-export function AppList({ apps, empty }: { apps: App[]; empty?: React.ReactNode }) {
-  if (apps.length === 0 && empty) return <>{empty}</>;
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+        className,
+      )}
+    >
       {apps.map((app) => (
         <AppCard key={app.id} app={app} />
       ))}
     </div>
-  );
-}
-
-export function StatLine({ app }: { app: App }) {
-  return (
-    <span>{app.signals.stars == null ? NOT_AVAILABLE : `${app.signals.stars.toLocaleString("en-US")} stars`}</span>
   );
 }

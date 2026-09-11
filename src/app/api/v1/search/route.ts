@@ -1,15 +1,30 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
-import { parseFilters } from "@/lib/search/query";
-import { track } from "@/lib/analytics";
+/** GET /api/v1/search — OmniSource's search engine, proxied verbatim. */
+import type { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
+import { getOmnisource } from "@/lib/omnisource";
+import { boolParam, fail, intParam, ok } from "@/lib/omnisource/http";
 
-/** GET /api/v1/search — universal search with filters, sorting and pagination. */
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const filters = parseFilters(Object.fromEntries(url.searchParams.entries()));
-  const result = await getProvider().search(filters);
-  if (filters.q) track("search", { query: filters.q, results: result.pagination.total });
-  return json(result, { cacheSeconds: 60 });
+export const revalidate = 60;
+
+export async function GET(request: NextRequest) {
+  try {
+    const params = request.nextUrl.searchParams;
+    const result = await getOmnisource().search(params.get("q") ?? "", {
+      platform: params.get("platform") ?? undefined,
+      category: params.get("category") ?? undefined,
+      developer: params.get("developer") ?? undefined,
+      license: params.get("license") ?? undefined,
+      architecture: params.get("architecture") ?? undefined,
+      openSource: boolParam(params.get("open_source")),
+      minTrust: params.get("min_trust")
+        ? intParam(params.get("min_trust"), 0, 0, 100)
+        : undefined,
+      sort: params.get("sort") ?? undefined,
+      page: intParam(params.get("page"), 1, 1, 10_000),
+      perPage: intParam(params.get("per_page"), 24, 1, 100),
+    });
+    return ok(result);
+  } catch (error) {
+    return fail(error);
+  }
 }

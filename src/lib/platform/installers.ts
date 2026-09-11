@@ -7,17 +7,34 @@
  * same interface without OmniStore's domain logic changing.
  */
 
-import type { Asset } from "@/lib/schemas/omnisource";
+import type { ReleaseAsset } from "@omnistore/shared-models";
 import { isSafeUrl } from "@/lib/security/urls";
-import { assetStatusNote, isDownloadableAsset } from "@/lib/schemas/omnisource";
+
+/** Client-side install guard: only VALID, https assets are handed off. */
+function isDownloadableAsset(asset: ReleaseAsset): boolean {
+  return asset.status === "VALID" && Boolean(asset.url);
+}
+
+function assetStatusNote(asset: ReleaseAsset): string {
+  switch (asset.status) {
+    case "INVALID":
+      return "This asset failed upstream verification and cannot be installed.";
+    case "QUARANTINED":
+      return "This asset is quarantined pending a security review.";
+    case "REVIEW_REQUIRED":
+      return "This asset is awaiting review and is not yet available.";
+    default:
+      return "This asset is not available for installation.";
+  }
+}
 
 export interface PlatformInstaller {
   /** Human readable platform name, e.g. "Android". */
   readonly platform: string;
   /** True when this client can complete an installation for the asset. */
-  canInstall(asset: Asset): boolean;
+  canInstall(asset: ReleaseAsset): boolean;
   /** Starts the installation flow. Rejects when the asset is not installable. */
-  install(asset: Asset): Promise<InstallResult>;
+  install(asset: ReleaseAsset): Promise<InstallResult>;
 }
 
 export type InstallResult = {

@@ -1,10 +1,16 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/developers — all indexed developers. */
+import type { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
+import { getOmnisource } from "@/lib/omnisource";
+import { fail, intParam, ok } from "@/lib/omnisource/http";
 
-/** GET /api/v1/developers — upstream developers with app counts. */
-export async function GET() {
-  const items = await getProvider().getDevelopers();
-  return json({ items }, { cacheSeconds: 3600 });
+export const revalidate = 1800;
+
+export async function GET(request: NextRequest) {
+  try {
+    const limit = intParam(request.nextUrl.searchParams.get("limit"), 120, 1, 500);
+    return ok(await getOmnisource().getDevelopers(limit));
+  } catch (error) {
+    return fail(error);
+  }
 }

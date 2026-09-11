@@ -1,10 +1,13 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/categories — the taxonomy. */
+import { getOmnisource } from "@/lib/omnisource";
+import { fail, ok } from "@/lib/omnisource/http";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
-/** GET /api/v1/categories — taxonomy with live counts. */
 export async function GET() {
-  const items = await getProvider().getCategories();
-  return json({ items }, { cacheSeconds: 3600 });
+  try {
+    return ok(await getOmnisource().getCategories());
+  } catch (error) {
+    return fail(error);
+  }
 }

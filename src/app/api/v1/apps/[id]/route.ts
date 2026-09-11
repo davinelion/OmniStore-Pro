@@ -1,12 +1,19 @@
-import { getProvider } from "@/lib/api";
-import { json, notFound } from "@/lib/api/http";
+/** GET /api/v1/apps/{id} — one app by id or slug. */
+import { getOmnisource } from "@/lib/omnisource";
+import { fail, notFoundResponse, ok } from "@/lib/omnisource/http";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
-/** GET /api/v1/apps/{id} — one app by canonical id or slug. */
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const app = await getProvider().getApp(resolvedParams.id);
-  if (!app) return notFound("App not found");
-  return json(app, { cacheSeconds: 300 });
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const app = await getOmnisource().getApp(decodeURIComponent(id));
+    if (!app) return notFoundResponse();
+    return ok(app);
+  } catch (error) {
+    return fail(error);
+  }
 }

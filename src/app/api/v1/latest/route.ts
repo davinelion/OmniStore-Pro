@@ -1,10 +1,13 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/latest — recently released/updated apps. */
+import { getOmnisource } from "@/lib/omnisource";
+import { fail, ok } from "@/lib/omnisource/http";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
-/** GET /api/v1/latest — recently added, updated and released. */
 export async function GET() {
-  const result = await getProvider().getLatest();
-  return json(result, { cacheSeconds: 300 });
+  try {
+    return ok(await getOmnisource().getRecent());
+  } catch (error) {
+    return fail(error);
+  }
 }

@@ -1,0 +1,24 @@
+{
+  "name": "@omnistore/shared-models",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared OmniStore domain models, wire DTOs, schemas and validators for the OmniSource REST API v1 contract. Used by the website and ready for iOS, Android and desktop clients.",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --root ../.."
+  },
+  "peerDependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "zod": "^3.23.8"
+  }
+}

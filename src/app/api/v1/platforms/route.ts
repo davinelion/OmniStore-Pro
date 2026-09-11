@@ -1,10 +1,13 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/platforms — platform taxonomy. */
+import { getOmnisource } from "@/lib/omnisource";
+import { fail, ok } from "@/lib/omnisource/http";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
-/** GET /api/v1/platforms — supported platforms with live counts and install hints. */
 export async function GET() {
-  const items = await getProvider().getPlatforms();
-  return json({ items }, { cacheSeconds: 3600 });
+  try {
+    return ok(await getOmnisource().getPlatforms());
+  } catch (error) {
+    return fail(error);
+  }
 }

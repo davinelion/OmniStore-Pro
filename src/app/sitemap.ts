@@ -1,91 +1,73 @@
 import type { MetadataRoute } from "next";
 
-import { getProvider } from "@/lib/api";
-import { catalogApps } from "@/lib/catalog/quality";
+import { getOmnisource } from "@/lib/omnisource";
 import { absoluteUrl } from "@/config/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
-/**
- * Sitemap generated from live OmniSource data.
- *
- * App and taxonomy pages are indexable; personal and query-driven pages
- * (search, compare, favorites) are excluded.
- */
+/** Dynamic sitemap: static routes + every app/collection/category/developer. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const provider = getProvider();
-  const [apps, categories, platforms, collections, developers] = await Promise.all([
-    catalogApps(provider),
-    provider.getCategories(),
-    provider.getPlatforms(),
-    provider.getCollections(),
-    provider.getDevelopers(),
+  const client = getOmnisource();
+
+  const staticRoutes: MetadataRoute.Sitemap = [
+    "",
+    "/apps",
+    "/search",
+    "/collections",
+    "/categories",
+    "/developers",
+    "/about",
+    "/privacy",
+    "/terms",
+  ].map((path) => ({
+    url: absoluteUrl(path),
+    changeFrequency: path === "" ? "daily" : "weekly",
+    priority: path === "" ? 1 : 0.6,
+  }));
+
+  const [apps, collections, categories, developers] = await Promise.allSettled([
+    client.getApps({ perPage: 100 }),
+    client.getCollections(1, 100),
+    client.getCategories(),
+    client.getDevelopers(200),
   ]);
 
-  const freshness = (await provider.getFeedMeta()).generated_at;
-  const lastModified = new Date(freshness);
-  const safeModified = Number.isNaN(lastModified.getTime()) ? new Date() : lastModified;
-
-  return [
-    ...["/alternatives", "/catalog-health", "/contribute"].map(path => ({ url: absoluteUrl(path), lastModified: safeModified })),
-    { url: absoluteUrl("/"), lastModified: safeModified, changeFrequency: "daily", priority: 1 },
-    { url: absoluteUrl("/apps"), lastModified: safeModified, changeFrequency: "daily", priority: 0.9 },
-    { url: absoluteUrl("/categories"), lastModified: safeModified, changeFrequency: "weekly", priority: 0.8 },
-    { url: absoluteUrl("/platforms"), lastModified: safeModified, changeFrequency: "weekly", priority: 0.8 },
-    { url: absoluteUrl("/collections"), lastModified: safeModified, changeFrequency: "weekly", priority: 0.7 },
-    { url: absoluteUrl("/trending"), lastModified: safeModified, changeFrequency: "daily", priority: 0.7 },
-    { url: absoluteUrl("/latest"), lastModified: safeModified, changeFrequency: "daily", priority: 0.7 },
-    {
-      url: absoluteUrl("/discover/cross-platform"),
-      lastModified: safeModified,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    { url: absoluteUrl("/developers"), lastModified: safeModified, changeFrequency: "weekly", priority: 0.6 },
-    { url: absoluteUrl("/docs"), lastModified: safeModified, changeFrequency: "monthly", priority: 0.6 },
-    { url: absoluteUrl("/about"), lastModified: safeModified, changeFrequency: "monthly", priority: 0.6 },
-    { url: absoluteUrl("/privacy"), lastModified: safeModified, changeFrequency: "yearly", priority: 0.3 },
-    { url: absoluteUrl("/terms"), lastModified: safeModified, changeFrequency: "yearly", priority: 0.3 },
-
-    ...apps.map((app) => ({
-      url: absoluteUrl(`/apps/${app.slug}`),
-      lastModified: app.updated_at ? new Date(app.updated_at) : safeModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    })),
-    ...apps.map((app) => ({
-      url: absoluteUrl(`/apps/${app.slug}/releases`),
-      lastModified: app.latest_release?.released_at ? new Date(app.latest_release.released_at) : safeModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.5,
-    })),
-    ...categories
-      .filter((category) => category.app_count > 0)
-      .map((category) => ({
+  if (apps.status === "fulfilled") {
+    for (const app of apps.value.items) {
+      staticRoutes.push({
+        url: absoluteUrl(`/app/${app.slug}`),
+        changeFrequency: "daily",
+        priority: 0.8,
+      });
+    }
+  }
+  if (collections.status === "fulfilled") {
+    for (const collection of collections.value.items) {
+      staticRoutes.push({
+        url: absoluteUrl(`/collection/${collection.slug}`),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      });
+    }
+  }
+  if (categories.status === "fulfilled") {
+    for (const category of categories.value) {
+      staticRoutes.push({
         url: absoluteUrl(`/categories/${category.slug}`),
-        lastModified: safeModified,
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      })),
-    ...platforms
-      .filter((platform) => platform.app_count > 0)
-      .map((platform) => ({
-        url: absoluteUrl(`/platforms/${platform.slug}`),
-        lastModified: safeModified,
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      })),
-    ...collections.map((collection) => ({
-      url: absoluteUrl(`/collections/${collection.slug}`),
-      lastModified: safeModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    })),
-    ...developers.map((developer) => ({
-      url: absoluteUrl(`/developers/${developer.slug}`),
-      lastModified: safeModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.5,
-    })),
-  ];
+        changeFrequency: "weekly",
+        priority: 0.5,
+      });
+    }
+  }
+  if (developers.status === "fulfilled") {
+    for (const developer of developers.value) {
+      staticRoutes.push({
+        url: absoluteUrl(`/developers/${developer.slug}`),
+        changeFrequency: "weekly",
+        priority: 0.4,
+      });
+    }
+  }
+
+  return staticRoutes;
 }

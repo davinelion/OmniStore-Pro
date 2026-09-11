@@ -1,15 +1,13 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/trending — OmniSource trending. */
+import { getOmnisource } from "@/lib/omnisource";
+import { fail, ok } from "@/lib/omnisource/http";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
-/**
- * GET /api/v1/trending
- *
- * Ranked from measurable upstream signals only. OmniStore does not publish
- * daily or weekly deltas it cannot compute from a single catalog snapshot.
- */
 export async function GET() {
-  const result = await getProvider().getTrending();
-  return json(result, { cacheSeconds: 300 });
+  try {
+    return ok(await getOmnisource().getTrending());
+  } catch (error) {
+    return fail(error);
+  }
 }
