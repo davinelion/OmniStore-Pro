@@ -14,7 +14,7 @@ export default async function FavoritesPage() {
   const t = await getTranslations("library");
   return (
     <div className="space-y-6">
-      <SectionHeading title={t("title")} description={t("description")} />
+      <SectionHeading level={1} title={t("title")} description={t("description")} />
       <LibraryTabs />
     </div>
   );

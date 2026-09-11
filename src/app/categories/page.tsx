@@ -20,7 +20,7 @@ export default async function CategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <SectionHeading title={t("title")} description={t("description")} />
+      <SectionHeading level={1} title={t("title")} description={t("description")} />
       {categories.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {categories.map((category) => (

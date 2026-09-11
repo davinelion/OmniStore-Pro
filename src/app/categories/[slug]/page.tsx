@@ -40,7 +40,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="space-y-6">
-      <SectionHeading
+      <SectionHeading level={1}
         title={name}
         description={description || t("appsIn", { category: name })}
       />

@@ -18,7 +18,7 @@ export default async function AboutPage() {
   ];
   return (
     <article className="mx-auto max-w-3xl space-y-8">
-      <SectionHeading title={t("title")} description={t("intro")} />
+      <SectionHeading level={1} title={t("title")} description={t("intro")} />
       {sections.map((section) => (
         <section key={section.title} className="space-y-2">
           <h2 className="text-lg font-semibold tracking-tight">{section.title}</h2>

@@ -14,7 +14,7 @@ export default async function MyCollectionsPage() {
   const t = await getTranslations("collections");
   return (
     <div className="space-y-6">
-      <SectionHeading title={t("userTitle")} description={t("description")} />
+      <SectionHeading level={1} title={t("userTitle")} description={t("description")} />
       <Suspense fallback={<Skeleton className="h-40 w-full" />}>
         <UserCollections />
       </Suspense>

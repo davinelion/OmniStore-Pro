@@ -12,7 +12,7 @@ export default async function PrivacyPage() {
   const paragraphs = [t("body1"), t("body2"), t("body3"), t("body4")];
   return (
     <article className="mx-auto max-w-3xl space-y-6">
-      <SectionHeading title={t("title")} />
+      <SectionHeading level={1} title={t("title")} />
       {paragraphs.map((paragraph) => (
         <p key={paragraph} className="text-sm leading-relaxed text-muted">
           {paragraph}

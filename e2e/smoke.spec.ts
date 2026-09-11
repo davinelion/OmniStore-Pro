@@ -22,7 +22,8 @@ test.describe("smoke", () => {
     const stats = await request.get("/api/v1/stats");
     expect(stats.ok()).toBeTruthy();
     const statsBody = await stats.json();
-    expect(statsBody.applications).toBeGreaterThan(0);
+    // The proxy serves OmniStore's normalized contract (apps), not raw upstream fields.
+    expect(statsBody.apps).toBeGreaterThan(0);
 
     const apps = await request.get("/api/v1/apps?per_page=5");
     expect(apps.ok()).toBeTruthy();

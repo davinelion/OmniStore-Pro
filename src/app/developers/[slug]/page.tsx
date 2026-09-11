@@ -32,7 +32,7 @@ export default async function DeveloperPage({ params }: { params: Promise<{ slug
 
   return (
     <div className="space-y-6">
-      <SectionHeading
+      <SectionHeading level={1}
         title={t("appsBy", { developer: developer.name })}
         description={t("appCount", { count: developer.appCount })}
       />
