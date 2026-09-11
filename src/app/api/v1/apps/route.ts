@@ -1,7 +1,8 @@
-/** GET /api/v1/apps — filtered catalog listing (proxied from OmniSource). */
+/** GET /api/v1/apps — filtered catalog listing (v1 wire pass-through). */
 import type { NextRequest } from "next/server";
 
 import { getOmnisource } from "@/lib/omnisource";
+import { PaginatedAppsDtoSchema } from "@omnistore/shared-models";
 import { boolParam, fail, intParam, ok } from "@/lib/omnisource/http";
 
 export const revalidate = 300;
@@ -9,21 +10,23 @@ export const revalidate = 300;
 export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams;
-    const result = await getOmnisource().getApps({
-      q: params.get("q") ?? undefined,
-      platform: params.get("platform") ?? undefined,
-      category: params.get("category") ?? undefined,
-      developer: params.get("developer") ?? undefined,
-      license: params.get("license") ?? undefined,
-      architecture: params.get("architecture") ?? undefined,
-      openSource: boolParam(params.get("open_source")),
-      minTrust: params.get("min_trust") ? intParam(params.get("min_trust"), 0, 0, 100) : undefined,
-      minQuality: params.get("min_quality") ? intParam(params.get("min_quality"), 0, 0, 100) : undefined,
-      sort: params.get("sort") ?? undefined,
-      page: intParam(params.get("page"), 1, 1, 10_000),
-      perPage: intParam(params.get("per_page"), 24, 1, 100),
-    });
-    return ok(result);
+    const query = new URLSearchParams();
+    for (const key of [
+      "q", "platform", "category", "developer", "license", "architecture",
+      "open_source", "min_trust", "min_quality", "updated_since", "sort", "page", "per_page",
+    ]) {
+      const value = params.get(key);
+      if (value) query.set(key, value);
+    }
+    if (boolParam(params.get("open_source")) !== undefined) {
+      query.set("open_source", String(boolParam(params.get("open_source"))));
+    }
+    const dto = await getOmnisource().request(
+      `/apps${query.size > 0 ? `?${query}` : ""}`,
+      PaginatedAppsDtoSchema,
+      { tags: ["apps"], revalidate: 300 },
+    );
+    return ok(dto);
   } catch (error) {
     return fail(error);
   }

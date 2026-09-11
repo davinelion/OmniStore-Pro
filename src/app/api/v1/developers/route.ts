@@ -1,15 +1,20 @@
-/** GET /api/v1/developers — all indexed developers. */
+/** GET /api/v1/developers — all indexed developers (v1 wire pass-through). */
 import type { NextRequest } from "next/server";
 
 import { getOmnisource } from "@/lib/omnisource";
-import { fail, intParam, ok } from "@/lib/omnisource/http";
+import { DeveloperRecordDtoSchema } from "@omnistore/shared-models";
+import { fail, ok } from "@/lib/omnisource/http";
+import { z } from "zod";
 
 export const revalidate = 1800;
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const limit = intParam(request.nextUrl.searchParams.get("limit"), 120, 1, 500);
-    return ok(await getOmnisource().getDevelopers(limit));
+    const dto = await getOmnisource().request("/developers", z.array(DeveloperRecordDtoSchema), {
+      tags: ["developers"],
+      revalidate: 1800,
+    });
+    return ok(dto);
   } catch (error) {
     return fail(error);
   }
