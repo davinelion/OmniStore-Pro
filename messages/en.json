@@ -9,6 +9,7 @@
     "collections": "Collections",
     "categories": "Categories",
     "developers": "Developers",
+    "track": "Track",
     "search": "Search",
     "favorites": "My library",
     "skipToContent": "Skip to content",
@@ -43,7 +44,11 @@
     "recommended": "Recommended for you",
     "recommendedDescription": "Explainable picks from the OmniSource recommendation engine.",
     "stats": "The catalog in numbers",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "statApps": "apps indexed",
+    "statPlatforms": "platforms",
+    "indexedFrom": "Indexed from",
+    "ctaTrack": "Track a source"
   },
   "stats": {
     "apps": "Apps",
@@ -175,7 +180,13 @@
     "allPlatforms": "All platforms",
     "allCategories": "All categories",
     "searchInside": "Search inside this collection",
-    "noQuery": "Start typing to search the catalog — results come from OmniSource's search engine."
+    "noQuery": "Start typing to search the catalog — results come from OmniSource's search engine.",
+    "close": "Close search",
+    "noResults": "No apps matched your search.",
+    "jumpTo": "Jump to",
+    "paletteHint": "Type at least two characters to search the catalog…",
+    "paletteNavigate": "to navigate",
+    "paletteSelect": "to select"
   },
   "collections": {
     "title": "Collections",
@@ -265,7 +276,11 @@
     "terms": "Terms",
     "source": "Source code",
     "poweredBy": "Powered by OmniSource Pro",
-    "language": "Language"
+    "language": "Language",
+    "catalog": "Catalog",
+    "project": "Project",
+    "sources": "Sources we track",
+    "sourcesNote": "OmniSource indexes releases directly from these upstreams — OmniStore never mirrors binaries."
   },
   "about": {
     "title": "About OmniStore",
@@ -294,5 +309,44 @@
   },
   "jsonLd": {
     "ratings": "{count} ratings"
+  },
+  "track": {
+    "title": "Track any source",
+    "subtitle": "Paste a repository or package URL. OmniStore watches it through OmniSource and tells you when a new release ships — for every platform, not just Android.",
+    "placeholder": "https://github.com/owner/repo — or just owner/repo",
+    "submit": "Track source",
+    "resolving": "Looking up source…",
+    "unrecognised": "That does not look like a repository or package URL we can read.",
+    "tryThese": "Try one of these",
+    "indexedTitle": "Found in the catalog",
+    "notIndexedTitle": "Not indexed yet",
+    "notIndexedBody": "OmniSource has not indexed this source, so there is no verified version or download to show. You can request it below.",
+    "requestIndexing": "Request indexing",
+    "requestSent": "Request sent to OmniSource",
+    "requestFailed": "We could not send that request. You can still open an issue.",
+    "openIssue": "Open a submission issue",
+    "alreadyTracked": "Already tracked",
+    "tracked": "Now tracking this source",
+    "untracked": "Stopped tracking",
+    "updatesTitle": "Updates available",
+    "updatesEmpty": "Everything you track is up to date.",
+    "trackedTitle": "Tracked sources",
+    "trackedEmpty": "You are not tracking anything yet. Paste a source URL above to start.",
+    "refresh": "Check for updates",
+    "refreshing": "Checking…",
+    "refreshFailed": "Could not reach OmniSource. Showing the last known versions.",
+    "added": "Added",
+    "stopTracking": "Stop tracking",
+    "markSeen": "Mark as seen",
+    "updateTo": "Update to {version}",
+    "version": "Version",
+    "noRelease": "No release yet",
+    "pendingBadge": "Awaiting indexing",
+    "upToDate": "Up to date",
+    "openApp": "Open app page",
+    "download": "Download",
+    "sourcesSupported": "GitHub · GitLab · Codeberg · Forgejo · F-Droid · Flathub · Winget · Homebrew",
+    "disclaimerTitle": "Where updates come from",
+    "disclaimerBody": "Versions are read from OmniSource, which indexes releases straight from the upstream forge. OmniStore keeps your tracked list on this device only and never mirrors binaries."
   }
 }

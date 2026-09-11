@@ -3,8 +3,13 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { dirFor } from "@/i18n/config";
 
+// Self-hosted variable fonts — no third-party request, no layout shift.
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
+
 import { site } from "@/config/site";
 import { Providers } from "@/components/layout/Providers";
+import { AmbientBackground } from "@/components/layout/AmbientBackground";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Pwa } from "@/components/layout/Pwa";

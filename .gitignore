@@ -22,3 +22,7 @@ public/workbox-*.js
 public/workbox-*.js.map
 public/fallback-*.js
 public/swe-worker-*.js
+
+# Alternate dist dirs used by local verification runs
+.next-dev/
+.next-build/

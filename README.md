@@ -83,12 +83,47 @@ the full contract and the plan for native clients.
 | Alternatives | Computed from shared categories and platforms — never hand-written |
 | Comparison | Up to 4 apps, table view, shareable via URL |
 | Taxonomy | Categories, platforms, developers, curated and rule-based collections |
+| Tracking | Paste any source URL → track releases, update inbox, local-only |
 | Personal | Favorites and follows, local-only, no account |
 | PWA | Installable, offline shell, cached API responses |
 | Theming | Light/dark/system, no flash, respects `prefers-reduced-motion` |
 | i18n | English and Bangla, extensible message catalogues |
 | Accessibility | Skip link, landmarks, labelled controls, keyboard paths, focus states |
 | SEO | Canonical URLs, OG/Twitter cards, JSON-LD, sitemap.xml, robots.txt |
+
+---
+
+## Tracking sources
+
+OmniStore can watch any upstream the way Obtanium does.
+
+Paste a repository or package URL on [`/track`](/track) — `owner/name`,
+`https://github.com/owner/name`, `git@host:owner/name.git`, or a
+package-manager page. OmniStore resolves it against OmniSource and either:
+
+- **finds it** → shows the app, its latest version and its platforms, and adds
+  it to your tracked list; or
+- **does not find it** → says so plainly, lets you track it as *awaiting
+  indexing*, and offers to request it from OmniSource.
+
+Tracked sources live in IndexedDB on your device — no account, no sync, no
+upload. **Check for updates** re-reads every tracked app's current version from
+OmniSource and diffs it against the version you last acknowledged, so the update
+inbox only ever reports a version that actually changed. Unknown versions never
+produce a false "update available".
+
+| Route | Purpose |
+| --- | --- |
+| `GET /api/v1/sources/resolve?url=` | Resolve a pasted URL to a catalog app |
+| `POST /api/v1/sources/refresh` | Current versions for tracked app ids |
+| `POST /api/v1/sources/submit` | Forward an indexing request (server-only key) |
+
+Supported upstreams: GitHub, GitLab, Codeberg, Forgejo, F-Droid, Flathub,
+Winget and Homebrew — the same connectors OmniSource ships.
+
+Indexing requests are only forwarded when `OMNISOURCE_SUBMIT_URL` is set. When
+it is not, the UI offers a prefilled "Suggest an app" issue instead and never
+claims a request was accepted.
 
 ---
 
@@ -104,6 +139,8 @@ Copy `.env.example` to `.env.local`. Every variable is optional.
 | `NEXT_PUBLIC_ENABLE_ANALYTICS` | `false` | Anonymous product analytics; off by default |
 | `FEATURE_*` | see below | Feature flags: `COMPARISON`, `FAVORITES`, `COLLECTIONS`, `REPORTING`, `PWA`, `AI_RECOMMENDATIONS` |
 | `OMNISTORE_REPORT_WEBHOOK_URL` | unset | Optional `https://` webhook that receives reports (server-side only) |
+| `OMNISOURCE_SUBMIT_URL` | unset | `https://` intake endpoint for source-indexing requests (server-side only) |
+| `OMNISOURCE_ADMIN_API_KEY` | unset | API key sent to the intake endpoint (server-side only, never `NEXT_PUBLIC_`) |
 | `GITHUB_TOKEN` | unset | Used only by `npm run ingest`, never by the app |
 
 **Never put a secret in a `NEXT_PUBLIC_*` variable** — they are shipped to the

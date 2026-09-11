@@ -1,3 +1,10 @@
+/* ------------------------------------------------------------------ */
+/* OmniStore design system — dark-first glass / aurora                  */
+/*                                                                     */
+/* Colours resolve to CSS variables so light/dark switching is instant  */
+/* and never flashes the wrong theme.                                   */
+/* ------------------------------------------------------------------ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,20 +16,23 @@
 :root {
   color-scheme: light;
 
-  --bg: 250 250 249;
+  --bg: 250 250 252;
   --surface: 255 255 255;
-  --surface-2: 244 245 247;
-  --surface-3: 236 238 242;
-  --line: 226 229 234;
-  --line-strong: 205 210 218;
+  --surface-2: 244 246 250;
+  --surface-3: 236 239 246;
 
-  --fg: 17 22 30;
-  --fg-muted: 95 105 120;
-  --fg-subtle: 130 140 155;
+  --line: 226 231 240;
+  --line-strong: 203 210 224;
 
-  --accent: 12 138 116;
-  --accent-hover: 10 118 100;
-  --accent-soft: 224 246 241;
+  --fg: 12 16 26;
+  --fg-muted: 90 100 120;
+  --fg-subtle: 128 138 155;
+
+  /* Brand: violet → cyan. `accent` is the primary, `accent-2` the aurora pair. */
+  --accent: 99 62 240;
+  --accent-2: 8 145 178;
+  --accent-hover: 84 50 220;
+  --accent-soft: 240 238 255;
   --accent-fg: 255 255 255;
 
   --info: 37 99 235;
@@ -30,8 +40,13 @@
   --warning: 180 83 9;
   --danger: 190 40 45;
 
-  --ring: 12 138 116;
+  --ring: 99 62 240;
   --shadow-color: 15 23 42;
+
+  /* Glass surfaces */
+  --glass: 255 255 255;
+  --glass-alpha: 0.72;
+  --glass-border: 255 255 255;
 
   --header-height: 4rem;
 }
@@ -39,28 +54,35 @@
 .dark {
   color-scheme: dark;
 
-  --bg: 9 11 16;
-  --surface: 17 21 29;
-  --surface-2: 23 28 38;
-  --surface-3: 31 37 49;
-  --line: 38 45 58;
-  --line-strong: 55 64 80;
+  --bg: 5 6 11;
+  --surface: 12 15 23;
+  --surface-2: 18 22 32;
+  --surface-3: 27 32 44;
 
-  --fg: 238 242 248;
-  --fg-muted: 156 168 185;
-  --fg-subtle: 122 134 152;
+  --line: 33 39 53;
+  --line-strong: 52 61 79;
 
-  --accent: 45 212 191;
-  --accent-hover: 94 234 212;
-  --accent-soft: 19 58 54;
-  --accent-fg: 4 16 15;
+  --fg: 236 239 246;
+  --fg-muted: 148 158 177;
+  --fg-subtle: 106 116 136;
+
+  --accent: 129 100 255;
+  --accent-2: 34 211 238;
+  --accent-hover: 149 124 255;
+  --accent-soft: 30 25 62;
+  --accent-fg: 255 255 255;
 
   --info: 96 165 250;
-  --success: 74 222 128;
+  --success: 52 211 153;
   --warning: 251 191 36;
   --danger: 248 113 113;
 
-  --ring: 45 212 191;
+  --ring: 129 100 255;
+  --shadow-color: 0 0 0;
+
+  --glass: 22 27 38;
+  --glass-alpha: 0.6;
+  --glass-border: 255 255 255;
 }
 
 /* ------------------------------------------------------------------ */
@@ -80,7 +102,7 @@
   body {
     background-color: rgb(var(--bg));
     color: rgb(var(--fg));
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -93,7 +115,7 @@
   }
 
   ::selection {
-    background-color: rgb(var(--accent) / 0.25);
+    background-color: rgb(var(--accent) / 0.3);
   }
 
   h1,
@@ -118,6 +140,32 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+
+  /* Scrollbars — thin and unobtrusive. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line-strong)) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--line-strong) / 0.7);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--fg-subtle) / 0.7);
   }
 }
 
@@ -148,21 +196,71 @@
     border-color: rgb(var(--line));
   }
 
+  /* --- Glass ------------------------------------------------------ */
+
+  .glass {
+    background-color: rgb(var(--glass) / var(--glass-alpha));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgb(var(--glass-border) / 0.08);
+  }
+
+  /* A hairline highlight along the top edge — the signature glass cue. */
+  .glass-sheen {
+    position: relative;
+  }
+
+  .glass-sheen::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--glass-border) / 0.28) 20%,
+      rgb(var(--glass-border) / 0.28) 80%,
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  /* --- Cards ------------------------------------------------------ */
+
   .card {
     background-color: rgb(var(--surface));
     border: 1px solid rgb(var(--line));
     border-radius: 1rem;
   }
 
+  /* Elevated variant used for hero panels and featured cards. */
+  .card-glass {
+    background:
+      linear-gradient(rgb(var(--glass) / 0.6), rgb(var(--glass) / 0.6)),
+      linear-gradient(135deg, rgb(var(--accent) / 0.1), rgb(var(--accent-2) / 0.06));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgb(var(--line) / 0.9);
+    border-radius: 1rem;
+    box-shadow:
+      0 1px 2px rgb(var(--shadow-color) / 0.06),
+      0 8px 32px -12px rgb(var(--shadow-color) / 0.28);
+  }
+
   .card-interactive {
     transition:
-      border-color 150ms ease,
-      transform 150ms ease,
-      box-shadow 150ms ease;
+      border-color 200ms ease,
+      transform 200ms cubic-bezier(0.32, 0.72, 0, 1),
+      box-shadow 200ms ease,
+      background-color 200ms ease;
   }
 
   .card-interactive:hover {
-    border-color: rgb(var(--accent) / 0.45);
+    border-color: rgb(var(--accent) / 0.5);
+    transform: translateY(-2px);
+    box-shadow:
+      0 2px 4px rgb(var(--shadow-color) / 0.08),
+      0 12px 32px -10px rgb(var(--accent) / 0.22);
   }
 
   .chip {
@@ -227,6 +325,10 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Utilities                                                           */
+/* ------------------------------------------------------------------ */
+
 @layer utilities {
   .text-muted {
     color: rgb(var(--fg-muted));
@@ -251,7 +353,59 @@
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Brand gradient used for hero type and accents. */
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      rgb(var(--fg)) 0%,
+      rgb(var(--fg)) 30%,
+      rgb(var(--accent)) 65%,
+      rgb(var(--accent-2)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      120deg,
+      rgb(var(--accent)) 0%,
+      rgb(var(--accent-2)) 100%
+    );
+  }
+
+  /* Faint technical grid, used behind hero sections. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(var(--line) / 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--line) / 0.55) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Aurora glow blobs. Sizes/positions come from inline classes. */
+  .aurora-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(72px);
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* Fades a scroll container's edge instead of a hard cut. */
+  .fade-x {
+    mask-image: linear-gradient(to right, transparent, black 24px, black calc(100% - 24px), transparent);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
 }
+
+/* ------------------------------------------------------------------ */
+/* Keyframes                                                           */
+/* ------------------------------------------------------------------ */
 
 @keyframes shimmer {
   100% {
@@ -272,4 +426,58 @@
 
 .animate-fade-in {
   animation: fade-in 220ms ease-out both;
+}
+
+@keyframes aurora-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(3%, -4%, 0) scale(1.08);
+  }
+  66% {
+    transform: translate3d(-3%, 3%, 0) scale(0.95);
+  }
+}
+
+.animate-aurora {
+  animation: aurora-drift 24s ease-in-out infinite;
+}
+
+@keyframes marquee-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-marquee-up {
+  animation: marquee-up 40s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(var(--accent) / 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgb(var(--accent) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--accent) / 0);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora,
+  .animate-marquee-up,
+  .animate-pulse-ring {
+    animation: none !important;
+  }
 }
