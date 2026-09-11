@@ -130,9 +130,21 @@ test.describe("library", () => {
           };
           open.onerror = () => resolve("idb-open-error");
         });
-      const proxy = await fetch("/api/v1/apps/keepassxc").then((r) => ({ status: r.status }));
+      const proxyResponse = await fetch("/api/v1/apps/keepassxc");
+      const bodyHead = (await proxyResponse.text()).slice(0, 260);
+      const sw = await navigator.serviceWorker
+        .getRegistration()
+        .then((r) => (r ? { active: Boolean(r.active), scope: r.scope } : null))
+        .catch((error) => `sw-error: ${String(error)}`);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       const mainText = (document.querySelector("main")?.textContent ?? "").slice(0, 400);
-      return JSON.stringify({ idbFavorites: await readIdb(), proxyStatus: proxy.status, mainText });
+      return JSON.stringify({
+        idbFavorites: await readIdb(),
+        proxyStatus: proxyResponse.status,
+        bodyHead,
+        sw,
+        mainText,
+      });
     });
     throw new Error(`LIBRARY DIAGNOSTICS >>> ${diagnostics}`);
 
