@@ -1,27 +1,32 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-import { SearchExperience } from "@/components/search/SearchExperience";
-import { AppGridSkeleton } from "@/components/ui/primitives";
+import { getOmnisource } from "@/lib/omnisource";
+import { BrowseView, type BrowseQuery } from "@/components/search/BrowseView";
 
-/**
- * Search results are user-specific and unbounded, so they are not indexed.
- * Category and app pages remain fully indexable.
- */
-export const metadata: Metadata = {
-  title: "Search",
-  description: "Search open-source applications across iOS, Android, Windows, macOS and Linux.",
-  robots: { index: false, follow: true },
-  alternates: { canonical: "/search" },
-};
+export const revalidate = 120;
 
-export default function SearchPage() {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<BrowseQuery>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  return {
+    title: query.q ? `“${query.q}” — Search` : "Search",
+    robots: query.q ? { index: false, follow: true } : undefined,
+  };
+}
+
+/** Search page — the engine is OmniSource's, results are never re-ranked. */
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<BrowseQuery>;
+}) {
+  const [query, client] = await Promise.all([searchParams, getOmnisource()]);
+  const [categories, platforms] = await Promise.all([client.getCategories(), client.getPlatforms()]);
   return (
-    <div className="space-y-6">
-      <h1 className="sr-only">Search open-source apps</h1>
-      <Suspense fallback={<AppGridSkeleton count={6} />}>
-        <SearchExperience />
-      </Suspense>
-    </div>
+    <BrowseView query={query} mode="search" categories={categories} platforms={platforms} />
   );
 }

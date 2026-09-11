@@ -1,61 +1,25 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-import { getProvider } from "@/lib/api";
-import { AppBrowser } from "@/components/app/AppBrowser";
-import { parseFilters } from "@/lib/search/query";
-import { formatNumber } from "@/lib/formatters";
+import { getOmnisource } from "@/lib/omnisource";
+import { BrowseView, type BrowseQuery } from "@/components/search/BrowseView";
 
-export const dynamic = "force-dynamic";
-
-type SearchParams = Record<string, string | string[] | undefined>;
+export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Apps",
-  description:
-    "Browse open-source applications across iOS, Android, Windows, macOS and Linux, with platform-aware packages and transparent scores.",
+  title: "Browse apps",
+  description: "The full open-source catalog with platform, category and trust filters.",
   alternates: { canonical: "/apps" },
 };
 
-export default async function AppsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const resolvedSearchParams = await searchParams;
-  const provider = getProvider();
-  const filters = parseFilters(resolvedSearchParams);
-
-  const [result, categories, platforms, licenses] = await Promise.all([
-    provider.getApps(filters),
-    provider.getCategories(),
-    provider.getPlatforms(),
-    provider.getLicenses(),
-  ]);
-
+export default async function AppsPage({
+  searchParams,
+}: {
+  searchParams: Promise<BrowseQuery>;
+}) {
+  const [query, client] = await Promise.all([searchParams, getOmnisource()]);
+  const [categories, platforms] = await Promise.all([client.getCategories(), client.getPlatforms()]);
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Apps</h1>
-        <p className="text-muted">
-          {formatNumber(result.pagination.total)} open-source applications indexed by OmniSource from
-          upstream repositories.
-        </p>
-      </header>
-
-      <AppBrowser
-        result={result}
-        filters={filters}
-        basePath="/apps"
-        facets={{
-          categories: categories.map((category) => ({
-            value: category.slug,
-            label: category.name,
-            count: category.app_count,
-          })),
-          platforms: platforms.map((platform) => ({
-            value: platform.slug,
-            label: platform.name,
-            count: platform.app_count,
-          })),
-          licenses: licenses.map((license) => ({ value: license.id, label: license.name, count: license.count })),
-        }}
-      />
-    </div>
+    <BrowseView query={query} mode="browse" categories={categories} platforms={platforms} />
   );
 }

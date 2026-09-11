@@ -1,10 +1,5 @@
 /**
- * Configuration-driven feature flags.
- *
- * Server flags come from the environment (no NEXT_PUBLIC_ prefix needed because
- * this module is imported from server code and inlined at build time).
- * Client components receive flags through the /api/v1/config payload so that
- * experiments can be toggled without a rebuild of presentation code.
+ * Environment feature flags, exposed to clients through /api/v1/config.
  */
 
 function envFlag(name: string, fallback: boolean) {
@@ -14,13 +9,12 @@ function envFlag(name: string, fallback: boolean) {
 }
 
 export const flags = {
-  comparison: envFlag("FEATURE_COMPARISON", true),
   favorites: envFlag("FEATURE_FAVORITES", true),
   collections: envFlag("FEATURE_COLLECTIONS", true),
-  reporting: envFlag("FEATURE_REPORTING", true),
+  userCollections: envFlag("FEATURE_USER_COLLECTIONS", true),
+  cloudSync: envFlag("FEATURE_CLOUD_SYNC", true),
   pwa: envFlag("FEATURE_PWA", true),
-  aiRecommendations: envFlag("FEATURE_AI_RECOMMENDATIONS", false),
-  i18n: envFlag("FEATURE_I18N", true),
+  analytics: envFlag("NEXT_PUBLIC_ENABLE_ANALYTICS", false),
 } as const;
 
 export type FeatureFlags = typeof flags;

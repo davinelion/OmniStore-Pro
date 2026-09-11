@@ -1,13 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
+const MOCK_PORT = Number(process.env.E2E_MOCK_PORT ?? 8007);
 const baseURL = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${PORT}`;
 
 /**
  * End-to-end configuration.
  *
- * CI runs the production build (`npm run build && npm start`); locally you can
- * point E2E_BASE_URL at an already-running dev server.
+ * Two servers are started: a hermetic mock of the OmniSource v1 API
+ * (scripts/mock-omnisource.mjs) and the production Next.js server pointed at
+ * it. Locally you can point E2E_BASE_URL at an already-running dev server.
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -33,11 +35,26 @@ export default defineConfig({
   ...(process.env.E2E_BASE_URL
     ? {}
     : {
-        webServer: {
-          command: `npx next start -H 127.0.0.1 -p ${PORT}`,
-          url: `${baseURL}/api/v1/health`,
-          reuseExistingServer: !process.env.CI,
-          timeout: 120_000,
-        },
+        webServer: [
+          {
+            command: `node scripts/mock-omnisource.mjs --port ${MOCK_PORT}`,
+            url: `http://127.0.0.1:${MOCK_PORT}/health`,
+            reuseExistingServer: !process.env.CI,
+            timeout: 30_000,
+            env: { MOCK_PORT: String(MOCK_PORT) },
+          },
+          {
+            command: `npx next start -H 127.0.0.1 -p ${PORT}`,
+            url: `${baseURL}/api/v1/health`,
+            ignoreHTTPSErrors: true,
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+            env: {
+              OMNISOURCE_API_URL: `http://127.0.0.1:${MOCK_PORT}/api/v1`,
+              NEXT_PUBLIC_SITE_URL: baseURL,
+              NODE_ENV: "production",
+            },
+          },
+        ],
       }),
 });

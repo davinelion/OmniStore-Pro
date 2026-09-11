@@ -1,10 +1,22 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/collections — public collections (v1 wire pass-through). */
+import type { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
+import { getOmnisource } from "@/lib/omnisource";
+import { PaginatedCollectionsDtoSchema } from "@omnistore/shared-models";
+import { fail, intParam, ok } from "@/lib/omnisource/http";
 
-/** GET /api/v1/collections — curated and rule-generated collections. */
-export async function GET() {
-  const items = await getProvider().getCollections();
-  return json({ items }, { cacheSeconds: 3600 });
+export const revalidate = 600;
+
+export async function GET(request: NextRequest) {
+  try {
+    const params = request.nextUrl.searchParams;
+    const dto = await getOmnisource().request(
+      `/collections?page=${intParam(params.get("page"), 1, 1, 1000)}&per_page=${intParam(params.get("per_page"), 30, 1, 100)}`,
+      PaginatedCollectionsDtoSchema,
+      { tags: ["collections"], revalidate: 600 },
+    );
+    return ok(dto);
+  } catch (error) {
+    return fail(error);
+  }
 }

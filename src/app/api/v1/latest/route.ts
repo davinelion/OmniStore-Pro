@@ -1,10 +1,19 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/latest — recently released/updated apps (v1 wire pass-through). */
+import { getOmnisource } from "@/lib/omnisource";
+import { AppDtoSchema } from "@omnistore/shared-models";
+import { fail, ok } from "@/lib/omnisource/http";
+import { z } from "zod";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
-/** GET /api/v1/latest — recently added, updated and released. */
 export async function GET() {
-  const result = await getProvider().getLatest();
-  return json(result, { cacheSeconds: 300 });
+  try {
+    const dto = await getOmnisource().request("/latest", z.array(AppDtoSchema), {
+      tags: ["latest"],
+      revalidate: 300,
+    });
+    return ok(dto);
+  } catch (error) {
+    return fail(error);
+  }
 }

@@ -1,27 +1,33 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
-import { DEFAULT_PER_PAGE, parseFilters } from "@/lib/search/query";
+/** GET /api/v1/apps — filtered catalog listing (v1 wire pass-through). */
+import type { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
+import { getOmnisource } from "@/lib/omnisource";
+import { PaginatedAppsDtoSchema } from "@omnistore/shared-models";
+import { boolParam, fail, intParam, ok } from "@/lib/omnisource/http";
 
-/**
- * GET /api/v1/apps — catalog listing with filters, sorting and pagination.
- * GET /api/v1/apps?ids=a,b — resolve specific apps (used by comparison).
- */
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const ids = url.searchParams.get("ids");
+export const revalidate = 300;
 
-  if (ids) {
-    const list = ids.split(",").map((id) => id.trim()).filter(Boolean).slice(0, 8);
-    const items = await getProvider().getAppsByIds(list);
-    return json({
-      items,
-      pagination: { page: 1, per_page: list.length || DEFAULT_PER_PAGE, total: items.length, total_pages: 1 },
-    });
+export async function GET(request: NextRequest) {
+  try {
+    const params = request.nextUrl.searchParams;
+    const query = new URLSearchParams();
+    for (const key of [
+      "q", "platform", "category", "developer", "license", "architecture",
+      "open_source", "min_trust", "min_quality", "updated_since", "sort", "page", "per_page",
+    ]) {
+      const value = params.get(key);
+      if (value) query.set(key, value);
+    }
+    if (boolParam(params.get("open_source")) !== undefined) {
+      query.set("open_source", String(boolParam(params.get("open_source"))));
+    }
+    const dto = await getOmnisource().request(
+      `/apps${query.size > 0 ? `?${query}` : ""}`,
+      PaginatedAppsDtoSchema,
+      { tags: ["apps"], revalidate: 300 },
+    );
+    return ok(dto);
+  } catch (error) {
+    return fail(error);
   }
-
-  const filters = parseFilters(Object.fromEntries(url.searchParams.entries()));
-  const result = await getProvider().getApps(filters);
-  return json(result, { cacheSeconds: 120 });
 }

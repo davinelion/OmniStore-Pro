@@ -1,47 +1,35 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
-import { getProvider } from "@/lib/api";
+import { getOmnisource } from "@/lib/omnisource";
+import { CategoryCard } from "@/components/category/CategoryCard";
 import { SectionHeading } from "@/components/ui/primitives";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Categories",
-  description: "Browse open-source applications by category across every supported platform.",
+  description: "The catalog taxonomy maintained by OmniSource.",
   alternates: { canonical: "/categories" },
 };
 
 export default async function CategoriesPage() {
-  const categories = await getProvider().getCategories();
-  const withApps = categories.filter((category) => category.app_count > 0);
+  const t = await getTranslations("categories");
+  const client = getOmnisource();
+  const categories = await client.getCategories();
 
   return (
-    <div className="space-y-8">
-      <SectionHeading
-        title="Categories"
-        description={`${withApps.length} categories with indexed applications.`}
-      />
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {withApps.map((category) => (
-          <Link
-            key={category.slug}
-            href={`/categories/${category.slug}`}
-            className="card card-interactive p-5"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <h2 className="font-semibold">{category.name}</h2>
-              <span className="rounded-full border border-line px-2 py-0.5 text-2xs tabular-nums text-fg-muted">
-                {category.app_count}
-              </span>
-            </div>
-            {category.description ? (
-              <p className="mt-2 text-sm text-muted">{category.description}</p>
-            ) : null}
-          </Link>
-        ))}
-      </div>
+    <div className="space-y-6">
+      <SectionHeading level={1} title={t("title")} description={t("description")} />
+      {categories.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted">{t("empty")}</p>
+      )}
     </div>
   );
 }

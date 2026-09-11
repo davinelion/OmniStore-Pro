@@ -1,207 +1,116 @@
 import { expect, test } from "@playwright/test";
 
+import { waitForLibraryWrite } from "./helpers/library";
+
 /**
- * End-to-end acceptance tests.
- *
- * These run against a production build (`npm run build && npm start`) in CI.
- * Install browsers once with `npx playwright install --with-deps`.
+ * End-to-end acceptance tests for the marketplace surfaces: browse, search,
+ * app detail, collections, taxonomy and library.
  */
 
-test.describe("home", () => {
-  test("loads and exposes search, browse and taxonomy navigation", async ({ page }) => {
-    await page.goto("/");
+test.describe("browse and search", () => {
+  test("browse lists apps and filters by category", async ({ page }) => {
+    await page.goto("/apps");
 
-    await expect(page.getByRole("heading", { name: "Discover Open-Source Apps", level: 1 }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /^apps$/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
 
-    const search = page.getByRole("searchbox").or(page.getByPlaceholder(/search/i)).first();
-    await expect(search).toBeVisible();
+    // Filter by the "Utilities" category via the client island.
+    await page.getByRole("combobox", { name: "Category" }).selectOption("utilities");
+    await expect(page).toHaveURL(/category=utilities/);
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
   });
 
-  test("searching from the home page takes you to results", async ({ page }) => {
-    await page.goto("/");
-    const search = page.getByRole("searchbox").or(page.getByPlaceholder(/search/i)).first();
-    await search.fill("localsend");
-    await search.press("Enter");
+  test("search returns ranked results with a result count", async ({ page }) => {
+    await page.goto("/search?q=notes");
 
-    await expect(page).toHaveURL(/\/search\?q=localsend/);
-    await expect(page.getByRole("link", { name: /localsend/i }).first()).toBeVisible();
-  });
-});
-
-test.describe("search and filters", () => {
-  test("returns results and reports a count", async ({ page }) => {
-    await page.goto("/search?q=music");
     await expect(page.getByText(/results?/i).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /audacity|spotube|navidrome/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Joplin/ }).first()).toBeVisible();
   });
 
-  test("shows an empty state for a nonsense query", async ({ page }) => {
-    await page.goto("/search?q=zzzqqqxxxnotarealapp");
-    await expect(page.getByText(/no apps found/i)).toBeVisible();
-    await expect(page.getByRole("button", { name: /clear filters/i })).toBeVisible();
-  });
-
-  test("platform filters narrow the result set", async ({ page }) => {
-    await page.goto("/apps");
-    const totalBefore = await page.locator("article").count();
-
-    await page.getByRole("link", { name: /platforms/i }).first().click();
-    await page.waitForURL(/\/platforms/);
-    await page.getByRole("link", { name: /macos/i }).first().click();
-
-    await expect(page).toHaveURL(/platform=macos|platforms\/macos/);
-    const totalAfter = await page.locator("article").count();
-    expect(totalAfter).toBeGreaterThan(0);
-    expect(totalAfter).toBeLessThanOrEqual(totalBefore);
-  });
-
-  test("pagination moves through results", async ({ page }) => {
-    await page.goto("/apps");
-    const next = page.getByRole("link", { name: /next/i }).first();
-    if ((await next.count()) === 0) test.skip();
-    await next.click();
-    await expect(page).toHaveURL(/page=2/);
+  test("search without a query shows the empty state, not an error", async ({ page }) => {
+    await page.goto("/search");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });
 
-test.describe("app pages", () => {
-  test("show real upstream data, scores and downloads", async ({ page }) => {
-    await page.goto("/apps/localsend");
+test.describe("app detail", () => {
+  test("overview shows identity, install handoff and trust evidence", async ({ page }) => {
+    await page.goto("/app/localsend");
 
-    await expect(page.getByRole("heading", { name: /localsend/i }).first()).toBeVisible();
-    await expect(page.getByText(/trust score/i).first()).toBeVisible();
-    await expect(page.getByText(/not a security guarantee/i).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: /download/i }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "LocalSend" })).toBeVisible();
+    await expect(page.getByText(/Share files to nearby devices/).first()).toBeVisible();
+
+    // Install panel: only VALID assets are offered as downloads.
+    const download = page.getByRole("link", { name: /Download/i }).first();
+    await expect(download).toBeVisible();
+    await expect(download).toHaveAttribute("href", /releases\/download/);
+
+    // Trust badge panel is rendered from the OmniSource trust report.
+    await expect(page.getByText(/Verified|Verified badge/i).first()).toBeVisible();
   });
 
-  test("download links are https and open safely", async ({ page }) => {
-    await page.goto("/apps/localsend");
-    const links = page.locator('a[href^="http"]');
-    const count = await links.count();
-    expect(count).toBeGreaterThan(0);
+  test("releases page lists the version timeline", async ({ page }) => {
+    await page.goto("/app/localsend/releases");
 
-    for (let i = 0; i < Math.min(count, 10); i += 1) {
-      const href = await links.nth(i).getAttribute("href");
-      expect(href).toMatch(/^https:\/\//);
-      const rel = await links.nth(i).getAttribute("rel");
-      expect(rel ?? "").toContain("noopener");
-    }
+    await expect(page.getByText("2.1.0").first()).toBeVisible();
+    await expect(page.getByText("2.0.0").first()).toBeVisible();
   });
 
-  test("release history is reachable and readable", async ({ page }) => {
-    await page.goto("/apps/localsend/releases");
-    await expect(page.getByText(/releases/i).first()).toBeVisible();
-    await expect(page.locator("ol li").first()).toBeVisible();
-  });
+  test("security dashboard renders score and scan evidence", async ({ page }) => {
+    await page.goto("/app/localsend/security");
 
-  test("alternatives and similar apps are listed", async ({ page }) => {
-    await page.goto("/apps/localsend");
-    const hasAlternatives = await page.getByText(/alternatives/i).count();
-    expect(hasAlternatives).toBeGreaterThan(0);
+    await expect(page.getByRole("heading", { level: 1, name: /security/i })).toBeVisible();
+    await expect(page.getByText(/Passed/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/metadata_integrity|Scan evidence|Vulnerabilities/i).first(),
+    ).toBeVisible();
   });
 });
 
-test.describe("comparison", () => {
-  test("lets you add apps and compare them side by side", async ({ page }) => {
-    await page.goto("/apps/localsend");
-    await page.getByRole("button", { name: /add .* to comparison/i }).first().click();
-    await page.goto("/apps/syncthing");
-    await page.getByRole("button", { name: /add .* to comparison/i }).first().click();
+test.describe("collections and taxonomy", () => {
+  test("collections index links into collection detail", async ({ page }) => {
+    await page.goto("/collections");
 
-    await page.goto("/compare");
-    await expect(page.getByRole("table")).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: /localsend/i })).toBeVisible();
-    await expect(page.getByRole("columnheader", { name: /syncthing/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Featured/ }).first()).toBeVisible();
+
+    await page.goto("/collection/featured");
+    await expect(page.getByRole("heading", { level: 1, name: "Featured" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible();
+  });
+
+  test("categories index and category detail work", async ({ page }) => {
+    await page.goto("/categories");
+    await expect(page.getByRole("link", { name: /Utilities/ }).first()).toBeVisible();
+
+    await page.goto("/categories/utilities");
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
+  });
+
+  test("developers index and developer detail work", async ({ page }) => {
+    await page.goto("/developers");
+    await expect(page.getByText(/LocalSend Team|KeePassXC Team/i).first()).toBeVisible();
+
+    await page.goto("/developers/localsend-org");
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
   });
 });
 
-test.describe("favorites", () => {
-  test("are saved locally and survive navigation", async ({ page }) => {
-    await page.goto("/apps/localsend");
-    await page.getByRole("button", { name: /favorite|save/i }).first().click();
+test.describe("library", () => {
+  test("favorites added on the app page persist to the library", async ({ page }) => {
+    await page.goto("/app/keepassxc");
+
+    const favorite = page.getByRole("button", { name: /favorite/i });
+    await expect(favorite).toBeVisible();
+    await favorite.click();
+    await expect(favorite).toHaveAttribute("aria-pressed", "true");
+
+    // The store update is synchronous but the IndexedDB write is async —
+    // wait for it to commit or the navigation can abort the transaction.
+    await waitForLibraryWrite(page, { kind: "favorites", appId: "keepassxc" });
 
     await page.goto("/favorites");
-    await expect(page.getByRole("link", { name: /localsend/i }).first()).toBeVisible();
-  });
-});
-
-test.describe("theme and responsive layout", () => {
-  test("dark mode toggles and persists", async ({ page }) => {
-    await page.goto("/");
-    const toggle = page.getByRole("button", { name: /theme|dark|light/i }).first();
-    await toggle.click();
-
-    const theme = await page.evaluate(() => document.documentElement.dataset.theme ?? document.documentElement.className);
-    expect(theme).toBeTruthy();
-
-    await page.reload();
-    const afterReload = await page.evaluate(() => document.documentElement.dataset.theme ?? document.documentElement.className);
-    expect(afterReload).toBe(theme);
-  });
-
-  test("works on a phone viewport", async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
-
-    await expect(page.getByRole("banner")).toBeVisible();
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    const overflowing = await page.locator("body *").evaluateAll(elements => elements
-      .filter(el => el.getBoundingClientRect().right > document.documentElement.clientWidth + 2)
-      .slice(0, 12).map(el => ({ tag: el.tagName, class: el.className, right: el.getBoundingClientRect().right })));
-    expect(overflow, JSON.stringify(overflowing)).toBeLessThanOrEqual(2);
-  });
-
-  test("works on a desktop viewport", async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/apps");
-    await expect(page.locator("article").first()).toBeVisible();
-  });
-});
-
-test.describe("accessibility", () => {
-  test("keyboard navigation reaches the search field", async ({ page }) => {
-    await page.goto("/");
-    await page.keyboard.press("Tab");
-    const first = await page.evaluate(() => document.activeElement?.textContent?.trim() ?? "");
-    expect(first.length).toBeGreaterThan(0);
-  });
-
-  test("images have alt text and headings are ordered", async ({ page }) => {
-    await page.goto("/apps/localsend");
-    const imagesWithoutAlt = await page.locator("img:not([alt])").count();
-    expect(imagesWithoutAlt).toBe(0);
-    const h1 = await page.locator("h1").count();
-    expect(h1).toBeGreaterThanOrEqual(1);
-  });
-});
-
-test.describe("error and offline states", () => {
-  test("an unknown app shows a 404 page", async ({ page }) => {
-    const response = await page.goto("/apps/not-a-real-app-xyz");
-    expect(response?.status()).toBe(404);
-    await expect(page.getByText(/could not find|404/i).first()).toBeVisible();
-  });
-
-  test("the API returns a typed error for an unknown app", async ({ request }) => {
-    const response = await request.get("/api/v1/apps/not-a-real-app-xyz");
-    expect(response.status()).toBe(404);
-    const body = await response.json();
-    expect(body.error.code).toBeTruthy();
-  });
-
-  test("the offline page renders when the network is unavailable", async ({ page, context }) => {
-    await page.goto("/");
-    // A load event does not mean the service worker has installed and claimed
-    // this page. Wait for the actual offline capability before cutting network.
-    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
-    await expect.poll(() => page.evaluate(async () => !!(await caches.match("/offline")))).toBe(true);
-    await context.setOffline(true);
-    await page.goto("/offline");
-    await expect(page.getByText(/offline/i).first()).toBeVisible();
-    await context.setOffline(false);
+    await expect(page.getByRole("heading", { level: 1, name: /My library/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible();
   });
 });

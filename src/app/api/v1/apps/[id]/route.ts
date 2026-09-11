@@ -1,12 +1,25 @@
-import { getProvider } from "@/lib/api";
-import { json, notFound } from "@/lib/api/http";
+/** GET /api/v1/apps/{id} — one app by id or slug (v1 wire pass-through). */
+import { getOmnisource } from "@/lib/omnisource";
+import { AppDtoSchema } from "@omnistore/shared-models";
+import { fail, notFoundResponse, ok } from "@/lib/omnisource/http";
+import { OmniSourceError } from "@/lib/omnisource";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
-/** GET /api/v1/apps/{id} — one app by canonical id or slug. */
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = await params;
-  const app = await getProvider().getApp(resolvedParams.id);
-  if (!app) return notFound("App not found");
-  return json(app, { cacheSeconds: 300 });
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const dto = await getOmnisource().request(
+      `/apps/${encodeURIComponent(decodeURIComponent(id))}`,
+      AppDtoSchema,
+      { tags: ["apps", `app:${id}`], revalidate: 120 },
+    );
+    return ok(dto);
+  } catch (error) {
+    if (error instanceof OmniSourceError && error.status === 404) return notFoundResponse();
+    return fail(error);
+  }
 }

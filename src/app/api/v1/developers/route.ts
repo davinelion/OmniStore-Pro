@@ -1,10 +1,21 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/developers — all indexed developers (v1 wire pass-through). */
+import type { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
+import { getOmnisource } from "@/lib/omnisource";
+import { DeveloperRecordDtoSchema } from "@omnistore/shared-models";
+import { fail, ok } from "@/lib/omnisource/http";
+import { z } from "zod";
 
-/** GET /api/v1/developers — upstream developers with app counts. */
-export async function GET() {
-  const items = await getProvider().getDevelopers();
-  return json({ items }, { cacheSeconds: 3600 });
+export const revalidate = 1800;
+
+export async function GET(_request: NextRequest) {
+  try {
+    const dto = await getOmnisource().request("/developers", z.array(DeveloperRecordDtoSchema), {
+      tags: ["developers"],
+      revalidate: 1800,
+    });
+    return ok(dto);
+  } catch (error) {
+    return fail(error);
+  }
 }

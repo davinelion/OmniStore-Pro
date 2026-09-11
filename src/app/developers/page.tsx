@@ -1,46 +1,35 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
-import { getProvider } from "@/lib/api";
-import { AppIcon } from "@/components/app/AppIcon";
+import { getOmnisource } from "@/lib/omnisource";
+import { DeveloperCard } from "@/components/developer/DeveloperCard";
 import { SectionHeading } from "@/components/ui/primitives";
-import { pluralize } from "@/lib/formatters";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Developers",
-  description: "Upstream developers and organisations publishing open-source applications in OmniStore.",
+  description: "The people and teams building the catalog.",
   alternates: { canonical: "/developers" },
 };
 
 export default async function DevelopersPage() {
-  const developers = await getProvider().getDevelopers();
+  const t = await getTranslations("developers");
+  const client = getOmnisource();
+  const developers = await client.getDevelopers(120);
 
   return (
-    <div className="space-y-8">
-      <SectionHeading
-        title="Developers"
-        description={`${developers.length} upstream developers and organisations represented in the catalog.`}
-      />
-
-      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {developers.map((developer) => (
-          <li key={developer.id}>
-            <Link href={`/developers/${developer.slug}`} className="card card-interactive flex items-center gap-3 p-4">
-              <AppIcon name={developer.name} src={developer.avatar_url} size="md" rounded="rounded-full" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">{developer.name}</p>
-                <p className="text-sm text-muted">{pluralize(developer.app_count, "app")}</p>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <p className="text-2xs text-fg-subtle">
-        OmniStore is a discovery interface. Every application remains the work of its upstream authors.
-      </p>
+    <div className="space-y-6">
+      <SectionHeading level={1} title={t("title")} description={t("description")} />
+      {developers.length > 0 ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {developers.map((developer) => (
+            <DeveloperCard key={developer.id} developer={developer} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted">{t("empty")}</p>
+      )}
     </div>
   );
 }

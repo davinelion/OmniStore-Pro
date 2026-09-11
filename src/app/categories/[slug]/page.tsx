@@ -1,79 +1,54 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-import { getProvider } from "@/lib/api";
-import { AppBrowser } from "@/components/app/AppBrowser";
-import { parseFilters, withFilterChange } from "@/lib/search/query";
+import { getOmnisource } from "@/lib/omnisource";
+import { AppGrid } from "@/components/app/AppCard";
+import { SectionHeading } from "@/components/ui/primitives";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
-type Params = { params: Promise<{ slug: string }> };
-type SearchParams = Record<string, string | string[] | undefined>;
-
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const resolvedParams = await params;
-  const categories = await getProvider().getCategories();
-  const category = categories.find((entry) => entry.slug === resolvedParams.slug);
-  if (!category) return { title: "Category not found" };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const client = getOmnisource();
+  const result = await client.getCategory(decodeURIComponent(slug));
   return {
-    title: `${category.name} apps`,
-    description:
-      category.description ??
-      `Open-source ${category.name.toLowerCase()} applications indexed by OmniSource.`,
-    alternates: { canonical: `/categories/${category.slug}` },
+    title: result?.category.name ?? "Category",
+    description: result?.category.description || undefined,
+    alternates: { canonical: `/categories/${slug}` },
   };
 }
 
-export default async function CategoryPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<SearchParams>;
-}) {
-  const resolvedParams = await params;
-  const resolvedSearchParams = await searchParams;
-  const provider = getProvider();
-  const categories = await provider.getCategories();
-  const category = categories.find((entry) => entry.slug === resolvedParams.slug);
-  if (!category) notFound();
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const client = getOmnisource();
+  const t = await getTranslations("categories");
 
-  // The category is part of the URL, so it is forced into the filter set.
-  const filters = withFilterChange(parseFilters(resolvedSearchParams), { categories: [category.slug] });
-
-  const [result, platforms, licenses] = await Promise.all([
-    provider.getApps(filters),
-    provider.getPlatforms(),
-    provider.getLicenses(),
+  const decoded = decodeURIComponent(slug);
+  const [categoryResult, appsResult] = await Promise.all([
+    client.getCategory(decoded),
+    client.getApps({ category: decoded, perPage: 60, sort: "popularity" }),
   ]);
+  if (!categoryResult && appsResult.items.length === 0) notFound();
+
+  const name = categoryResult?.category.name ?? decoded;
+  const description = categoryResult?.category.description || null;
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">{category.name}</h1>
-        <p className="text-muted">{category.description}</p>
-      </header>
-
-      <AppBrowser
-        result={result}
-        filters={filters}
-        basePath={`/categories/${category.slug}`}
-        facets={{
-          categories: categories.map((entry) => ({
-            value: entry.slug,
-            label: entry.name,
-            count: entry.app_count,
-          })),
-          platforms: platforms.map((platform) => ({
-            value: platform.slug,
-            label: platform.name,
-            count: platform.app_count,
-          })),
-          licenses: licenses.map((license) => ({ value: license.id, label: license.name, count: license.count })),
-        }}
-        emptyTitle={`No apps in ${category.name}.`}
-        emptyDescription="Try removing a filter to see more results."
+    <div className="space-y-6">
+      <SectionHeading level={1}
+        title={name}
+        description={description || t("appsIn", { category: name })}
       />
+      {appsResult.items.length > 0 ? (
+        <AppGrid apps={appsResult.items} />
+      ) : (
+        <p className="py-10 text-center text-sm text-muted">{t("empty")}</p>
+      )}
     </div>
   );
 }

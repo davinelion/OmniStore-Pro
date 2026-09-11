@@ -16,140 +16,77 @@ export function ScreenshotGallery({
   screenshots,
   appName,
 }: {
-  screenshots: Array<{
-    url: string;
-    alt: string | null;
-    attribution?: string;
-    source_url?: string;
-    permission?: string;
-  }>;
+  screenshots: string[];
   appName: string;
 }) {
   const [active, setActive] = useState(0);
   const [failed, setFailed] = useState<Set<number>>(new Set());
 
-  const images = screenshots
-    .map((shot, index) => ({ ...shot, index, safeUrl: safeImageUrl(shot.url) }))
-    .filter((shot): shot is typeof shot & { safeUrl: string } =>
-      Boolean(shot.safeUrl),
-    );
+  const usable = screenshots
+    .map((url, index) => ({ url, index }))
+    .filter(({ url, index }) => Boolean(safeImageUrl(url)) && !failed.has(index));
 
-  if (images.length === 0) {
-    return (
-      <section aria-labelledby="screenshots-heading">
-        <h2 id="screenshots-heading" className="text-lg font-semibold">
-          Screenshots
-        </h2>
-        <p className="mt-2 flex items-center gap-2 rounded-xl border border-dashed border-line px-4 py-6 text-sm text-muted">
-          <ImageOff className="h-4 w-4" aria-hidden />
-          Screenshots not available — upstream does not publish any through
-          OmniSource.
-        </p>
-      </section>
-    );
-  }
+  if (usable.length === 0) return null;
 
-  const current = images[Math.min(active, images.length - 1)];
+  const current = usable[Math.min(active, usable.length - 1)]!;
 
   return (
-    <section aria-labelledby="screenshots-heading">
-      <h2 id="screenshots-heading" className="text-lg font-semibold">
-        Screenshots
-      </h2>
-
-      <ul className="mt-2 space-y-1 text-xs text-muted">
-        {images
-          .filter((shot) => shot.attribution)
-          .map((shot) => (
-            <li key={shot.url}>
-              {shot.attribution}{" "}
-              {shot.source_url && safeImageUrl(shot.source_url) ? (
-                <a
-                  className="text-accent underline"
-                  href={shot.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Source
-                </a>
-              ) : null}
-              {shot.permission ? ` · ${shot.permission}` : ""}
-            </li>
+    <div className="space-y-3">
+      <div className="card relative flex aspect-[16/9] items-center justify-center overflow-hidden bg-surface-2">
+        {/* Upstream image hosts vary; native <img> keeps remote loading robust. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          key={current.url}
+          src={current.url}
+          alt={`${appName} screenshot ${current.index + 1}`}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-contain"
+          onError={() =>
+            setFailed((prev) => new Set(prev).add(current.index))
+          }
+        />
+      </div>
+      {usable.length > 1 ? (
+        <div
+          className="no-scrollbar flex gap-2 overflow-x-auto pb-1"
+          role="tablist"
+          aria-label={appName}
+        >
+          {usable.map(({ url, index }) => (
+            <button
+              key={url}
+              type="button"
+              role="tab"
+              aria-selected={index === current.index}
+              aria-label={`${appName} screenshot ${index + 1}`}
+              onClick={() => setActive(index)}
+              className={cn(
+                "relative h-14 w-24 shrink-0 overflow-hidden rounded-lg border transition-colors",
+                index === current.index
+                  ? "border-accent"
+                  : "border-line opacity-70 hover:opacity-100",
+              )}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+                onError={() => setFailed((prev) => new Set(prev).add(index))}
+              />
+            </button>
           ))}
-      </ul>
-      {/* Mobile: horizontal scrolling strip. Desktop: preview + thumbnails. */}
-      <div
-        className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar md:hidden"
-        role="list"
-      >
-        {images.map((shot) => (
-          <div
-            key={shot.url}
-            role="listitem"
-            className="relative aspect-[9/16] w-44 shrink-0 overflow-hidden rounded-2xl border border-line bg-surface-2"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={shot.safeUrl}
-              alt={shot.alt ?? `${appName} screenshot`}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover"
-            />
-          </div>
-        ))}
-      </div>
-
-      <div className="hidden md:block">
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-line bg-surface-2">
-          {failed.has(current.index) ? (
-            <div className="flex h-full items-center justify-center text-sm text-muted">
-              Image unavailable
-            </div>
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={current.safeUrl}
-              alt={current.alt ?? `${appName} screenshot ${current.index + 1}`}
-              loading="lazy"
-              decoding="async"
-              onError={() =>
-                setFailed((prev) => new Set(prev).add(current.index))
-              }
-              className="h-full w-full object-contain"
-            />
-          )}
         </div>
-
-        {images.length > 1 ? (
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {images.map((shot, index) => (
-              <button
-                key={shot.url}
-                type="button"
-                onClick={() => setActive(index)}
-                aria-label={`Show screenshot ${index + 1}`}
-                aria-current={index === active}
-                className={cn(
-                  "h-16 w-28 shrink-0 overflow-hidden rounded-lg border transition-colors",
-                  index === active
-                    ? "border-accent"
-                    : "border-line hover:border-line-strong",
-                )}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={shot.safeUrl}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </section>
+      ) : null}
+      {failed.size > 0 && failed.size === screenshots.length ? (
+        <p className="flex items-center gap-2 text-sm text-muted">
+          <ImageOff className="h-4 w-4" aria-hidden /> No screenshots could be
+          loaded.
+        </p>
+      ) : null}
+    </div>
   );
 }

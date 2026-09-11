@@ -1,10 +1,19 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/platforms — platform taxonomy (v1 wire pass-through). */
+import { getOmnisource } from "@/lib/omnisource";
+import { PlatformInfoDtoSchema } from "@omnistore/shared-models";
+import { fail, ok } from "@/lib/omnisource/http";
+import { z } from "zod";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 
-/** GET /api/v1/platforms — supported platforms with live counts and install hints. */
 export async function GET() {
-  const items = await getProvider().getPlatforms();
-  return json({ items }, { cacheSeconds: 3600 });
+  try {
+    const dto = await getOmnisource().request("/platforms", z.array(PlatformInfoDtoSchema), {
+      tags: ["platforms"],
+      revalidate: 1800,
+    });
+    return ok(dto);
+  } catch (error) {
+    return fail(error);
+  }
 }

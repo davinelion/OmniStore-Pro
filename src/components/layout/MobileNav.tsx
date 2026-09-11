@@ -2,55 +2,92 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bookmark, Compass, Home, LayoutGrid, Search } from "lucide-react";
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { Heart, Home, Layers, FolderTree, LayoutGrid, Menu, Users, X } from "lucide-react";
 
-import { useI18n } from "./I18nProvider";
 import { cn } from "@/lib/utils";
 
-/**
- * Mobile primary navigation.
- *
- * Designed for thumb reach on a phone-sized viewport rather than as a shrunken
- * desktop bar, with 44px minimum targets.
- */
 const ITEMS = [
-  { href: "/", key: "nav.home", icon: Home },
-  { href: "/trending", key: "nav.discover", icon: Compass },
-  { href: "/search", key: "nav.search", icon: Search },
-  { href: "/categories", key: "nav.categories", icon: LayoutGrid },
-  { href: "/favorites", key: "nav.favorites", icon: Bookmark },
+  { href: "/", key: "home", icon: Home },
+  { href: "/apps", key: "browse", icon: LayoutGrid },
+  { href: "/collections", key: "collections", icon: Layers },
+  { href: "/categories", key: "categories", icon: FolderTree },
+  { href: "/developers", key: "developers", icon: Users },
+  { href: "/favorites", key: "favorites", icon: Heart },
 ] as const;
 
+/** Mobile navigation sheet. */
 export function MobileNav() {
+  const t = useTranslations("nav");
   const pathname = usePathname();
-  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
 
   return (
-    <nav
-      aria-label="Mobile primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 backdrop-blur-xl md:hidden"
-    >
-      <ul className="mx-auto flex max-w-content items-stretch justify-around px-2 py-1.5 safe-bottom">
-        {ITEMS.map((item) => {
-          const Icon = item.icon;
-          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          return (
-            <li key={item.href} className="flex-1">
-              <Link
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-2xs transition-colors",
-                  active ? "text-accent" : "text-fg-subtle",
-                )}
+    <div className="lg:hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={t("openMenu")}
+        aria-expanded={open}
+        className="rounded-full border border-line bg-surface p-2 text-muted transition-colors hover:text-fg"
+      >
+        <Menu className="h-5 w-5" aria-hidden />
+      </button>
+      {open ? (
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            aria-label={t("closeMenu")}
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setOpen(false)}
+          />
+          <nav className="absolute inset-y-0 end-0 w-72 max-w-[85vw] border-s border-line bg-bg p-4 shadow-raised">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="font-semibold">OmniStore</span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label={t("closeMenu")}
+                className="rounded-full p-2 text-muted hover:bg-surface-2"
               >
-                <Icon className="h-5 w-5" aria-hidden />
-                {t(item.key)}
+                <X className="h-5 w-5" aria-hidden />
+              </button>
+            </div>
+            <ul className="space-y-1">
+              {ITEMS.map(({ href, key, icon: Icon }) => {
+                const active = pathname === href;
+                return (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                        active ? "bg-accent-soft text-accent" : "text-muted hover:bg-surface-2 hover:text-fg",
+                      )}
+                    >
+                      <Icon className="h-4.5 w-4.5" aria-hidden />
+                      {t(key)}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-4 border-t border-line pt-4">
+              <Link
+                href="/collections/mine"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted hover:bg-surface-2 hover:text-fg"
+              >
+                <Layers className="h-4.5 w-4.5" aria-hidden />
+                {t("collections")}
               </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+            </div>
+          </nav>
+        </div>
+      ) : null}
+    </div>
   );
 }

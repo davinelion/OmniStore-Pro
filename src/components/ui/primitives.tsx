@@ -14,19 +14,23 @@ export function SectionHeading({
   action,
   id,
   className,
+  level = 2,
 }: {
-  title: string;
+  title: React.ReactNode;
   description?: string | null;
   action?: React.ReactNode;
   id?: string;
   className?: string;
+  /** 1 for page titles (one h1 per page), 2 for in-page sections. */
+  level?: 1 | 2;
 }) {
+  const Heading = (level === 1 ? "h1" : "h2") as "h1" | "h2";
   return (
     <div className={cn("flex flex-wrap items-end justify-between gap-3", className)}>
       <div>
-        <h2 id={id} className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
+        <Heading id={id} className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
           {title}
-        </h2>
+        </Heading>
         {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
       </div>
       {action}

@@ -1,15 +1,19 @@
-import { getProvider } from "@/lib/api";
-import { json } from "@/lib/api/http";
+/** GET /api/v1/trending — OmniSource trending (v1 wire pass-through). */
+import { getOmnisource } from "@/lib/omnisource";
+import { AppDtoSchema } from "@omnistore/shared-models";
+import { fail, ok } from "@/lib/omnisource/http";
+import { z } from "zod";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
-/**
- * GET /api/v1/trending
- *
- * Ranked from measurable upstream signals only. OmniStore does not publish
- * daily or weekly deltas it cannot compute from a single catalog snapshot.
- */
 export async function GET() {
-  const result = await getProvider().getTrending();
-  return json(result, { cacheSeconds: 300 });
+  try {
+    const dto = await getOmnisource().request("/trending", z.array(AppDtoSchema), {
+      tags: ["trending"],
+      revalidate: 600,
+    });
+    return ok(dto);
+  } catch (error) {
+    return fail(error);
+  }
 }

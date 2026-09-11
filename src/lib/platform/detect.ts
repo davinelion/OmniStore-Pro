@@ -1,4 +1,4 @@
-import type { Platform } from "@/lib/schemas/omnisource";
+import type { Platform } from "@omnistore/shared-models";
 
 /**
  * Best-effort client platform detection.

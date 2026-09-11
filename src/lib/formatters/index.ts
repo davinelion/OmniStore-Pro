@@ -5,7 +5,7 @@
  * placeholder number, date or size for data OmniSource did not supply.
  */
 
-import type { Architecture, PackageType, Platform } from "@/lib/schemas/omnisource";
+import type { Architecture, AssetStatus, Platform } from "@omnistore/shared-models";
 
 export const NOT_AVAILABLE = "Not available";
 
@@ -96,7 +96,7 @@ export function platformLabel(platform: string): string {
 }
 
 export function architectureLabel(architecture: string): string {
-  const map: Record<Architecture, string> = {
+  const map: Record<string, string> = {
     arm64: "ARM64 / Apple Silicon",
     arm: "ARM",
     x86_64: "x86_64",
@@ -108,7 +108,7 @@ export function architectureLabel(architecture: string): string {
 }
 
 export function packageTypeLabel(packageType: string): string {
-  const map: Record<PackageType, string> = {
+  const map: Record<string, string> = {
     APK: "APK",
     AAB: "AAB",
     IPA: "IPA",
@@ -128,7 +128,7 @@ export function packageTypeLabel(packageType: string): string {
     SOURCE: "Source",
     OTHER: "Other",
   };
-  return map[packageType as PackageType] ?? packageType;
+  return map[packageType] ?? packageType;
 }
 
 /**
