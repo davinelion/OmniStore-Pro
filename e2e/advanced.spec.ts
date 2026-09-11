@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { waitForLibraryWrite } from "./helpers/library";
+
 /**
  * Advanced flows: user collections with share-link import, offline fallback
  * and i18n rendering.
@@ -14,6 +16,7 @@ test.describe("user collections", () => {
     await page.getByPlaceholder("Collection name").press("Enter");
 
     await expect(page.getByText("My toolkit").first()).toBeVisible();
+    await waitForLibraryWrite(page, { collectionName: "My toolkit" });
 
     // Persisted across reloads (IndexedDB).
     await page.reload();

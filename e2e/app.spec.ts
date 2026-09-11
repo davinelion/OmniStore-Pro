@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { waitForLibraryWrite } from "./helpers/library";
+
 /**
  * End-to-end acceptance tests for the marketplace surfaces: browse, search,
  * app detail, collections, taxonomy and library.
@@ -100,6 +102,10 @@ test.describe("library", () => {
     await expect(favorite).toBeVisible();
     await favorite.click();
     await expect(favorite).toHaveAttribute("aria-pressed", "true");
+
+    // The store update is synchronous but the IndexedDB write is async —
+    // wait for it to commit or the navigation can abort the transaction.
+    await waitForLibraryWrite(page, { kind: "favorites", appId: "keepassxc" });
 
     await page.goto("/favorites");
     await expect(page.getByRole("heading", { level: 1, name: /My library/i })).toBeVisible();
