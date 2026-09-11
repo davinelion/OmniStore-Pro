@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -139,11 +139,16 @@ function CollectionEditor({
   const [apps, setApps] = useState<App[]>([]);
   const [expanded, setExpanded] = useState(false);
 
+  // Request each id exactly once per mount (deps keyed on the id list only).
+  const requestedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
+    const missing = collection.appIds.filter((id) => !requestedRef.current.has(id));
+    if (missing.length === 0) return;
+    for (const id of missing) requestedRef.current.add(id);
     let cancelled = false;
-    (async () => {
+    void (async () => {
       const results = await Promise.allSettled(
-        collection.appIds.map((id) => getOmnisource().getApp(id)),
+        missing.map((id) => getOmnisource().getApp(id)),
       );
       if (cancelled) return;
       setApps(

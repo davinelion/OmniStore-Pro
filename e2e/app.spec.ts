@@ -95,32 +95,43 @@ test.describe("collections and taxonomy", () => {
 });
 
 test.describe("library", () => {
-  test.beforeEach(async ({ page }) => {
-    // Log every fetch (and unhandled rejection) from before first app code.
-    await page.addInitScript(() => {
-      const log: unknown[] = [];
-      (window as unknown as { __sdkLog: unknown[] }).__sdkLog = log;
-      const original = window.fetch.bind(window);
-      window.fetch = async (...args: Parameters<typeof fetch>) => {
-        const started = Date.now();
-        try {
-          const response = await original(...args);
-          log.push({
-            url: String(args[0]),
-            status: response.status,
-            ms: Date.now() - started,
-          });
-          return response;
-        } catch (error) {
-          log.push({ url: String(args[0]), error: String(error) });
-          throw error;
-        }
-      };
-      window.addEventListener("unhandledrejection", (event) => {
-        log.push({ unhandledRejection: String(event.reason) });
-      });
-    });
+
+  test("favorites added on the app page persist to the library", async ({ page }) => {
+    await page.goto("/app/keepassxc");
+
+    const favorite = page.getByRole("button", { name: /favorite/i });
+    await expect(favorite).toBeVisible();
+    await favorite.click();
+    await expect(favorite).toHaveAttribute("aria-pressed", "true");
+
+    // The store update is synchronous but the IndexedDB write is async —
+    // wait for it to commit or the navigation can abort the transaction.
+    await waitForLibraryWrite(page, { kind: "favorites", appId: "keepassxc" });
+
+    await page.goto("/favorites");
+    await expect(page.getByRole("heading", { level: 1, name: /My library/i })).toBeVisible();
+
+    await expect(page.getByRole("link", { name: /KeePassXC/ }).first()).toBeVisible();
   });
+
+  test("categories index and category detail work", async ({ page }) => {
+    await page.goto("/categories");
+    await expect(page.getByRole("link", { name: /Utilities/ }).first()).toBeVisible();
+
+    await page.goto("/categories/utilities");
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
+  });
+
+  test("developers index and developer detail work", async ({ page }) => {
+    await page.goto("/developers");
+    await expect(page.getByText(/LocalSend Team|KeePassXC Team/i).first()).toBeVisible();
+
+    await page.goto("/developers/localsend-org");
+    await expect(page.getByRole("link", { name: /LocalSend/ }).first()).toBeVisible();
+  });
+});
+
+test.describe("library", () => {
 
   test("favorites added on the app page persist to the library", async ({ page }) => {
     await page.goto("/app/keepassxc");

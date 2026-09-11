@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CloudOff, CloudUpload, Heart, RefreshCw } from "lucide-react";
 
@@ -29,12 +29,16 @@ export function LibraryTabs() {
 
   const ids = library[tab];
 
-  // Resolve ids → App cards through OmniSource.
+  // Resolve ids → App cards through OmniSource. Each id is requested exactly
+  // once per page load (ref-guarded, deps keyed on ids only) so a re-render
+  // can never cancel an in-flight request and drop the result.
+  const requestedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
-    let cancelled = false;
-    const missing = ids.filter((id) => !appsById.has(id));
+    const missing = ids.filter((id) => !requestedRef.current.has(id));
     if (missing.length === 0) return;
-    (async () => {
+    for (const id of missing) requestedRef.current.add(id);
+    let cancelled = false;
+    void (async () => {
       const results = await Promise.allSettled(missing.map((id) => getOmnisource().getApp(id)));
       if (cancelled) return;
       setAppsById((previous) => {
@@ -49,7 +53,7 @@ export function LibraryTabs() {
     return () => {
       cancelled = true;
     };
-  }, [ids, appsById]);
+  }, [ids]);
 
   const apps = useMemo(
     () => ids.map((id) => appsById.get(id)).filter((app): app is App => app != null),
