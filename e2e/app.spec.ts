@@ -126,7 +126,8 @@ test.describe("library", () => {
     } catch {
       const state = await page.evaluate(() => ({
         hasReactRoot: document.querySelector("main")?.children.length ?? 0,
-        mainText: (document.querySelector("main")?.textContent ?? "").slice(0, 200),
+        mainText: (document.querySelector("main")?.textContent ?? "").slice(0, 250),
+        libraryDebug: (window as unknown as Record<string, unknown>).__libraryDebug ?? null,
       }));
       throw new Error(
         `LIBRARY DIAGNOSTICS >>> pageErrors=${JSON.stringify(pageErrors)} consoleErrors=${JSON.stringify(consoleErrors)} state=${JSON.stringify(state)}`,
