@@ -144,7 +144,10 @@ export class OmniSourceClient {
       ...options.headers,
     };
     this.clientCacheTtl = options.clientCacheTtl ?? 60;
-    this.doFetch = options.fetch ?? fetch;
+    // Bind lazily: Next.js patches global fetch (client and server) after
+    // module evaluation, so capturing the binding at construction time can
+    // freeze a stale/unpatched implementation in the browser.
+    this.doFetch = options.fetch ?? ((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init));
 
     this.appsApi = new AppsApi(this);
     this.searchApi = new SearchApi(this);
