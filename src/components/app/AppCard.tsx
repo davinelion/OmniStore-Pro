@@ -95,7 +95,7 @@ export function AppCard({
       <CardShell
         href={href}
         className={cn(
-          "group relative flex min-h-[15rem] flex-col justify-end overflow-hidden p-5 sm:min-h-[17rem] sm:p-6",
+          "group relative flex min-h-[15rem] flex-col justify-end overflow-hidden p-5 sm:min-h-[19rem] sm:p-6",
           className,
         )}
       >
@@ -113,10 +113,29 @@ export function AppCard({
           aria-hidden
           className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/30"
         />
+        {/* Brand glow behind the icon — the editorial "spotlight" cue. */}
+        <div
+          aria-hidden
+          className={cn(
+            "absolute -bottom-16 -left-10 h-56 w-56 rounded-full opacity-40 blur-3xl",
+            "bg-[radial-gradient(closest-side,rgb(var(--accent)/0.5),rgb(var(--accent-2)/0.25),transparent)]",
+            "transition-opacity duration-300 group-hover:opacity-70",
+          )}
+        />
         <div className="relative flex items-end gap-4">
-          <AppIcon name={app.name} src={app.icon} size="xl" />
+          <AppIcon
+            name={app.name}
+            src={app.icon}
+            size="xl"
+            className={cn(
+              "shadow-raised ring-1 ring-line/60 transition-transform duration-300 ease-spring",
+              "group-hover:scale-[1.04]",
+            )}
+          />
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-lg font-semibold sm:text-xl">{app.name}</h3>
+            <h3 className="truncate font-display text-xl font-bold tracking-tight sm:text-2xl">
+              {app.name}
+            </h3>
             <p className="mt-0.5 line-clamp-2 text-sm text-muted">
               {app.shortDescription || app.description}
             </p>
@@ -143,9 +162,16 @@ export function AppCard({
       className={cn("flex h-full flex-col gap-3 p-4", className)}
     >
       <div className="flex items-start gap-3">
-        <AppIcon name={app.name} src={app.icon} size="lg" />
+        <AppIcon
+          name={app.name}
+          src={app.icon}
+          size="lg"
+          className="transition-transform duration-200 ease-spring group-hover:scale-105"
+        />
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[0.95rem] font-semibold leading-snug">{app.name}</h3>
+          <h3 className="truncate font-display text-[0.95rem] font-semibold leading-snug tracking-tight">
+            {app.name}
+          </h3>
           <p className="truncate text-xs text-muted">{app.developer}</p>
         </div>
       </div>

@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
+
+import { ShieldCheck } from "lucide-react";
 
 import type { App, Collection, CollectionLayout } from "@omnistore/shared-models";
 import type { TrustBadge } from "@omnistore/shared-models";
 import { cn } from "@/lib/utils";
 import { AppCard } from "@/components/app/AppCard";
+import { AppIcon } from "@/components/app/AppIcon";
+import { TrustBadgeList } from "@/components/app/TrustBadges";
+import { PlatformBadgeRow } from "@/components/platform/PlatformBadges";
 import { SectionHeading } from "@/components/ui/primitives";
 
 /**
@@ -87,6 +92,8 @@ function CollectionLayoutView({
   switch (layout) {
     case "hero":
       return <HeroLayout apps={apps} badgesByAppId={badgesByAppId} />;
+    case "ranked":
+      return <RankedLayout apps={apps} badgesByAppId={badgesByAppId} />;
     case "grid":
       return (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -200,6 +207,75 @@ function HeroLayout({
           <AppCard key={app.id} app={app} />
         ))}
       </div>
+    </div>
+  );
+}
+
+/**
+ * RankedLayout — editorial "chart" rows with oversized ghost numerals.
+ *
+ * Used for Trending: the rank is the visual protagonist, the app is the
+ * detail. Rows are full-width links so the whole row is the hit target.
+ */
+function RankedLayout({
+  apps,
+  badgesByAppId,
+}: {
+  apps: App[];
+  badgesByAppId?: ReadonlyMap<string, readonly TrustBadge[]>;
+}) {
+  const t = useTranslations("app");
+  return (
+    <div className="card overflow-hidden p-1.5 sm:p-2">
+      <ol className="divide-y divide-line/70">
+        {apps.slice(0, 8).map((app, index) => (
+          <li key={app.id}>
+            <Link
+              href={`/app/${app.slug}`}
+              className={cn(
+                "group flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-surface-2/70 sm:gap-4 sm:p-4",
+              )}
+            >
+              <span
+                aria-hidden
+                className="text-ghost w-9 shrink-0 text-right font-display text-3xl font-bold tabular sm:w-12 sm:text-5xl"
+              >
+                {index + 1}
+              </span>
+              <AppIcon name={app.name} src={app.icon} size="md" rounded="rounded-xl" />
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="truncate font-semibold group-hover:text-accent">
+                    {app.name}
+                  </span>
+                  <TrustBadgeList badges={badgesByAppId?.get(app.id) ?? []} size="sm" />
+                </span>
+                <span className="mt-0.5 block truncate text-sm text-muted">
+                  {app.shortDescription || app.developer}
+                </span>
+              </span>
+              <span className="hidden shrink-0 items-center gap-3 sm:flex">
+                <PlatformBadgeRow platforms={app.platforms ?? []} />
+                {app.trustScore != null ? (
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-semibold tabular",
+                      app.trustScore >= 80
+                        ? "bg-success/10 text-success"
+                        : "bg-warning/10 text-warning",
+                    )}
+                    title={t("trustScore")}
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
+                    {app.trustScore}
+                  </span>
+                ) : null}
+                <TrendingUp className="h-4 w-4 text-accent/70" aria-hidden />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

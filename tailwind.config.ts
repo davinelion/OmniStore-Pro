@@ -49,6 +49,15 @@ const config: Config = {
         ring: withOpacity("--ring"),
       },
       fontFamily: {
+        display: [
+          "Space Grotesk Variable",
+          "Space Grotesk",
+          "Inter Variable",
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
         sans: [
           "Inter Variable",
           "Inter",
