@@ -1,16 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { SearchBox } from "@/components/search/SearchBox";
+import { Logo } from "@/components/brand/Logo";
+import { CommandPalette } from "@/components/search/CommandPalette";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileNav } from "./MobileNav";
 
 const NAV = [
   { href: "/apps", key: "browse" },
+  { href: "/track", key: "track" },
   { href: "/collections", key: "collections" },
   { href: "/categories", key: "categories" },
   { href: "/developers", key: "developers" },
@@ -18,62 +23,94 @@ const NAV = [
 
 export function Header() {
   const t = useTranslations("nav");
+  const tSearch = useTranslations("search");
+  const pathname = usePathname() ?? "/";
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-content items-center gap-3 px-4 sm:px-6">
-        <Link
-          href="/"
-          className="flex shrink-0 items-center gap-2 rounded-lg font-semibold tracking-tight"
-          aria-label="OmniStore home"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-accent-fg text-sm font-bold">
-            O
-          </span>
-          <span className="hidden text-[1.05rem] sm:block">OmniStore</span>
-        </Link>
-
-        <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-1">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="rounded-full px-3 py-1.5 text-sm text-muted transition-colors hover:bg-surface-2 hover:text-fg"
-                >
-                  {t(item.key)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="mx-auto hidden w-full max-w-md md:block">
-          <SearchBox />
-        </div>
-
-        <div className="ms-auto flex items-center gap-2">
-          <div className="hidden md:block">
-            <ThemeToggle />
-          </div>
-          <div className="hidden sm:block">
-            <LanguageSwitcher compact />
-          </div>
+    <>
+      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/70 backdrop-blur-xl supports-[backdrop-filter]:bg-bg/60">
+        <div className="mx-auto flex h-16 max-w-content items-center gap-2 px-4 sm:px-6">
           <Link
-            href="/favorites"
-            className={cn(
-              "hidden rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-muted",
-              "transition-colors hover:border-accent/50 hover:text-fg sm:block",
-            )}
+            href="/"
+            className="flex shrink-0 items-center gap-2.5 rounded-lg font-semibold tracking-tight"
+            aria-label="OmniStore home"
           >
-            {t("favorites")}
+            <Logo size={30} className="rounded-[9px] shadow-glow" />
+            <span className="hidden text-[1.05rem] tracking-tight sm:block">OmniStore</span>
           </Link>
-          <MobileNav />
+
+          <nav aria-label="Primary" className="hidden lg:block">
+            <ul className="flex items-center gap-0.5">
+              {NAV.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                    className={cn(
+                      "relative rounded-full px-3 py-1.5 text-sm transition-colors",
+                      isActive(item.href)
+                        ? "text-fg"
+                        : "text-muted hover:bg-surface-2/70 hover:text-fg",
+                    )}
+                  >
+                    {t(item.key)}
+                    {isActive(item.href) ? (
+                      <span
+                        aria-hidden
+                        className="absolute inset-x-3 -bottom-[13px] h-px bg-brand-gradient"
+                      />
+                    ) : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Search trigger — the palette owns the actual input. */}
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className={cn(
+              "group ms-auto flex h-9 w-9 items-center justify-center rounded-full border border-line",
+              "bg-surface-2/50 text-muted transition-colors hover:border-accent/50 hover:text-fg",
+              "md:ms-4 md:h-10 md:w-full md:max-w-xs md:justify-start md:gap-2 md:px-3.5",
+            )}
+            aria-label={tSearch("title")}
+          >
+            <Search className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="hidden flex-1 text-start text-sm text-subtle md:block">
+              {tSearch("placeholder")}
+            </span>
+            <kbd className="hidden shrink-0 items-center gap-0.5 rounded border border-line bg-surface px-1.5 py-0.5 font-sans text-2xs text-subtle md:flex">
+              <span aria-hidden>⌘</span>K
+            </kbd>
+          </button>
+
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <Link
+              href="/favorites"
+              className={cn(
+                "hidden rounded-full border border-line bg-surface-2/50 px-3 py-1.5 text-sm text-muted",
+                "transition-colors hover:border-accent/50 hover:text-fg sm:block",
+              )}
+            >
+              {t("favorites")}
+            </Link>
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
+            <div className="hidden sm:block">
+              <LanguageSwitcher compact />
+            </div>
+            <MobileNav />
+          </div>
         </div>
-      </div>
-      <div className="border-t border-line px-4 py-2 md:hidden">
-        <SearchBox />
-      </div>
-    </header>
+      </header>
+
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+    </>
   );
 }

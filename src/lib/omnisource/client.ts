@@ -267,6 +267,40 @@ export class OmniSourceClient {
     this.analyticsApi.track(event);
   }
 
+  /**
+   * Absolute URL of the upstream service's health probe.
+   *
+   * `/health` is mounted on the service root, *outside* the `/api/v1` prefix,
+   * so it cannot be built by concatenating a path onto `baseUrl` — a `..`
+   * segment only removes `v1` and yields `/api/health`, which 404s. Strip the
+   * versioned prefix explicitly instead.
+   */
+  get healthUrl(): string {
+    const root = this.baseUrl.replace(/\/api\/v\d+(?:\/.*)?$/, "");
+    return `${root || this.baseUrl}/health`;
+  }
+
+  /**
+   * Probe the upstream service.
+   *
+   * Resolves to `null` when the service is unreachable or unhealthy rather
+   * than throwing, so callers can report a status without a try/catch.
+   */
+  async probeHealth(timeoutMs = 3000): Promise<{ status?: string } | null> {
+    try {
+      const response = await fetch(this.healthUrl, {
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: { accept: "application/json" },
+        cache: "no-store",
+      });
+      if (!response.ok) return null;
+      const json = (await response.json()) as { status?: string };
+      return typeof json?.status === "string" ? { status: json.status } : {};
+    } catch {
+      return null;
+    }
+  }
+
   /* -------------------------------------------------------------- */
   /* Core request pipeline                                           */
   /* -------------------------------------------------------------- */

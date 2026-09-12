@@ -12,6 +12,7 @@ import { safeHref } from "@/lib/security/urls";
 import { AppIcon } from "@/components/app/AppIcon";
 import { TrustBadgeList } from "@/components/app/TrustBadges";
 import { SecurityBadge } from "@/components/app/SecurityBadge";
+import { SourcePanel } from "@/components/app/SourcePanel";
 import { InstallPanel } from "@/components/app/InstallPanel";
 import { TrustPanel } from "@/components/app/TrustPanel";
 import { ScreenshotGallery } from "@/components/app/ScreenshotGallery";
@@ -105,7 +106,11 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/40" />
           </>
         ) : (
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-accent-soft via-surface to-surface" />
+          <div aria-hidden className="absolute inset-0">
+            <div className="absolute -left-16 -top-24 h-72 w-72 rounded-full bg-accent/25 blur-3xl" />
+            <div className="absolute -bottom-24 -right-16 h-64 w-64 rounded-full bg-accent-2/20 blur-3xl" />
+            <div className="bg-grid absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
+          </div>
         )}
         <div className="relative flex flex-col gap-5 p-5 sm:flex-row sm:items-end sm:p-8">
           <AppIcon
@@ -205,6 +210,7 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
 
         {/* ---------------- Sidebar ---------------- */}
         <aside className="space-y-5">
+          <SourcePanel app={app} />
           <InstallPanel app={app} preferredPlatform={preferredPlatform} />
           <TrustPanel report={trust as TrustReport | null} />
 

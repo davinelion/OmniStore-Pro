@@ -25,7 +25,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      {/*
+        Dark-first: the storefront is designed as a dark, glass/aurora surface.
+        `enableSystem` is off so the intended identity is what visitors see on a
+        first load; the header toggle still offers light and dark, and the choice
+        is remembered per device. Set `enableSystem` back to true to follow the
+        OS preference instead.
+      */}
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
         {children}
       </ThemeProvider>
     </QueryClientProvider>
