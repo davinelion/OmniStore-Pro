@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import type { Category, PlatformInfo, SearchFilters } from "@omnistore/shared-models";
 import { getOmnisource } from "@/lib/omnisource";
+import { orFallback } from "@/lib/omnisource/with-fallback";
 import { AppCard } from "@/components/app/AppCard";
 import { BrowseFilters } from "./BrowseFilters";
 import { SearchBox } from "./SearchBox";
@@ -53,9 +54,13 @@ export async function BrowseView({
   params.sort = (query.sort ??
     (mode === "search" ? "relevance" : "popularity")) as SearchFilters["sort"];
 
-  const result = await (mode === "search"
-    ? client.search(params.q ?? "", params)
-    : client.getApps(params));
+  // A failed catalog read degrades to an empty result set with the filters
+  // still usable, rather than turning the route into a 500.
+  const result = await orFallback(
+    mode === "search" ? client.search(params.q ?? "", params) : client.getApps(params),
+    { items: [], pagination: { page, perPage, total: 0, totalPages: 0 }, freshness: null },
+    `${mode} results`,
+  );
 
   const { items, pagination } = result;
 
