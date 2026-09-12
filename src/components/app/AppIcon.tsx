@@ -10,6 +10,18 @@ const SIZES = {
   xl: "h-24 w-24 text-4xl",
 } as const;
 
+/**
+ * Deterministic hue from the app name so every app keeps the same brand tile
+ * across surfaces and themes, without storing any per-app metadata.
+ */
+function hueFor(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  }
+  return hash % 360;
+}
+
 export type AppIconSize = keyof typeof SIZES;
 
 /**
@@ -35,18 +47,32 @@ export function AppIcon({
   const letter = (name.trim()[0] ?? "?").toUpperCase();
 
   if (!src || failed) {
+    const hue = hueFor(name);
+    const gradient = `linear-gradient(140deg, hsl(${hue} 72% 52%), hsl(${(hue + 36) % 360} 78% 38%))`;
     return (
       <div
         className={cn(
-          "flex shrink-0 items-center justify-center border border-line bg-accent-soft font-semibold text-accent",
+          "relative flex shrink-0 items-center justify-center overflow-hidden font-bold text-white",
+          "ring-1 ring-black/10 dark:ring-white/10",
           SIZES[size],
           rounded,
           className,
         )}
+        style={{ background: gradient }}
         aria-hidden
         data-testid="app-icon-fallback"
       >
-        {letter}
+        {/* Top-left sheen so the tile reads as a real app icon, not a flat chip. */}
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(120%_80%_at_28%_18%,rgb(255_255_255/0.38),transparent_58%)]"
+        />
+        <span
+          className="relative"
+          style={{ textShadow: "0 1px 2px rgb(0 0 0 / 0.28)" }}
+        >
+          {letter}
+        </span>
       </div>
     );
   }

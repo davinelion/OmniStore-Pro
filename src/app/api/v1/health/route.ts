@@ -8,12 +8,15 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const client = getOmnisource();
-    const upstream = await client.probeHealth(3000);
+    const bundled = client.isBundled;
+    const upstream = bundled ? { status: "bundled" } : await client.probeHealth(3000);
     return ok({
       status: "ok",
       version: site.version,
       upstream: upstream?.status ?? (upstream ? "unknown" : "unreachable"),
-      upstreamUrl: client.baseUrl.replace(/^https?:\/\//, ""),
+      upstreamUrl: bundled
+        ? "bundled-catalog"
+        : client.baseUrl.replace(/^https?:\/\//, ""),
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
