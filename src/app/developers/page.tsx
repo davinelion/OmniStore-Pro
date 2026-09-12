@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { getOmnisource } from "@/lib/omnisource";
+import { orEmpty } from "@/lib/omnisource/with-fallback";
 import { DeveloperCard } from "@/components/developer/DeveloperCard";
 import { SectionHeading } from "@/components/ui/primitives";
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 export default async function DevelopersPage() {
   const t = await getTranslations("developers");
   const client = getOmnisource();
-  const developers = await client.getDevelopers(120);
+  const developers = await orEmpty(client.getDevelopers(120), "developers page");
 
   return (
     <div className="space-y-6">

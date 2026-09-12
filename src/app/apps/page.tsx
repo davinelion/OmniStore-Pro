@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { getOmnisource } from "@/lib/omnisource";
+import { orEmpty } from "@/lib/omnisource/with-fallback";
 import { BrowseView, type BrowseQuery } from "@/components/search/BrowseView";
 
 export const revalidate = 300;
@@ -18,7 +19,11 @@ export default async function AppsPage({
   searchParams: Promise<BrowseQuery>;
 }) {
   const [query, client] = await Promise.all([searchParams, getOmnisource()]);
-  const [categories, platforms] = await Promise.all([client.getCategories(), client.getPlatforms()]);
+  // Degrade rather than 500: filters disappear, the catalog still renders.
+  const [categories, platforms] = await Promise.all([
+    orEmpty(client.getCategories(), "categories (browse filters)"),
+    orEmpty(client.getPlatforms(), "platforms (browse filters)"),
+  ]);
   return (
     <BrowseView query={query} mode="browse" categories={categories} platforms={platforms} />
   );

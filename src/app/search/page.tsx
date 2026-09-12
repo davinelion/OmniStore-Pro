@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { getOmnisource } from "@/lib/omnisource";
+import { orEmpty } from "@/lib/omnisource/with-fallback";
 import { BrowseView, type BrowseQuery } from "@/components/search/BrowseView";
 
 export const revalidate = 120;
@@ -25,7 +26,10 @@ export default async function SearchPage({
   searchParams: Promise<BrowseQuery>;
 }) {
   const [query, client] = await Promise.all([searchParams, getOmnisource()]);
-  const [categories, platforms] = await Promise.all([client.getCategories(), client.getPlatforms()]);
+  const [categories, platforms] = await Promise.all([
+    orEmpty(client.getCategories(), "categories (search filters)"),
+    orEmpty(client.getPlatforms(), "platforms (search filters)"),
+  ]);
   return (
     <BrowseView query={query} mode="search" categories={categories} platforms={platforms} />
   );

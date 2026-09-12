@@ -13,6 +13,9 @@ const distDir = process.env.NEXT_DIST_DIR ?? ".next";
 
 const withIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+/** Absolute path of the bundled catalog, for the webpack alias below. */
+const feedFile = new URL("./data/omnisource-feed.json", import.meta.url).pathname;
+
 /** PWA caching (Phase 14): icons, screenshots, API responses, shells. */
 const withNextPwa = withPWA({
   dest: "public",
@@ -59,6 +62,27 @@ const nextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [{ protocol: "https", hostname: "**" }],
+  },
+  webpack: (config, { nextRuntime }) => {
+    /**
+     * Keep the 13 MB bundled catalog out of the browser and edge builds.
+     *
+     * `src/lib/omnisource/index.ts` is imported by client components (the
+     * command palette and search box), so webpack also builds a chunk for the
+     * feed provider's dynamic `import()` of the catalog JSON. Nothing in a
+     * browser can ever execute that path — `FeedBackedClient` is constructed
+     * only when `typeof window === "undefined"` — but without this alias the
+     * chunk is still emitted to `/_next/static/` and deployed: ~8.9 MB of dead
+     * weight that is publicly fetchable by anyone who guesses the URL.
+     *
+     * Aliasing the file to `false` in every non-Node compilation resolves it to
+     * an empty module instead, so no catalog chunk is produced. Browsers always
+     * read the catalog through the same-origin `/api/v1` proxy.
+     */
+    if (nextRuntime !== "nodejs") {
+      config.resolve.alias = { ...config.resolve.alias, [feedFile]: false };
+    }
+    return config;
   },
   async headers() {
     return [

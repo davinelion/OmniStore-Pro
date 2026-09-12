@@ -9,13 +9,13 @@ indexed, installable, accessible, and ready for native clients to reuse its
 
 ---
 
-## Advanced store upgrade
+## What's included
 
-New: [update inbox](/updates), personal library with private notes and portable
-backups, shareable lists, editorial alternatives, catalog transparency, RSS,
-reviewed metadata enrichment, contribution forms and opt-in count-only telemetry.
-See [advanced store guide](docs/ADVANCED_STORE.md) for setup, limits, and the
-external-service work that remains. Requires **Node 22.12+**.
+A device-local personal library with private notes and portable backups,
+shareable lists, editorial alternatives, catalog transparency, contribution
+forms, and opt-in count-only telemetry. See the
+[advanced store guide](docs/ADVANCED_STORE.md) for setup and limits. Requires
+**Node 22.12+**.
 
 ## Quick start
 
@@ -36,15 +36,25 @@ export GITHUB_TOKEN=ghp_...    # or rely on `gh auth login`
 npm run ingest                 # re-fetch every source, re-score, rewrite the feed
 ```
 
-`npm run ingest` reads `data/sources.json` (110 curated upstream repositories),
-calls the GitHub repository and releases APIs, normalises platforms,
-architectures and package types, computes scores from real signals, and writes a
-feed that is validated against `src/lib/schemas/omnisource.ts` before it is
-accepted. A partial run (expired credentials, network failure) refuses to
-overwrite a good feed unless you pass `--force`.
+`npm run ingest` reads `data/sources.json` (a curated list of upstream
+repositories), calls the GitHub repository and releases APIs, normalises
+platforms, architectures and package types from the **real release assets** each
+project publishes, derives trust / quality / popularity scores from public
+signals, and writes a feed validated against the shared zod schemas in
+`packages/shared-models` before it is accepted. A partial run (expired
+credentials, network failure, a high 404 rate) refuses to overwrite a good feed
+unless you pass `--force`.
 
-Useful flags: `--only=owner/repo` re-ingests one source, `--out=path.json`
-writes elsewhere.
+The committed `data/omnisource-feed.json` currently holds **444 apps, 1,891
+releases and 13,357 validated assets**.
+
+Useful flags: `--only=owner/repo` re-ingests one source, `--limit=N` smoke-tests
+the first N, `--out=path.json` writes elsewhere, `--concurrency=N` tunes
+parallelism. `npm run ingest:check` runs a 12-source dry run to `/tmp`.
+
+GitHub renames repositories often, and the API silently follows those redirects.
+The ingest reports the effective repository in its `ingest.failures` report, so a
+source that quietly became something else is visible rather than assumed good.
 
 ---
 
@@ -53,16 +63,40 @@ writes elsewhere.
 ```
 Presentation   Next.js App Router pages + React components
                (server-rendered for crawlable pages, client components for
-                search, compare, favorites, theme, downloads)
+                search, favorites, theme, downloads)
       ↓
-Application    src/lib/search  ·  src/lib/scores  ·  src/lib/omnisource
-               query parsing, ranking, filtering, signal-based scoring
+SDK            getOmnisource() → OmniSourceClient
+               AppsApi · SearchApi · CollectionsApi · DevelopersApi
+               RecommendationsApi · CategoriesApi · TrustApi · SecurityApi
       ↓
-API client     getProvider()  (server)   ·   omniClient → /api/v1/* (browser)
+Transport      server: OmniSourceClient (HTTP) or FeedBackedClient (in-process)
+               browser: always the same-origin /api/v1 proxy
       ↓
-OmniSource     bundled feed (default) or a live deployment
-               (NEXT_PUBLIC_OMNISOURCE_API_URL)
+OmniSource     1. a live deployment, when OMNISOURCE_API_URL is set
+               2. the bundled feed in data/omnisource-feed.json (default)
 ```
+
+Both data paths implement the identical OmniSource v1 contract, so nothing above
+the transport knows which one answered. Every response is validated with the
+shared zod schemas in `packages/shared-models` before it reaches a component —
+malformed data degrades, it never crashes a page.
+
+**Data source selection** is deliberate:
+
+- `OMNISOURCE_API_URL` set → a live OmniSource deployment answers. This is the
+  intended production wiring.
+- Nothing set → `FeedBackedClient` serves `data/omnisource-feed.json`
+  in-process. A fresh clone or a bare Vercel deploy renders a complete store with
+  zero configuration instead of an empty shell.
+
+The feed is loaded only in the Node.js runtime and only through a dynamic import
+(see the comment in `next.config.mjs`), so the ~12 MB catalog never enters the
+browser or edge bundles — browsers always read through `/api/v1`.
+
+**Degradation:** every catalog read on a server-rendered page goes through
+`orFallback` / `Promise.allSettled`. If a read fails the section renders empty
+and the reason is logged with its route context; the route still returns 200
+rather than 500.
 
 The UI never reads a database and never depends on OmniSource internals.
 Swapping the bundled feed for a live OmniSource is a configuration change, not a
@@ -159,9 +193,9 @@ browser.
 | `npm run lint` | ESLint (Next + React hooks + a11y rules) |
 | `npm test` | Unit, component, contract and integration tests |
 | `npm run test:unit` | Unit + component tests only (`src/**`) |
-| `npm run test:integration` | Server integration tests (`tests/**`) |
 | `npm run e2e` | Playwright end-to-end (needs `npm run e2e:install` once) |
-| `npm run ingest` | Refresh the OmniSource feed from upstream |
+| `npm run ingest` | Refresh the bundled OmniSource feed from upstream |
+| `npm run ingest:check` | 12-source dry run to `/tmp` — smoke-test ingest changes |
 | `npm run verify` | lint + typecheck + unit tests + build |
 
 ---
@@ -233,17 +267,25 @@ These are product requirements, not preferences:
 
 ## Known limitations
 
-- The bundled feed is a **snapshot** (110 sources, refreshed by `npm run ingest`,
-  which the included `Ingest` workflow can schedule weekly). Every page shows
-  when the data was generated, and `/api/v1/health` reports it.
+- The bundled feed is a **snapshot** (444 sources, refreshed by `npm run ingest`;
+  there is no scheduled workflow in this repository yet, so refresh it manually
+  or add one). Every page shows when the data was generated, and
+  `/api/v1/health` reports it.
 - iPadOS coverage is thin because upstream projects rarely publish iPad-only
   artefacts; the platform is supported end-to-end and will populate as OmniSource does.
-- A handful of upstream tag formats stay unnormalised on purpose (experimental
-  nightlies, monorepo tags like `core@13.2.0`, commit-based builds): OmniStore
-  shows the tag upstream published rather than inventing a version.
-- Search is a high-quality in-process index over the current snapshot. It is not
-  a distributed search engine; extremely large catalogs should move ranking into
-  OmniSource behind the same contract.
+- Version strings are normalised for display (a leading `v`, `release-` prefixes
+  and scoped package names are reduced to the version) but a handful of upstream
+  tag formats stay as published on purpose — experimental nightlies and
+  commit-based builds show the tag upstream published rather than an invented
+  version.
+- Platform and package metadata comes from **GitHub release assets**. Projects
+  that distribute only through their own download infrastructure (Blender,
+  Inkscape, FFmpeg, LibreOffice, Krita, …) appear with correct metadata but no
+  download buttons until an OmniSource deployment indexes those channels.
+- The bundled feed's security report covers only the checks the ingest actually
+  performed (metadata integrity, release-asset validation, licence provenance,
+  repository activity). It runs **no** vulnerability, CVE or malware scanning and
+  never claims to — point `OMNISOURCE_API_URL` at a real OmniSource for that.
 - Favorites, follows and comparison selections are **device-local**. Account sync
   is designed for (see the store interface) but not implemented.
 - End-to-end tests need Playwright browsers, which some sandboxes cannot download.
@@ -253,18 +295,19 @@ These are product requirements, not preferences:
 ## Repository layout
 
 ```
-src/app/**            routes: pages and /api/v1/* handlers
-src/components/**     UI: app, search, compare, platform, layout, ui primitives
-src/lib/api/**        provider seam (local/http), browser client, HTTP helpers
-src/lib/schemas/**    the OmniSource contract (Zod + TS types)
-src/lib/omnisource/   OmniSource-side normalisation and artefact rules
-src/lib/search/       query parsing, ranking, filtering, pagination
-src/lib/scores/       signal-based scoring with factor transparency
-src/lib/security/     URL and markdown hardening
-src/config/**         site, flags, licences, collections
-data/                 sources.json, the generated feed, the ingest report
-scripts/ingest.ts     upstream → validated OmniSource-shaped feed
-docs/                 client architecture and API contract
-e2e/                  Playwright acceptance tests
-tests/                integration and performance suites
+src/app/**               routes: pages and /api/v1/* handlers
+src/components/**        UI: app, search, collection, platform, layout, primitives
+src/lib/omnisource/**    the OmniSource SDK: client, endpoint groups, mappers
+src/lib/omnisource/feed/ bundled-feed catalog + v1 request router (server-only)
+src/lib/library/**       device-local library, notes, share links
+src/lib/favorites/**     device-local favorites store
+src/lib/track/**         source tracking
+src/lib/security/**      URL hardening
+src/config/**            site metadata, feature flags
+packages/shared-models/  the OmniSource v1 contract (zod schemas, DTOs, mappers)
+data/sources.json        curated upstream repositories
+data/omnisource-feed.json generated catalog snapshot (committed)
+scripts/ingest.mjs       upstream → validated OmniSource-shaped feed
+docs/                    client architecture and API contract
+e2e/                     Playwright acceptance tests
 ```
