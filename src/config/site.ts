@@ -6,7 +6,25 @@
  * runtime. Only presentation concerns live in this file.
  */
 
-const rawUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+/**
+ * Resolve the public site URL. `site.url` must ALWAYS be a valid absolute URL
+ * — `layout.tsx` feeds it straight into `new URL(...)` (metadataBase) and
+ * `absoluteUrl()` concatenates paths onto it. An empty or malformed
+ * `NEXT_PUBLIC_SITE_URL` (e.g. an env var created without a value) must never
+ * break the build, so anything unusable falls back to the dev default.
+ */
+function resolveSiteUrl(value: string | undefined): string {
+  const candidate = (value ?? "").trim().replace(/\/+$/, "");
+  if (!candidate) return "http://localhost:3000";
+  try {
+    new URL(candidate);
+  } catch {
+    return "http://localhost:3000";
+  }
+  return candidate;
+}
+
+const rawUrl = resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
 function normaliseUrl(value: string) {
   return value.replace(/\/+$/, "");
