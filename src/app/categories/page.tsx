@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { getOmnisource } from "@/lib/omnisource";
+import { orEmpty } from "@/lib/omnisource/with-fallback";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { SectionHeading } from "@/components/ui/primitives";
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 export default async function CategoriesPage() {
   const t = await getTranslations("categories");
   const client = getOmnisource();
-  const categories = await client.getCategories();
+  const categories = await orEmpty(client.getCategories(), "categories page");
 
   return (
     <div className="space-y-6">

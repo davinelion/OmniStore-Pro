@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { UserRound } from "lucide-react";
 
 import { getOmnisource } from "@/lib/omnisource";
+import { orFallback } from "@/lib/omnisource/with-fallback";
 import { CollectionCard } from "@/components/collection/CollectionCard";
 import { SectionHeading } from "@/components/ui/primitives";
 
@@ -16,7 +17,11 @@ export const metadata: Metadata = {
 export default async function CollectionsPage() {
   const [t, tCommon] = await Promise.all([getTranslations("collections"), getTranslations("common")]);
   const client = getOmnisource();
-  const { items } = await client.getCollections(1, 60);
+  const { items } = await orFallback(
+    client.getCollections(1, 60),
+    { items: [], pagination: { page: 1, perPage: 60, total: 0, totalPages: 0 } },
+    "collections page",
+  );
 
   return (
     <div className="space-y-8">
