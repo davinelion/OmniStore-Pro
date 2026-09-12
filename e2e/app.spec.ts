@@ -49,11 +49,22 @@ test.describe("app detail", () => {
     await expect(page.getByText(/Verified|Verified badge/i).first()).toBeVisible();
   });
 
-  test("releases page lists the version timeline", async ({ page }) => {
+  test("releases page lists the version timeline", async ({ page, request }) => {
+    // Read the expected versions from the API rather than hardcoding them —
+    // the catalog (here, the hermetic mock) changes whenever data is refreshed,
+    // and a hardcoded version turns a data change into a false failure.
+    const app = (await (await request.get("/api/v1/apps/localsend")).json()) as {
+      releases?: Array<{ version: string }>;
+    };
+    const versions = (app.releases ?? []).map((release) => release.version);
+    expect(versions.length).toBeGreaterThan(1);
+
     await page.goto("/app/localsend/releases");
 
-    await expect(page.getByText("2.1.0").first()).toBeVisible();
-    await expect(page.getByText("2.0.0").first()).toBeVisible();
+    // The timeline is newest-first, so the first two entries are the current
+    // release and the one before it.
+    await expect(page.getByText(versions[0]!, { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(versions[1]!, { exact: true }).first()).toBeVisible();
   });
 
   test("security dashboard renders score and scan evidence", async ({ page }) => {

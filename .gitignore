@@ -24,5 +24,4 @@ public/fallback-*.js
 public/swe-worker-*.js
 
 # Alternate dist dirs used by local verification runs
-.next-dev/
-.next-build/
+.next-*/
