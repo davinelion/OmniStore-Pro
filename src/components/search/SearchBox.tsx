@@ -1,5 +1,6 @@
 "use client";
 
+import Fuse from "fuse.js";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -9,16 +10,11 @@ import type { App } from "@omnistore/shared-models";
 import { getOmnisource } from "@/lib/omnisource";
 import { cn } from "@/lib/utils";
 import { AppIcon } from "@/components/app/AppIcon";
+import { trackEvent } from "@/lib/analytics/client";
 
 const RECENT_KEY = "omnistore:recent-searches";
-export const POPULAR_SEARCHES = [
-  "launcher",
-  "notes",
-  "password",
-  "media",
-  "sync",
-  "messaging",
-];
+/** Search terms are populated from OmniSource trending apps at runtime. */
+export const POPULAR_SEARCHES: string[] = [];
 
 function readRecent(): string[] {
   try {
@@ -67,12 +63,25 @@ export function SearchBox({
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<App[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
+  const [trending, setTrending] = useState<string[]>([]);
   const listboxId = useId();
   const boxRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     setRecent(readRecent());
+    let mounted = true;
+    getOmnisource()
+      .getTrending()
+      .then((apps) => {
+        if (mounted) setTrending(apps.slice(0, 6).map((app) => app.name));
+      })
+      .catch(() => {
+        // Trending is optional decoration; OmniSource remains the source of truth.
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -98,7 +107,18 @@ export function SearchBox({
         const result = await getOmnisource().search(trimmed, { perPage: 6 }, { signal: controller.signal });
         setSuggestions(result.items);
       } catch {
-        /* aborted or offline — keep previous suggestions */
+        // Fuse is only a resilient fallback over a freshly fetched OmniSource
+        // corpus; it never ships a local or mock catalog.
+        try {
+          const live = await getOmnisource().getApps({ perPage: 100 }, { signal: controller.signal });
+          const fuse = new Fuse(live.items, {
+            keys: ["name", "shortDescription", "developer", "tags"],
+            threshold: 0.35,
+          });
+          setSuggestions(fuse.search(trimmed, { limit: 6 }).map(({ item }) => item));
+        } catch {
+          /* aborted or offline — keep previous suggestions */
+        }
       }
     }, 220);
     return () => clearTimeout(timer);
@@ -108,6 +128,7 @@ export function SearchBox({
     const trimmed = value.trim();
     if (!trimmed) return;
     setRecent(pushRecent(trimmed));
+    trackEvent({ type: "search", metadata: { queryLength: trimmed.length } });
     setOpen(false);
     if (onSearch) {
       onSearch(trimmed);
@@ -248,7 +269,7 @@ export function SearchBox({
             <p className="px-2 pb-1 pt-1 text-2xs font-semibold uppercase tracking-wide text-subtle">
               {t("popular")}
             </p>
-            {POPULAR_SEARCHES.map((item) => (
+            {(trending.length > 0 ? trending : POPULAR_SEARCHES).map((item) => (
               <button
                 key={item}
                 type="button"

@@ -31,7 +31,7 @@ const withNextPwa = withPWA({
     runtimeCaching: [
       {
         // OmniStore API responses (proxied OmniSource data)
-        urlPattern: /\/api\/v1\/(apps|search|collections|categories|developers|trending|latest|stats|trust|security|platforms).*/,
+        urlPattern: /\/api\/v1\/(apps|search|collections|categories|developers|trending|latest|stats|trust|security|platforms|recommendations).*/,
         handler: "NetworkFirst",
         options: {
           cacheName: "omnistore-api",
@@ -58,10 +58,22 @@ const nextConfig = {
   reactStrictMode: true,
   distDir,
   poweredByHeader: false,
-  transpilePackages: ["@omnistore/shared-models"],
+  transpilePackages: ["@omnistore/shared-models", "@omnistore/omnisource-sdk"],
   images: {
-    unoptimized: true,
-    remotePatterns: [{ protocol: "https", hostname: "**" }],
+    // Keep image optimization enabled. The allowlist prevents OmniSource data
+    // from turning Next/Image into an open remote-image proxy.
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      "avatars.githubusercontent.com",
+      "github.com",
+      "raw.githubusercontent.com",
+      "objects.githubusercontent.com",
+      "user-images.githubusercontent.com",
+      ...(process.env.NEXT_PUBLIC_OMNISOURCE_IMAGE_HOSTS ?? "")
+        .split(",")
+        .map((hostname) => hostname.trim())
+        .filter(Boolean),
+    ].map((hostname) => ({ protocol: "https", hostname })),
   },
   webpack: (config, { nextRuntime }) => {
     /**
@@ -90,6 +102,9 @@ const nextConfig = {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           // OmniStore is a public catalogue; it stays embeddable by design
           // (no X-Frame-Options / frame-ancestors).

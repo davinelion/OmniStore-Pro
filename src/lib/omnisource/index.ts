@@ -21,6 +21,10 @@
  */
 
 import { OmniSourceClient } from "./client";
+// Re-export the framework-neutral contract so non-Next clients and tests can
+// share the exact same SDK entry point as the storefront.
+export { OmniSourceApiClient, OmniSourceApiError } from "@omnistore/omnisource-sdk";
+export type { ApiRequestOptions, AppQuery, PaginatedApps, PaginatedCollections, Stats } from "@omnistore/omnisource-sdk";
 import { FeedBackedClient, FEED_BASE_URL } from "./feed/client";
 
 export { OmniSourceClient, OmniSourceError } from "./client";

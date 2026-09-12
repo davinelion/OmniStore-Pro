@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { WifiOff } from "lucide-react";
+import { Download, WifiOff, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 /**
@@ -20,7 +20,43 @@ export function Pwa() {
     register();
   }, []);
 
-  return <OfflineBanner />;
+  return (
+    <>
+      <OfflineBanner />
+      <InstallPrompt />
+    </>
+  );
+}
+
+interface InstallEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+function InstallPrompt() {
+  const t = useTranslations("common");
+  const [event, setEvent] = useState<InstallEvent | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onBeforeInstall = (value: Event) => {
+      value.preventDefault();
+      setEvent(value as InstallEvent);
+      setVisible(true);
+    };
+    window.addEventListener("beforeinstallprompt", onBeforeInstall);
+    return () => window.removeEventListener("beforeinstallprompt", onBeforeInstall);
+  }, []);
+
+  if (!visible || !event) return null;
+  return (
+    <aside className="fixed inset-x-4 bottom-4 z-40 mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-accent/30 bg-surface p-4 shadow-raised" role="dialog" aria-label={t("installApp")}>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent"><Download className="h-5 w-5" aria-hidden /></span>
+      <span className="min-w-0 flex-1"><strong className="block text-sm">{t("installApp")}</strong><span className="mt-0.5 block text-xs text-muted">{t("installAppDescription")}</span></span>
+      <button type="button" onClick={async () => { await event.prompt(); setVisible(false); }} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-fg">{t("install")}</button>
+      <button type="button" onClick={() => setVisible(false)} className="rounded-full p-1 text-muted hover:bg-surface-2" aria-label={t("dismiss")}><X className="h-4 w-4" aria-hidden /></button>
+    </aside>
+  );
 }
 
 function OfflineBanner() {

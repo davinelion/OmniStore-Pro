@@ -28,13 +28,7 @@
     {
       "name": "Trending",
       "short_name": "Trending",
-      "url": "/trending",
-      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Compare apps",
-      "short_name": "Compare",
-      "url": "/compare",
+      "url": "/apps?sort=popularity",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     },
     {

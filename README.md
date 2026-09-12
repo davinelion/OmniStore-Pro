@@ -33,9 +33,10 @@ cp .env.example .env.local     # optional: every variable has a safe default
 npm run dev                    # http://localhost:3000
 ```
 
-The app works immediately: a validated OmniSource-shaped feed ships in
-`data/omnisource-feed.json`. No account, no database, no upstream service
-required.
+For local development the app works immediately with a validated snapshot
+produced by OmniSource ingest in `data/omnisource-feed.json`. Production
+should always set `OMNISOURCE_API_URL` so every request is served by the live
+OmniSource-Pro API; the UI contains no mock catalog or hand-authored app data.
 
 ### Refresh the data from upstream
 
@@ -73,7 +74,10 @@ Presentation   Next.js App Router pages + React components
                (server-rendered for crawlable pages, client components for
                 search, favorites, theme, downloads)
       ↓
-SDK            getOmnisource() → OmniSourceClient
+SDK            @omnistore/omnisource-sdk (framework-neutral shared client)
+               getApps · getApp · getCategories · getTrending · getCollections
+               getStats · getRecommendations
+               Next adapter: getOmnisource() → OmniSourceClient
                AppsApi · SearchApi · CollectionsApi · DevelopersApi
                RecommendationsApi · CategoriesApi · TrustApi · SecurityApi
       ↓
@@ -108,8 +112,11 @@ rather than 500.
 
 The UI never reads a database and never depends on OmniSource internals.
 Swapping the bundled feed for a live OmniSource is a configuration change, not a
-rewrite. See [`docs/CLIENT_ARCHITECTURE.md`](docs/CLIENT_ARCHITECTURE.md) for
-the full contract and the plan for native clients.
+rewrite. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the current system
+boundaries, [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for Vercel, and
+[`docs/DEVELOPER.md`](docs/DEVELOPER.md) for extension and locale rules. The
+legacy [`docs/CLIENT_ARCHITECTURE.md`](docs/CLIENT_ARCHITECTURE.md) covers the
+native-client contract.
 
 ---
 
@@ -179,6 +186,9 @@ Copy `.env.example` to `.env.local`. Every variable is optional.
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Absolute URLs for SEO and sitemap |
 | `NEXT_PUBLIC_OMNISTORE_VERSION` | `1.0.0` | Version surfaced in `/api/v1/health` |
 | `NEXT_PUBLIC_ENABLE_ANALYTICS` | `false` | Anonymous product analytics; off by default |
+| `NEXT_PUBLIC_POSTHOG_KEY` | unset | Optional consent-gated PostHog project key |
+| `NEXT_PUBLIC_OMNISOURCE_IMAGE_HOSTS` | `avatars.githubusercontent.com` | Comma-separated trusted HTTPS media hosts |
+| `OMNISOURCE_WEBHOOK_SECRET` | unset | HMAC secret for automatic ISR tag revalidation |
 | `FEATURE_*` | see below | Feature flags: `COMPARISON`, `FAVORITES`, `COLLECTIONS`, `REPORTING`, `PWA`, `AI_RECOMMENDATIONS` |
 | `OMNISTORE_REPORT_WEBHOOK_URL` | unset | Optional `https://` webhook that receives reports (server-side only) |
 | `OMNISOURCE_SUBMIT_URL` | unset | `https://` intake endpoint for source-indexing requests (server-side only) |

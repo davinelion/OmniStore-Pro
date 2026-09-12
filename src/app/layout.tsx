@@ -14,6 +14,7 @@ import { AmbientBackground } from "@/components/layout/AmbientBackground";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Pwa } from "@/components/layout/Pwa";
+import { Observability } from "@/components/layout/Observability";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -77,6 +78,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </a>
             <Header />
             <Pwa />
+            <Observability />
             <main id="main" className="mx-auto w-full max-w-content px-4 pb-16 pt-6 sm:px-6">
               {children}
             </main>

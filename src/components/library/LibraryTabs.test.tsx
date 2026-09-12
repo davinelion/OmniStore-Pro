@@ -73,7 +73,9 @@ describe("LibraryTabs", () => {
     // Fresh module graph per test = fresh module state (a "new page load").
     vi.resetModules();
     const { default: en } = await import("@/../messages/en.json");
-    const messages = { library: (en as Record<string, unknown>).library };
+    // Supply the complete locale so the card's app labels do not emit
+    // next-intl missing-message warnings during the accessibility test.
+    const messages = en as Record<string, unknown>;
     const { LibraryTabs } = await import("./LibraryTabs");
     await seedFavorite();
     render(

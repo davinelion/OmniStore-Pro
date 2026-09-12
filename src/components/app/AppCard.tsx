@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Download } from "lucide-react";
 
 import type { App, TrustBadge } from "@omnistore/shared-models";
 import { formatCompactNumber, relativeTime } from "@/lib/formatters";
+import { safeImageUrl } from "@/lib/security/urls";
 import { sourceFromRepository } from "@/lib/sources";
 import { cn } from "@/lib/utils";
 import { AppIcon } from "./AppIcon";
@@ -99,14 +101,14 @@ export function AppCard({
           className,
         )}
       >
-        {app.banner ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={app.banner}
+        {safeImageUrl(app.banner) ? (
+          <Image
+            src={safeImageUrl(app.banner)!}
             alt=""
-            loading={priority ? "eager" : "lazy"}
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover opacity-25 transition-opacity duration-300 group-hover:opacity-35"
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            priority={priority}
+            className="object-cover opacity-25 transition-opacity duration-300 group-hover:opacity-35"
           />
         ) : null}
         <div

@@ -8,6 +8,7 @@ import type { App, Architecture, Platform, ReleaseAsset } from "@omnistore/share
 import { architectureLabel, formatBytes, packageTypeLabel, platformLabel } from "@/lib/formatters";
 import { safeHref } from "@/lib/security/urls";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics/client";
 
 /**
  * InstallPanel — platform-aware download hand-off.
@@ -104,7 +105,7 @@ export function InstallPanel({
               </p>
             ) : null}
             {groupAssets.map((asset) => (
-              <AssetRow key={asset.id} asset={asset} handoff={t("installHandoff")} downloadLabel={t("download")} />
+              <AssetRow key={asset.id} appId={app.id} asset={asset} handoff={t("installHandoff")} downloadLabel={t("download")} />
             ))}
           </li>
         ))}
@@ -126,10 +127,12 @@ function groupByArchitecture(assets: ReleaseAsset[]): Array<[Architecture | null
 }
 
 function AssetRow({
+  appId,
   asset,
   handoff,
   downloadLabel,
 }: {
+  appId: string;
   asset: ReleaseAsset;
   handoff: string;
   downloadLabel: string;
@@ -171,6 +174,7 @@ function AssetRow({
           target="_blank"
           rel="noopener noreferrer external"
           title={handoff}
+          onClick={() => trackEvent({ type: "download_click", appId, metadata: { packageType: asset.packageType } })}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-fg transition-colors hover:bg-accent-hover"
         >
           <Download className="h-3.5 w-3.5" aria-hidden />

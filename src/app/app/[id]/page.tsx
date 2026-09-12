@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -8,7 +9,7 @@ import type { App, RecommendationItem, SecurityReport, TrustReport } from "@omni
 import { getOmnisource } from "@/lib/omnisource";
 import { absoluteUrl, site } from "@/config/site";
 import { formatDate, formatCompactNumber } from "@/lib/formatters";
-import { safeHref } from "@/lib/security/urls";
+import { safeHref, safeImageUrl } from "@/lib/security/urls";
 import { AppIcon } from "@/components/app/AppIcon";
 import { TrustBadgeList } from "@/components/app/TrustBadges";
 import { SecurityBadge } from "@/components/app/SecurityBadge";
@@ -20,6 +21,8 @@ import { ReleaseTimeline } from "@/components/app/ReleaseTimeline";
 import { FavoriteButton, AddToCollectionButton } from "@/components/app/FavoriteButton";
 import { RecommendationRow } from "@/components/app/RecommendationRow";
 import { detectPlatformHeader } from "@/lib/platform/header";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { ReleaseIntegrity } from "@/components/app/ReleaseIntegrity";
 
 export const revalidate = 300;
 
@@ -39,10 +42,16 @@ export async function generateMetadata({
     openGraph: {
       title: app.name,
       description: app.shortDescription || app.description || undefined,
-      images: app.banner
-        ? [{ url: app.banner }]
+      images: safeImageUrl(app.banner)
+        ? [{ url: safeImageUrl(app.banner)!, alt: app.name }]
         : [{ url: absoluteUrl("/og.png"), width: 1200, height: 630, alt: app.name }],
       type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: app.name,
+      description: app.shortDescription || app.description || undefined,
+      images: [safeImageUrl(app.banner) ?? absoluteUrl("/og.png")],
     },
   };
 }
@@ -55,13 +64,20 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
   const app = await client.getApp(decodeURIComponent(id));
   if (!app) notFound();
 
-  const [trust, security, recommendations, similar, preferredPlatform] = await Promise.all([
+  const [trustResult, securityResult, recommendationsResult, similarResult, platformResult] = await Promise.allSettled([
     client.getTrust(app.id),
     client.getSecurity(app.id),
     client.getRecommendations(app.id, 8),
     client.getSimilar(app.id, 8),
     detectPlatformHeader(),
   ]);
+  // Secondary intelligence is optional decoration. A transient upstream
+  // failure must not turn a perfectly valid app detail into a 500.
+  const trust = trustResult.status === "fulfilled" ? trustResult.value : null;
+  const security = securityResult.status === "fulfilled" ? securityResult.value : null;
+  const recommendations = recommendationsResult.status === "fulfilled" ? recommendationsResult.value : null;
+  const similar = similarResult.status === "fulfilled" ? similarResult.value : null;
+  const preferredPlatform = platformResult.status === "fulfilled" ? platformResult.value : null;
 
   // Recommendations may duplicate similar items — split by kind, drop dups.
   const items: RecommendationItem[] =
@@ -88,6 +104,7 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
 
   return (
     <div className="space-y-8">
+      <AnalyticsTracker type="app_view" appId={app.id} />
       <script
         type="application/ld+json"
         // JSON-LD is generated from validated API data; no user markup flows here.
@@ -96,14 +113,15 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
 
       {/* ---------------- Hero ---------------- */}
       <section className="relative overflow-hidden rounded-4xl border border-line">
-        {app.banner ? (
+        {safeImageUrl(app.banner) ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={app.banner}
+            <Image
+              src={safeImageUrl(app.banner)!}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover opacity-20"
-              fetchPriority="high"
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover opacity-20"
             />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-bg via-bg/80 to-bg/40" />
           </>
@@ -222,6 +240,7 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
         <aside className="space-y-5">
           <SourcePanel app={app} />
           <InstallPanel app={app} preferredPlatform={preferredPlatform} />
+          <ReleaseIntegrity app={app} />
           <TrustPanel report={trust as TrustReport | null} />
 
           {/* Security summary → full dashboard */}
