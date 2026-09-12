@@ -6,8 +6,9 @@
  *   const app = await getOmnisource().getApp("localsend");
  *
  * `getOmnisource()` returns a per-runtime singleton configured from
- * OMNISOURCE_API_URL / NEXT_PUBLIC_OMNISOURCE_API_URL. There is no other
- * data path in this application — no local catalog, no bundled feed.
+ * OMNISOURCE_API_URL / NEXT_PUBLIC_OMNISOURCE_API_URL. When no upstream is
+ * configured it serves a bundled, contract-valid catalog in-process, so the
+ * storefront works out of the box; set OMNISOURCE_API_URL to go live.
  */
 
 import { OmniSourceClient } from "./client";

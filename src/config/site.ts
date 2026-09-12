@@ -14,7 +14,15 @@
  * break the build, so anything unusable falls back to the dev default.
  */
 function resolveSiteUrl(value: string | undefined): string {
-  const candidate = (value ?? "").trim().replace(/\/+$/, "");
+  // Preferred: NEXT_PUBLIC_SITE_URL. On Vercel without it, fall back to the
+  // platform-injected production URL so canonical tags and sitemap.xml are
+  // correct with zero configuration.
+  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "";
+  const candidate = (value || vercelUrl || "").trim().replace(/\/+$/, "");
   if (!candidate) return "http://localhost:3000";
   try {
     new URL(candidate);

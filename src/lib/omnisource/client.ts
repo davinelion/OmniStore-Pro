@@ -32,6 +32,7 @@ import { RecommendationsApi } from "./recommendations";
 import { SearchApi, type SearchParams } from "./search";
 import { SecurityApi } from "./security";
 import { TrustApi } from "./trust";
+import { bundledRoute } from "./bundled/router";
 import type {
   App,
   Category,
@@ -88,6 +89,8 @@ export interface OmniSourceClientOptions {
   headers?: Record<string, string>;
   /** Browser-side memory-cache TTL, seconds. Default 60. */
   clientCacheTtl?: number;
+  /** Serve the bundled catalog instead of making HTTP requests. */
+  bundled?: boolean;
   fetch?: typeof fetch;
 }
 
@@ -98,6 +101,9 @@ interface CacheEntry {
 
 const DEFAULT_TIMEOUT = 10_000;
 const DEFAULT_RETRIES = 2;
+
+/** Placeholder origin used when the catalog is served in-process. */
+export const BUNDLED_BASE_URL = "bundled://catalog/api/v1";
 
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -132,11 +138,13 @@ export class OmniSourceClient {
   private readonly defaultHeaders: Record<string, string>;
   private readonly clientCacheTtl: number;
   private readonly doFetch: typeof fetch;
+  private readonly bundled: boolean;
   private static memory = new Map<string, CacheEntry>();
 
   constructor(baseUrl: string, apiKey?: string, options: OmniSourceClientOptions = {}) {
     this.baseUrl = baseUrl.replace(/\/+$/, "");
     this.apiKey = apiKey || undefined;
+    this.bundled = options.bundled === true;
     this.defaultRevalidate = options.revalidate ?? 300;
     this.defaultHeaders = {
       accept: "application/json",
@@ -267,6 +275,11 @@ export class OmniSourceClient {
     this.analyticsApi.track(event);
   }
 
+  /** True when the catalog is served in-process (no live OmniSource). */
+  get isBundled(): boolean {
+    return this.bundled;
+  }
+
   /**
    * Absolute URL of the upstream service's health probe.
    *
@@ -287,6 +300,7 @@ export class OmniSourceClient {
    * than throwing, so callers can report a status without a try/catch.
    */
   async probeHealth(timeoutMs = 3000): Promise<{ status?: string } | null> {
+    if (this.bundled) return { status: "ok" };
     try {
       const response = await fetch(this.healthUrl, {
         signal: AbortSignal.timeout(timeoutMs),
@@ -347,6 +361,10 @@ export class OmniSourceClient {
     schema: Validator<T>,
     options: RequestOptions = {},
   ): Promise<T> {
+    if (this.bundled) {
+      return this.requestBundled(path, schema, options);
+    }
+
     const url = `${this.baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
     const method = options.method ?? "GET";
     const cacheKey = this.clientCacheKey(url, options);
@@ -446,6 +464,30 @@ export class OmniSourceClient {
       : new OmniSourceError(0, "network_error", "Request failed", url);
   }
 
+  /**
+   * In-process request path used when no OmniSource is configured. Routes the
+   * wire path through the bundled catalog and validates the result against the
+   * same schemas as a real HTTP response, so callers behave identically.
+   */
+  private async requestBundled<T>(
+    path: string,
+    schema: Validator<T>,
+    options: RequestOptions,
+  ): Promise<T> {
+    const url = new URL(path, BUNDLED_BASE_URL);
+    const json = bundledRoute(options.method ?? "GET", url.pathname, url.searchParams);
+    const parsedResult = schema.safeParse(json);
+    if (!parsedResult.success) {
+      throw new OmniSourceError(
+        502,
+        "schema_mismatch",
+        "Bundled catalog response did not match the OmniSource v1 contract",
+        url.toString(),
+      );
+    }
+    return parsedResult.data;
+  }
+
   /** Like `request` but resolves to an `ApiResult` instead of throwing. */
   async safe<T>(
     path: string,
@@ -486,16 +528,26 @@ export class OmniSourceClient {
   static fromEnv(): OmniSourceClient {
     const serverUrl =
       process.env.OMNISOURCE_API_URL || process.env.NEXT_PUBLIC_OMNISOURCE_API_URL;
-    const baseUrl =
-      typeof window === "undefined"
-        ? serverUrl || "http://127.0.0.1:8000/api/v1"
-        : process.env.NEXT_PUBLIC_OMNISOURCE_API_URL || "/api/v1";
     const apiKey =
       (typeof window === "undefined" ? process.env.OMNISOURCE_API_KEY : undefined) ||
       process.env.NEXT_PUBLIC_OMNISOURCE_API_KEY ||
       undefined;
-    return new OmniSourceClient(baseUrl, apiKey, {
-      revalidate: Number(process.env.OMNISOURCE_REVALIDATE ?? 300),
+    const revalidate = Number(process.env.OMNISOURCE_REVALIDATE ?? 300);
+
+    if (typeof window === "undefined") {
+      // No upstream configured → serve the bundled catalog in-process so the
+      // storefront is fully populated out of the box (e.g. a first Vercel
+      // deploy with zero env vars). Set OMNISOURCE_API_URL to go live.
+      if (!serverUrl) {
+        return new OmniSourceClient(BUNDLED_BASE_URL, undefined, { bundled: true, revalidate });
+      }
+      return new OmniSourceClient(serverUrl, apiKey, { revalidate });
+    }
+
+    // Browsers always talk to the same-origin /api/v1 proxy; the server behind
+    // it resolves to bundled or live data.
+    return new OmniSourceClient(process.env.NEXT_PUBLIC_OMNISOURCE_API_URL || "/api/v1", apiKey, {
+      revalidate,
     });
   }
 }

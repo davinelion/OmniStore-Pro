@@ -9,13 +9,13 @@ indexed, installable, accessible, and ready for native clients to reuse its
 
 ---
 
-## Advanced store upgrade
+## Advanced store guide
 
-New: [update inbox](/updates), personal library with private notes and portable
-backups, shareable lists, editorial alternatives, catalog transparency, RSS,
-reviewed metadata enrichment, contribution forms and opt-in count-only telemetry.
-See [advanced store guide](docs/ADVANCED_STORE.md) for setup, limits, and the
-external-service work that remains. Requires **Node 22.12+**.
+The [advanced store guide](docs/ADVANCED_STORE.md) covers the update inbox,
+personal library with private notes and portable backups, shareable lists,
+catalog transparency, RSS, reviewed metadata enrichment, contribution forms and
+opt-in count-only telemetry — including setup, limits, and the external-service
+work that remains. Requires **Node 22.12+**.
 
 ## Quick start
 
@@ -25,26 +25,21 @@ cp .env.example .env.local     # optional: every variable has a safe default
 npm run dev                    # http://localhost:3000
 ```
 
-The app works immediately: a validated OmniSource-shaped feed ships in
-`data/omnisource-feed.json`. No account, no database, no upstream service
-required.
+The app works immediately: with no `OMNISOURCE_API_URL` configured it serves a
+bundled, contract-valid demo catalog in-process (`src/lib/omnisource/bundled/`),
+so every page renders with real open-source software out of the box. No
+account, no database, no upstream service required.
 
-### Refresh the data from upstream
+### Go live against a real OmniSource
 
 ```bash
-export GITHUB_TOKEN=ghp_...    # or rely on `gh auth login`
-npm run ingest                 # re-fetch every source, re-score, rewrite the feed
+# .env.local
+OMNISOURCE_API_URL=https://your-omnisource.example/api/v1   # server-side
 ```
 
-`npm run ingest` reads `data/sources.json` (110 curated upstream repositories),
-calls the GitHub repository and releases APIs, normalises platforms,
-architectures and package types, computes scores from real signals, and writes a
-feed that is validated against `src/lib/schemas/omnisource.ts` before it is
-accepted. A partial run (expired credentials, network failure) refuses to
-overwrite a good feed unless you pass `--force`.
-
-Useful flags: `--only=owner/repo` re-ingests one source, `--out=path.json`
-writes elsewhere.
+Every page renders from OmniSource through this URL. Leaving it empty falls
+back to the bundled catalog — swapping between the two is a configuration
+change, not a rewrite.
 
 ---
 
@@ -53,21 +48,21 @@ writes elsewhere.
 ```
 Presentation   Next.js App Router pages + React components
                (server-rendered for crawlable pages, client components for
-                search, compare, favorites, theme, downloads)
+                search, favorites, theme, downloads)
       ↓
-Application    src/lib/search  ·  src/lib/scores  ·  src/lib/omnisource
-               query parsing, ranking, filtering, signal-based scoring
+Application    src/lib/omnisource  ·  src/lib/platform  ·  src/lib/security
+               API groups, filters, platform detection, URL hardening
       ↓
-API client     getProvider()  (server)   ·   omniClient → /api/v1/* (browser)
+API client     OmniSourceClient (server)  ·  same-origin /api/v1/* (browser)
       ↓
-OmniSource     bundled feed (default) or a live deployment
-               (NEXT_PUBLIC_OMNISOURCE_API_URL)
+OmniSource     bundled catalog (default) or a live deployment
+               (OMNISOURCE_API_URL)
 ```
 
 The UI never reads a database and never depends on OmniSource internals.
-Swapping the bundled feed for a live OmniSource is a configuration change, not a
-rewrite. See [`docs/CLIENT_ARCHITECTURE.md`](docs/CLIENT_ARCHITECTURE.md) for
-the full contract and the plan for native clients.
+Swapping the bundled catalog for a live OmniSource is a configuration change,
+not a rewrite. See [`docs/CLIENT_ARCHITECTURE.md`](docs/CLIENT_ARCHITECTURE.md)
+for the full contract and the plan for native clients.
 
 ---
 
@@ -133,15 +128,15 @@ Copy `.env.example` to `.env.local`. Every variable is optional.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_OMNISOURCE_API_URL` | unset | Base URL of a live OmniSource deployment. Unset = bundled feed |
-| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Absolute URLs for SEO and sitemap |
+| `OMNISOURCE_API_URL` | unset | Base URL of a live OmniSource deployment (server-side). Unset = bundled catalog |
+| `NEXT_PUBLIC_OMNISOURCE_API_URL` | unset | Optional browser-visible base URL for direct client reads |
+| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Absolute URLs for SEO and sitemap (auto-detected from Vercel env when unset) |
 | `NEXT_PUBLIC_OMNISTORE_VERSION` | `1.0.0` | Version surfaced in `/api/v1/health` |
 | `NEXT_PUBLIC_ENABLE_ANALYTICS` | `false` | Anonymous product analytics; off by default |
-| `FEATURE_*` | see below | Feature flags: `COMPARISON`, `FAVORITES`, `COLLECTIONS`, `REPORTING`, `PWA`, `AI_RECOMMENDATIONS` |
+| `FEATURE_*` | see below | Feature flags: `FAVORITES`, `COLLECTIONS`, `USER_COLLECTIONS`, `CLOUD_SYNC`, `PWA` |
 | `OMNISTORE_REPORT_WEBHOOK_URL` | unset | Optional `https://` webhook that receives reports (server-side only) |
 | `OMNISOURCE_SUBMIT_URL` | unset | `https://` intake endpoint for source-indexing requests (server-side only) |
 | `OMNISOURCE_ADMIN_API_KEY` | unset | API key sent to the intake endpoint (server-side only, never `NEXT_PUBLIC_`) |
-| `GITHUB_TOKEN` | unset | Used only by `npm run ingest`, never by the app |
 
 **Never put a secret in a `NEXT_PUBLIC_*` variable** — they are shipped to the
 browser.
@@ -157,35 +152,53 @@ browser.
 | `npm start` | Serve the production build |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint (Next + React hooks + a11y rules) |
-| `npm test` | Unit, component, contract and integration tests |
+| `npm test` | All unit + component tests (Vitest) |
 | `npm run test:unit` | Unit + component tests only (`src/**`) |
-| `npm run test:integration` | Server integration tests (`tests/**`) |
 | `npm run e2e` | Playwright end-to-end (needs `npm run e2e:install` once) |
-| `npm run ingest` | Refresh the OmniSource feed from upstream |
 | `npm run verify` | lint + typecheck + unit tests + build |
 
 ---
 
 ## Testing
 
-- **Unit** — schemas, search, scoring, URL safety, normalisation, formatters.
-- **Component** — download panel (only validated assets become downloads),
-  scores, cards, release history, search states, comparison hook.
-- **Contract** — `/api/v1/*` shapes, status codes, error envelopes, pagination
-  clamping, rate limiting, report validation.
-- **Integration** — a real Next.js server: every page renders, filters work,
-  JSON-LD is valid, no unsafe link scheme reaches the HTML, sitemap/robots/manifest/health are served.
-- **Performance** — search and filter budgets over synthetic 2,000-app catalogs
-  and the real feed.
+- **Unit** — schemas/mappers, bundled catalog, source URL parsing, formatters,
+  sectioning and library share/export helpers.
+- **Component** — library tabs render and hydrate favorites from IndexedDB.
 - **End-to-end** — Playwright specs (search, filters, app pages, downloads,
-  comparison, favorites, theming, responsive, accessibility, 404s, offline).
+  favorites, theming, responsive, accessibility, 404s, offline) against the
+  hermetic OmniSource mock (`scripts/mock-omnisource.mjs`).
   Browsers must be installed once: `npm run e2e:install`.
 
 ---
 
 ## Deployment
 
-**Vercel / Netlify / any Node host**
+**Vercel**
+
+1. Push this repository to GitHub and import it at https://vercel.com/new —
+   the framework is detected automatically (`vercel.json` pins it to Next.js).
+2. Build needs Node ≥ 22.12 (declared in `package.json#engines`, so Vercel
+   picks the right runtime automatically).
+3. **No environment variables are required.** With no `OMNISOURCE_API_URL`
+   configured the app serves its bundled, contract-valid catalog in-process,
+   so the storefront is fully populated on the very first deploy.
+4. To go live against a real OmniSource backend, set `OMNISOURCE_API_URL`
+   (and optionally `OMNISOURCE_API_KEY`) in the project's Environment
+   Variables and redeploy.
+
+Optional but recommended:
+
+- `NEXT_PUBLIC_SITE_URL` — public origin for canonical URLs and `sitemap.xml`.
+  When unset, Vercel's `VERCEL_PROJECT_PRODUCTION_URL` is used automatically.
+
+Post-deploy checks:
+
+```bash
+curl -fsS "$SITE/api/v1/health"      # status should be "ok"
+curl -fsS "$SITE/sitemap.xml" | head # should list /app/… URLs
+```
+
+**Netlify / any Node host**
 
 ```bash
 npm ci && npm run build && npm start     # Node ≥ 22.12
@@ -233,9 +246,9 @@ These are product requirements, not preferences:
 
 ## Known limitations
 
-- The bundled feed is a **snapshot** (110 sources, refreshed by `npm run ingest`,
-  which the included `Ingest` workflow can schedule weekly). Every page shows
-  when the data was generated, and `/api/v1/health` reports it.
+- The bundled catalog is a **demo snapshot** (25 curated open-source apps) that
+  ships in `src/lib/omnisource/bundled/` so the storefront works out of the box.
+  Set `OMNISOURCE_API_URL` to a live deployment for the real, growing catalog.
 - iPadOS coverage is thin because upstream projects rarely publish iPad-only
   artefacts; the platform is supported end-to-end and will populate as OmniSource does.
 - A handful of upstream tag formats stay unnormalised on purpose (experimental
@@ -253,18 +266,17 @@ These are product requirements, not preferences:
 ## Repository layout
 
 ```
-src/app/**            routes: pages and /api/v1/* handlers
-src/components/**     UI: app, search, compare, platform, layout, ui primitives
-src/lib/api/**        provider seam (local/http), browser client, HTTP helpers
-src/lib/schemas/**    the OmniSource contract (Zod + TS types)
-src/lib/omnisource/   OmniSource-side normalisation and artefact rules
-src/lib/search/       query parsing, ranking, filtering, pagination
-src/lib/scores/       signal-based scoring with factor transparency
-src/lib/security/     URL and markdown hardening
-src/config/**         site, flags, licences, collections
-data/                 sources.json, the generated feed, the ingest report
-scripts/ingest.ts     upstream → validated OmniSource-shaped feed
-docs/                 client architecture and API contract
-e2e/                  Playwright acceptance tests
-tests/                integration and performance suites
+src/app/**               routes: pages and /api/v1/* handlers
+src/components/**        UI: app, search, collection, platform, layout, ui primitives
+src/lib/omnisource/**    API groups, client, HTTP helpers — and bundled/ (demo catalog)
+src/lib/security/        URL and markdown hardening
+src/lib/platform/        OS detection and install-handoff helpers
+src/config/**            site metadata and feature flags
+src/i18n/**              locale config; messages/<locale>.json catalogues
+packages/shared-models/  domain models, wire DTOs and Zod schemas (v1 contract)
+public/                  icons, manifest, and the Open Graph image
+scripts/mock-omnisource.mjs  hermetic OmniSource v1 mock for local/E2E use
+docs/                    client architecture and API contract
+e2e/                     Playwright acceptance tests
+tests/                   test setup and shared suites
 ```

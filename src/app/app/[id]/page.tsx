@@ -39,7 +39,9 @@ export async function generateMetadata({
     openGraph: {
       title: app.name,
       description: app.shortDescription || app.description || undefined,
-      images: app.banner ? [{ url: app.banner }] : undefined,
+      images: app.banner
+        ? [{ url: app.banner }]
+        : [{ url: absoluteUrl("/og.png"), width: 1200, height: 630, alt: app.name }],
       type: "website",
     },
   };

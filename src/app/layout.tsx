@@ -8,7 +8,7 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
 import "@fontsource-variable/space-grotesk";
 
-import { site } from "@/config/site";
+import { absoluteUrl, site } from "@/config/site";
 import { Providers } from "@/components/layout/Providers";
 import { AmbientBackground } from "@/components/layout/AmbientBackground";
 import { Header } from "@/components/layout/Header";
@@ -34,11 +34,20 @@ export const metadata: Metadata = {
     title: site.title,
     description: site.description,
     url: site.url,
+    images: [
+      {
+        url: absoluteUrl("/og.png"),
+        width: 1200,
+        height: 630,
+        alt: `${site.name} — ${site.tagline}`,
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: site.title,
     description: site.description,
+    images: [absoluteUrl("/og.png")],
   },
   robots: { index: true, follow: true },
 };
