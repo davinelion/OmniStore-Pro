@@ -84,7 +84,7 @@ export async function BrowseView({
     <div className="space-y-6">
       <header className="space-y-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{heading}</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">{heading}</h1>
           <p className="mt-1 text-sm text-muted" aria-live="polite">
             {tSearch("results", { count: pagination.total })}
           </p>

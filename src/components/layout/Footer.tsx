@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Github } from "lucide-react";
 
 import { site } from "@/config/site";
 import { Logo } from "@/components/brand/Logo";
@@ -18,20 +19,28 @@ export function Footer() {
   const tNav = useTranslations("nav");
 
   return (
-    <footer className="relative mt-20 border-t border-line/70">
+    <footer className="relative mt-24 overflow-hidden border-t border-line/70">
       {/* Hairline brand accent along the very top edge of the footer. */}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-brand-gradient opacity-60" />
+      <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-brand-gradient opacity-70" />
+      {/* Faint bottom bloom so the page doesn't end on a flat edge. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 left-1/2 h-64 w-[48rem] max-w-full -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"
+      />
 
-      <div className="mx-auto max-w-content px-4 py-14 sm:px-6">
+      <div className="relative mx-auto max-w-content px-4 py-14 sm:px-6">
         <div className="grid gap-10 md:grid-cols-[1.6fr_1fr_1fr_1.2fr]">
           <div>
-            <p className="flex items-center gap-2.5 font-semibold tracking-tight">
-              <Logo size={28} className="rounded-lg" />
-              {site.name}
-            </p>
+            <Link href="/" className="group inline-flex items-center gap-3">
+              <Logo size={34} className="rounded-xl shadow-glow transition-transform duration-200 group-hover:scale-105" />
+              <span className="font-display text-lg font-bold tracking-tight">{site.name}</span>
+            </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">{t("about")}</p>
-            <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface-2/50 px-3 py-1 text-xs text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden />
+            <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface-2/50 px-3.5 py-1.5 text-xs text-muted">
+              <span className="relative flex h-2 w-2" aria-hidden>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/50" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+              </span>
               {t("poweredBy")}
             </p>
           </div>
@@ -72,8 +81,9 @@ export function Footer() {
                   href={site.repoUrl}
                   target="_blank"
                   rel="noopener noreferrer external"
-                  className="text-muted transition-colors hover:text-fg"
+                  className="group inline-flex items-center gap-1.5 text-muted transition-colors hover:text-fg"
                 >
+                  <Github className="h-4 w-4" aria-hidden />
                   {t("source")}
                 </a>
               </li>

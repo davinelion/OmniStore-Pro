@@ -109,7 +109,15 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
           <div aria-hidden className="absolute inset-0">
             <div className="absolute -left-16 -top-24 h-72 w-72 rounded-full bg-accent/25 blur-3xl" />
             <div className="absolute -bottom-24 -right-16 h-64 w-64 rounded-full bg-accent-2/20 blur-3xl" />
+            <div
+              className="absolute left-1/2 top-0 h-56 w-[36rem] max-w-full -translate-x-1/2 -translate-y-1/3 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(closest-side, rgb(var(--accent) / 0.18), rgb(var(--accent-2) / 0.08) 55%, transparent 75%)",
+              }}
+            />
             <div className="bg-grid absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
+            <div className="bg-noise absolute inset-0 opacity-[0.04] mix-blend-overlay" />
           </div>
         )}
         <div className="relative flex flex-col gap-5 p-5 sm:flex-row sm:items-end sm:p-8">
@@ -118,10 +126,10 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
             src={app.icon}
             size="xl"
             rounded="rounded-3xl"
-            className="h-24 w-24 shadow-card sm:h-28 sm:w-28"
+            className="h-24 w-24 shadow-raised ring-1 ring-line/60 sm:h-28 sm:w-28"
           />
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">{app.name}</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-4xl">{app.name}</h1>
             {app.developer && app.developerId ? (
               <Link
                 href={`/developers/${app.developerId}`}

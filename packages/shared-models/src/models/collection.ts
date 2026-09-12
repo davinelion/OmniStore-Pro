@@ -17,4 +17,4 @@ export interface Collection {
   apps?: App[];
 }
 
-export type CollectionLayout = "hero" | "carousel" | "grid" | "list" | "compact";
+export type CollectionLayout = "hero" | "carousel" | "grid" | "list" | "compact" | "ranked";

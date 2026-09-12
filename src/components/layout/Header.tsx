@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -27,6 +27,14 @@ export function Header() {
   const pathname = usePathname() ?? "/";
   const [paletteOpen, setPaletteOpen] = useState(false);
 
+  // The hero (and future surfaces) open the palette through a window event,
+  // keeping palette state owned by the header without prop drilling.
+  useEffect(() => {
+    const openPalette = () => setPaletteOpen(true);
+    window.addEventListener("omnistore:open-palette", openPalette);
+    return () => window.removeEventListener("omnistore:open-palette", openPalette);
+  }, []);
+
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
@@ -39,7 +47,9 @@ export function Header() {
             aria-label="OmniStore home"
           >
             <Logo size={30} className="rounded-[9px] shadow-glow" />
-            <span className="hidden text-[1.05rem] tracking-tight sm:block">OmniStore</span>
+            <span className="hidden font-display text-[1.05rem] font-bold tracking-tight sm:block">
+              OmniStore
+            </span>
           </Link>
 
           <nav aria-label="Primary" className="hidden lg:block">

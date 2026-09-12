@@ -6,6 +6,7 @@ import { dirFor } from "@/i18n/config";
 // Self-hosted variable fonts — no third-party request, no layout shift.
 import "@fontsource-variable/inter";
 import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/space-grotesk";
 
 import { site } from "@/config/site";
 import { Providers } from "@/components/layout/Providers";
