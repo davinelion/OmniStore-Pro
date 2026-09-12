@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { safeImageUrl } from "@/lib/security/urls";
 
 const SIZES = {
   sm: "h-10 w-10 text-base",
@@ -46,7 +48,9 @@ export function AppIcon({
   const [failed, setFailed] = useState(false);
   const letter = (name.trim()[0] ?? "?").toUpperCase();
 
-  if (!src || failed) {
+  const imageUrl = safeImageUrl(src);
+
+  if (!imageUrl || failed) {
     const hue = hueFor(name);
     const gradient = `linear-gradient(140deg, hsl(${hue} 72% 52%), hsl(${(hue + 36) % 360} 78% 38%))`;
     return (
@@ -78,14 +82,12 @@ export function AppIcon({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
+    <Image
+      src={imageUrl}
       alt=""
-      loading="lazy"
-      decoding="async"
       width={96}
       height={96}
+      sizes="(max-width: 640px) 40px, 64px"
       onError={() => setFailed(true)}
       className={cn("shrink-0 border border-line bg-surface object-cover", SIZES[size], rounded, className)}
     />

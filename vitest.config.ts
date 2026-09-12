@@ -12,6 +12,9 @@ export default defineConfig({
     setupFiles: ["./tests/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}", "tests/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["e2e/**", "node_modules/**", ".next/**"],
+    // The validated 13 MB ingest snapshot is intentionally loaded from disk
+    // in router tests; allow the first cold import to finish on CI.
+    hookTimeout: 30_000,
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "src") },

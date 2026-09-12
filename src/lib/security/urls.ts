@@ -46,8 +46,31 @@ export function safeHrefOr(raw: string | null | undefined, fallback: string): st
   return safeHref(raw) ?? fallback;
 }
 
+/**
+ * Next/Image allowlist. Keep this list intentionally small; deployments that
+ * mirror OmniSource media can add a host with NEXT_PUBLIC_OMNISOURCE_IMAGE_HOSTS
+ * (comma-separated) without opening an arbitrary remote-image proxy.
+ */
+const TRUSTED_IMAGE_HOSTS = new Set([
+  "avatars.githubusercontent.com",
+  "github.com",
+  "raw.githubusercontent.com",
+  "objects.githubusercontent.com",
+  "user-images.githubusercontent.com",
+]);
+
+export function isTrustedImageUrl(raw?: string | null): boolean {
+  const url = raw ? parse(raw.trim()) : null;
+  if (!url || !isSafeUrl(raw)) return false;
+  const configured = (process.env.NEXT_PUBLIC_OMNISOURCE_IMAGE_HOSTS ?? "")
+    .split(",")
+    .map((host) => host.trim().toLowerCase())
+    .filter(Boolean);
+  return TRUSTED_IMAGE_HOSTS.has(url.hostname.toLowerCase()) || configured.includes(url.hostname.toLowerCase());
+}
+
 export function safeImageUrl(raw?: string | null): string | undefined {
-  return safeHref(raw);
+  return isTrustedImageUrl(raw) ? raw ?? undefined : undefined;
 }
 
 /**

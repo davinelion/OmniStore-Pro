@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Layers } from "lucide-react";
@@ -6,6 +7,8 @@ import { Layers } from "lucide-react";
 import { getOmnisource } from "@/lib/omnisource";
 import { CollectionBrowser } from "@/components/collection/CollectionBrowser";
 import { formatDateTime } from "@/lib/formatters";
+import { safeImageUrl } from "@/lib/security/urls";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 
 export const revalidate = 600;
 
@@ -42,15 +45,17 @@ export default async function CollectionPage({
 
   return (
     <div className="space-y-6">
+      <AnalyticsTracker type="collection_view" collection={collection.slug} />
       {/* Banner */}
       <header className="relative overflow-hidden rounded-4xl border border-line bg-gradient-to-br from-accent-soft via-surface to-surface p-6 sm:p-10">
-        {apps[0]?.banner ? (
+        {safeImageUrl(apps[0]?.banner) ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={apps[0].banner}
+            <Image
+              src={safeImageUrl(apps[0]?.banner)!}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover opacity-15"
+              fill
+              sizes="100vw"
+              className="object-cover opacity-15"
             />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/40" />
           </>

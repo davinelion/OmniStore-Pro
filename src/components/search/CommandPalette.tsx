@@ -1,5 +1,6 @@
 "use client";
 
+import Fuse from "fuse.js";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -9,6 +10,7 @@ import type { App } from "@omnistore/shared-models";
 import { getOmnisource } from "@/lib/omnisource";
 import { cn } from "@/lib/utils";
 import { AppIcon } from "@/components/app/AppIcon";
+import { trackEvent } from "@/lib/analytics/client";
 
 type PaletteItem =
   | { kind: "app"; id: string; label: string; hint: string; href: string; icon: string | null }
@@ -123,7 +125,21 @@ export function CommandPalette({
           setActive(0);
         }
       } catch {
-        /* aborted or offline — keep the previous result set */
+        // If the upstream search index is temporarily unavailable, keep instant
+        // search useful with a Fuse index built from a live OmniSource page.
+        try {
+          const live = await getOmnisource().getApps({ perPage: 100 }, { signal: controller.signal });
+          const fuse = new Fuse(live.items, {
+            keys: ["name", "shortDescription", "developer", "tags"],
+            threshold: 0.35,
+          });
+          if (!controller.signal.aborted) {
+            setResults(fuse.search(trimmed, { limit: 8 }).map(({ item }) => item));
+            setActive(0);
+          }
+        } catch {
+          /* aborted or offline — keep the previous result set */
+        }
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -166,12 +182,13 @@ export function CommandPalette({
   const go = useCallback(
     (item: PaletteItem | undefined) => {
       if (!item) return;
+      if (query.trim()) trackEvent({ type: "search", metadata: { queryLength: query.trim().length } });
       close();
       setQuery("");
       setResults([]);
       router.push(item.href);
     },
-    [close, router],
+    [close, query, router],
   );
 
   if (!open) return null;

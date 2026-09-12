@@ -9,8 +9,8 @@ const english = (await import(`../../messages/en.json`)).default;
  * next-intl request configuration (no i18n routing: one set of routes, the
  * active locale travels in a cookie so URLs stay language-independent).
  *
- * Secondary locales merge over the English catalog, so a missing key in a
- * translation renders the English copy — never a raw key or a broken page.
+ * Locale files are validated for exact leaf-key parity in CI, so every runtime
+ * locale is loaded as a complete catalog. There is no missing-key fallback.
  */
 export default getRequestConfig(async () => {
   const store = await cookies();
@@ -22,7 +22,11 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: { ...english, ...localized },
-    onError() {},
+    messages: localized,
+    onError(error) {
+      // A complete catalog is a release invariant. Keep production UI quiet,
+      // while allowing the validation script to catch missing keys before deploy.
+      if (process.env.NODE_ENV !== "production") console.error(error);
+    },
   };
 });

@@ -1,0 +1,19 @@
+{
+  "name": "@omnistore/omnisource-sdk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Typed, runtime-validated OmniSource-Pro API client shared by OmniStore clients.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@omnistore/shared-models": "*",
+    "zod": "^3.23.8"
+  }
+}

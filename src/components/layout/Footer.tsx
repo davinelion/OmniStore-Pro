@@ -62,6 +62,11 @@ export function Footer() {
             <h2 className="text-xs font-semibold uppercase tracking-wider text-fg">{t("project")}</h2>
             <ul className="mt-4 space-y-2.5 text-sm">
               <li>
+                <Link href="/dashboard" className="text-muted transition-colors hover:text-fg">
+                  {tNav("dashboard")}
+                </Link>
+              </li>
+              <li>
                 <Link href="/about" className="text-muted transition-colors hover:text-fg">
                   {t("docs")}
                 </Link>
