@@ -164,6 +164,51 @@ export default async function HomePage() {
 
       <CrossPlatformBanner />
 
+      {/* Obtanium-style Direct Updates Banner */}
+      <div className="relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-br from-surface via-surface to-accent-soft/40 p-6 sm:p-8">
+        <div className="absolute -left-20 top-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+        <div className="absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-accent-2/10 blur-3xl" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-bold text-accent">
+              <Download className="h-3.5 w-3.5" />
+              New: Obtanium-Style Direct Updates
+            </div>
+            <h2 className="mt-3 font-display text-xl font-bold tracking-tight sm:text-2xl">
+              Get App Updates <span className="text-gradient-brand">Directly From Source</span>
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              Like Obtanium for Android — but for every platform. Track any app from GitHub, GitLab, F-Droid. OmniStore checks directly for new releases, notifies you, and lets you download APK/EXE/DMG straight from source. No store middleman, no tracking.
+            </p>
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-2/50 px-3 py-2">
+                <Download className="h-4 w-4 text-accent" />
+                <span className="text-xs font-medium">Direct APK/EXE from GitHub</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-2/50 px-3 py-2">
+                <Sparkles className="h-4 w-4 text-accent" />
+                <span className="text-xs font-medium">Background checks every 6h</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-2/50 px-3 py-2">
+                <Github className="h-4 w-4 text-accent" />
+                <span className="text-xs font-medium">Skip, rollback, track-only</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="/updates" className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-glow hover:bg-accent-hover hover:-translate-y-0.5 transition-all">
+              <Download className="h-4 w-4" />
+              Open Updates Center
+            </Link>
+            <Link href="/track" className="inline-flex items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold hover:border-accent/40 transition-colors">
+              <Layers className="h-4 w-4" />
+              Track a source
+            </Link>
+            <p className="text-center text-2xs text-muted">444 apps • 13k assets • Import/export • Auto-update</p>
+          </div>
+        </div>
+      </div>
+
       <AIAssistant apps={data.allApps} />
 
       <CollectionSection

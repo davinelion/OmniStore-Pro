@@ -16,6 +16,7 @@ import { MobileNav } from "./MobileNav";
 const NAV = [
   { href: "/apps", key: "browse" },
   { href: "/platforms", key: "platforms" },
+  { href: "/updates", key: "updates" },
   { href: "/track", key: "track" },
   { href: "/collections", key: "collections" },
   { href: "/categories", key: "categories" },

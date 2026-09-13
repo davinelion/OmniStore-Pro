@@ -25,6 +25,7 @@ import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { ReleaseIntegrity } from "@/components/app/ReleaseIntegrity";
 import { PlatformDownloadMatrix, StickyDownloadBar } from "@/components/store/PlatformDownloadMatrix";
 import { StoreAppGrid } from "@/components/store/StoreAppCard";
+import { TrackAppButton } from "@/components/app/TrackAppButton";
 import { cn } from "@/lib/utils";
 
 export const revalidate = 300;
@@ -238,6 +239,7 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
               ) : null}
             </div>
             <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch">
+              <TrackAppButton app={app} />
               <FavoriteButton appId={app.id} kind="favorites" withLabel />
               <FavoriteButton appId={app.id} kind="watchlist" />
               <AddToCollectionButton appId={app.id} />
@@ -267,6 +269,38 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
           ) : null}
 
           <ScreenshotGallery screenshots={app.screenshots ?? []} appName={app.name} />
+
+          {/* Obtanium-style Direct Update Banner */}
+          <div className="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent-soft to-accent-2/10 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-white shadow-glow">
+                  <Download className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold flex items-center gap-2">
+                    Direct Updates — Like Obtanium
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-2xs text-white">NEW</span>
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted max-w-xl">
+                    Track this app and get updates directly from {app.repository ? new URL(app.repository).hostname : "GitHub"} — no store middleman. Background checks every 6h, notifications, skip version, rollback, import/export. Like Obtanium for Android but for all platforms.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <span className="rounded-full bg-surface-3 px-2 py-0.5 text-2xs">Direct APK/EXE/DMG</span>
+                    <span className="rounded-full bg-surface-3 px-2 py-0.5 text-2xs">Background checks</span>
+                    <span className="rounded-full bg-surface-3 px-2 py-0.5 text-2xs">Skip & rollback</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <TrackAppButton app={app} />
+                <Link href="/updates" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-xs font-medium hover:border-accent/40">
+                  <Layers className="h-3.5 w-3.5" />
+                  Open Updates Center
+                </Link>
+              </div>
+            </div>
+          </div>
 
           {/* Platform Download Matrix — direct + source like F-Droid */}
           <PlatformDownloadMatrix app={app} />

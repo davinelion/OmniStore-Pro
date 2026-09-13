@@ -310,15 +310,16 @@ OmniStore is **fully automated and connected**:
 
 See [docs/AUTOMATION.md](docs/AUTOMATION.md) for full wiring, scaling to thousands of apps, and production env.
 
-## Largest Store Experience
+## Largest Store Experience + Obtanium Direct Updates
 
 - **Platform Stores:** `/platforms` — Windows (EXE/MSI/MSIX), macOS (DMG/PKG), Linux (AppImage/Flatpak/DEB/RPM), Android (APK), iOS. Each is a full store with categories, direct downloads, source transparency.
 - **App Cards:** `StoreAppCard` — icon, platform chips, **Direct Download** button (primary platform asset, size, type), **Source** (GitHub) always visible, quick platform switcher, trust/version. Like Play Store cards.
 - **App Detail:** Gradient hero, platform-aware CTA, `PlatformDownloadMatrix` (all platforms, grouped, validated, size, checksum), `InstallPanel` (platform tabs, arch groups, prominent Download), `SourcePanel` (stars/forks, repo/homepage/docs cards, transparency banner like F-Droid).
 - **Cross-Platform:** `detectPlatformHeader()` prioritizes user's OS but shows all. Cross-platform champions (3+ platforms) ranked higher, showcased.
 - **AI:** `AIAssistant` — natural language search with synonyms (editor→ide, video→media), typo tolerance, live preview, suggestions ("video editor for Linux"), insights ticker, smart category ranking. Recommendations with reasons.
+- **Obtanium Direct Updates:** `/updates` — Get app updates directly from source (GitHub, GitLab, F-Droid etc.), background checks every 6h, notifications, per-app auto-update, skip version, track-only, rollback to previous releases, import/export, installed version tracking. Like Obtanium for Android but for all platforms. See [docs/OBTANIUM.md](docs/OBTANIUM.md).
 
-Every card shows **Direct Download + Source Link** — seamless like App Store, transparent like F-Droid.
+Every card shows **Direct Download + Source Link** — seamless like App Store, transparent like F-Droid, with Obtanium-style direct updates.
 
 ## Known limitations
 
