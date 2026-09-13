@@ -164,7 +164,7 @@ export default async function HomePage() {
 
       <CrossPlatformBanner />
 
-      {/* Obtanium-style Direct Updates Banner */}
+      {/* Obtainium-style Direct Updates Banner */}
       <div className="relative overflow-hidden rounded-3xl border border-accent/30 bg-gradient-to-br from-surface via-surface to-accent-soft/40 p-6 sm:p-8">
         <div className="absolute -left-20 top-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
         <div className="absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-accent-2/10 blur-3xl" />
@@ -172,13 +172,13 @@ export default async function HomePage() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-bold text-accent">
               <Download className="h-3.5 w-3.5" />
-              New: Obtanium-Style Direct Updates
+              New: Obtainium-Style Direct Updates
             </div>
             <h2 className="mt-3 font-display text-xl font-bold tracking-tight sm:text-2xl">
               Get App Updates <span className="text-gradient-brand">Directly From Source</span>
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              Like Obtanium for Android — but for every platform. Track any app from GitHub, GitLab, F-Droid. OmniStore checks directly for new releases, notifies you, and lets you download APK/EXE/DMG straight from source. No store middleman, no tracking.
+              Like Obtainium for Android — but for every platform. Track any app from GitHub, GitLab, F-Droid. OmniStore checks directly for new releases, notifies you, and lets you download APK/EXE/DMG straight from source. No store middleman, no tracking.
             </p>
             <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
               <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-2/50 px-3 py-2">

@@ -29,7 +29,7 @@ import { relativeTime, formatBytes, packageTypeLabel, platformLabel } from "@/li
 import { safeHref } from "@/lib/security/urls";
 import { cn } from "@/lib/utils";
 
-interface ObtaniumCardProps {
+interface ObtainiumCardProps {
   tracked: TrackedApp;
   app?: App | null;
   onUpdate: (key: string, patch: Partial<TrackedApp>) => void;
@@ -39,7 +39,7 @@ interface ObtaniumCardProps {
   onSetInstalled: (key: string, version: string) => void;
 }
 
-export function ObtaniumCard({ tracked, app, onUpdate, onAcknowledge, onSkip, onUntrack, onSetInstalled }: ObtaniumCardProps) {
+export function ObtainiumCard({ tracked, app, onUpdate, onAcknowledge, onSkip, onUntrack, onSetInstalled }: ObtainiumCardProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showReleases, setShowReleases] = useState(false);
   const hasUpdate = tracked.latestVersion && (tracked.installedVersion ?? tracked.seenVersion) !== tracked.latestVersion && !tracked.trackOnly && tracked.skippedVersion !== tracked.latestVersion;
@@ -118,7 +118,7 @@ export function ObtaniumCard({ tracked, app, onUpdate, onAcknowledge, onSkip, on
             </button>
           </div>
 
-          {/* Direct Download — Obtanium core */}
+          {/* Direct Download — Obtainium core */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {hasUpdate && downloadHref ? (
               <a
@@ -214,12 +214,12 @@ export function ObtaniumCard({ tracked, app, onUpdate, onAcknowledge, onSkip, on
         </div>
       </div>
 
-      {/* Per-app settings — Obtanium style */}
+      {/* Per-app settings — Obtainium style */}
       {showSettings ? (
         <div className="border-t border-line bg-surface-2/30 p-4 space-y-3">
           <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
             <Settings className="h-3.5 w-3.5" />
-            Per-App Settings — Obtanium Style
+            Per-App Settings — Obtainium Style
           </h4>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="flex items-center justify-between gap-2 rounded-xl border border-line bg-surface p-2.5">
@@ -267,7 +267,7 @@ export function ObtaniumCard({ tracked, app, onUpdate, onAcknowledge, onSkip, on
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-medium">Installed version (Obtanium: version on device)</label>
+            <label className="text-xs font-medium">Installed version (Obtainium: version on device)</label>
             <div className="flex gap-2">
               <input
                 value={tracked.installedVersion ?? ""}
@@ -279,7 +279,7 @@ export function ObtaniumCard({ tracked, app, onUpdate, onAcknowledge, onSkip, on
                 Set to latest
               </button>
             </div>
-            <p className="text-2xs text-muted">Tell OmniStore what version you have installed — like Obtanium reads version from device. Updates are calculated from this.</p>
+            <p className="text-2xs text-muted">Tell OmniStore what version you have installed — like Obtainium reads version from device. Updates are calculated from this.</p>
           </div>
 
           {tracked.skippedVersion ? (

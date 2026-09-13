@@ -790,10 +790,10 @@ Object.assign(DISPLAY_NAMES, {
   "gnome/gnome-mahjongg": "GNOME Mahjongg",
   "gottcode/tanglet": "Tanglet",
   "gottcode/connectagram": "Connectagram",
-  "manuskript/manuskript": "Manuskript",
-  "obtainium/obtainium": "Obtainium",
-  "ghostwriter/ghostwriter": "ghostwriter",
-  "icestorm/icestorm": "Project IceStorm",
+  "olivierkes/manuskript": "Manuskript",
+  "imranr98/obtainium": "Obtainium",
+  "kde/ghostwriter": "Ghostwriter",
+  "yosyshq/icestorm": "Project IceStorm",
 });
 
 /**
@@ -850,6 +850,58 @@ function normaliseVersion(tag) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Source identity guard                                               */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Minimum stars before a curated source is trusted without an explicit
+ * acknowledgement. Every entry in `sources.json` is a hand-picked, notable
+ * project; a near-zero star count means the name was squatted by an unrelated
+ * project, not that we found the real one.
+ *
+ * Tiny-but-real projects (GNOME games, KDE ports, upstream mirrors) opt out
+ * with `"allow_low_stars": true` on the source entry.
+ */
+const MIN_STARS = 100;
+
+/**
+ * Reject a repository that is not the project the catalog asked for.
+ *
+ * Two distinct failure modes, both observed in production data:
+ *
+ *  1. **Name squatting.** `sources.json` said `obtainium/Obtainium`, which is a
+ *     real 3-star repo ("Obtainium - Cypto Currency") that has nothing to do
+ *     with the 19k-star Android updater at `ImranR98/Obtainium`. The ingest had
+ *     no way to notice: the fetch returned 200 and the metadata was valid, so
+ *     an impostor shipped to users with a working app page.
+ *  2. **Silent redirects.** GitHub follows renames transparently, so
+ *     `zadam/trilium` quietly becomes `TriliumNext/Trilium`. That is usually
+ *     correct and must keep working — but it should be *declared*, not
+ *     discovered, so a rename into an abandoned or hijacked namespace is
+ *     visible in review instead of being assumed good.
+ *
+ * Declare an expected rename with `"renamed_to": "NewOwner/newrepo"`.
+ */
+function checkIdentity(source, repo) {
+  const requested = String(source.repo).toLowerCase();
+  const resolved = String(repo.full_name ?? "").toLowerCase();
+
+  if (resolved && resolved !== requested) {
+    const declared = String(source.renamed_to ?? "").toLowerCase();
+    if (declared !== resolved) {
+      return { ok: false, reason: `redirected_to_${repo.full_name}` };
+    }
+  }
+
+  const stars = repo.stargazers_count ?? 0;
+  if (stars < MIN_STARS && !source.allow_low_stars) {
+    return { ok: false, reason: `low_signal_${stars}_stars` };
+  }
+
+  return { ok: true };
+}
+
+/* ------------------------------------------------------------------ */
 /* Ingest one source                                                   */
 /* ------------------------------------------------------------------ */
 
@@ -863,6 +915,9 @@ async function ingestOne(source) {
   }
   const repo = repoRes.body;
   if (repo.private || repo.fork) return { ok: false, reason: "not_public", repo: source.repo };
+
+  const identity = checkIdentity(source, repo);
+  if (!identity.ok) return { ok: false, reason: identity.reason, repo: source.repo };
 
   const relRes = await gh(`/repos/${owner}/${repoName}/releases?per_page=6`);
   const rawReleases = Array.isArray(relRes.body) ? relRes.body : [];

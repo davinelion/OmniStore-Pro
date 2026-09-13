@@ -124,6 +124,7 @@
     "watchRemove": "Nicht mehr beobachten",
     "breakingChanges": "Kann fehlerhafte Änderungen enthalten",
     "source": "Indiziert von {source}",
+    "sourceLabel": "Quelle",
     "openSource": "Open Source",
     "activelyDeveloped": "Aktiv entwickelt",
     "installHandoff": "Du wirst zum Upstream-Release-Host weitergeleitet. OmniStore spiegelt niemals Binärdateien.",

@@ -124,6 +124,7 @@
     "watchRemove": "Dejar de vigilar",
     "breakingChanges": "Puede contener cambios incompatibles",
     "source": "Indexado desde {source}",
+    "sourceLabel": "Fuente",
     "openSource": "Código abierto",
     "activelyDeveloped": "En desarrollo activo",
     "installHandoff": "Continuarás al servidor de lanzamientos original para descargar. OmniStore nunca replica binarios.",

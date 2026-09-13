@@ -1,6 +1,6 @@
 {
   "$schema": "../scripts/sources.schema.json",
-  "description": "Curated upstream repositories OmniStore indexes. `npm run ingest` resolves every entry through the GitHub API, normalises platforms and package types from real release assets, scores them from public signals, and writes data/omnisource-feed.json. Entries that 404 or fail validation are skipped, never guessed.",
+  "description": "Curated upstream repositories OmniStore indexes. `npm run ingest` resolves every entry through the GitHub API, normalises platforms and package types from real release assets, scores them from public signals, and writes data/omnisource-feed.json. Entries that 404 or fail validation are skipped, never guessed. Each entry is also identity-checked: a repo resolving to a different full_name is rejected unless the entry declares \"renamed_to\": \"Owner/repo\", and a repo under 100 stars is rejected as a likely name-squat unless the entry sets \"allow_low_stars\": true.",
   "generated_by": "scripts/ingest.mjs",
   "sources": [
     {
@@ -48,7 +48,8 @@
         "notes",
         "knowledge-base",
         "hierarchy"
-      ]
+      ],
+      "renamed_to": "TriliumNext/Trilium"
     },
     {
       "repo": "siyuan-note/siyuan",
@@ -223,7 +224,8 @@
       "tags": [
         "raw",
         "photography"
-      ]
+      ],
+      "renamed_to": "RawTherapee/RawTherapee"
     },
     {
       "repo": "HandBrake/HandBrake",
@@ -356,7 +358,8 @@
         "terminal",
         "multiplexer",
         "lua"
-      ]
+      ],
+      "renamed_to": "wezterm/wezterm"
     },
     {
       "repo": "Swordfish90/cool-retro-term",
@@ -580,7 +583,8 @@
         "photos",
         "encryption",
         "backup"
-      ]
+      ],
+      "renamed_to": "ente/ente"
     },
     {
       "repo": "immich-app/immich",
@@ -825,7 +829,8 @@
       "tags": [
         "game-engine",
         "cpp"
-      ]
+      ],
+      "renamed_to": "godotengine/godot-cpp"
     },
     {
       "repo": "godotengine/godot",
@@ -1035,7 +1040,8 @@
       "tags": [
         "3d-printing",
         "slicer"
-      ]
+      ],
+      "renamed_to": "OrcaSlicer/OrcaSlicer"
     },
     {
       "repo": "prusa3d/PrusaSlicer",
@@ -1120,7 +1126,8 @@
       "tags": [
         "containers",
         "devops"
-      ]
+      ],
+      "renamed_to": "podman-desktop/podman-desktop"
     },
     {
       "repo": "kubernetes/kubernetes",
@@ -2192,7 +2199,8 @@
       "tags": [
         "fonts",
         "linting"
-      ]
+      ],
+      "renamed_to": "fonttools/fontbakery"
     },
     {
       "repo": "Penpot/penpot",
@@ -2724,7 +2732,8 @@
       "tags": [
         "packaging",
         "linux"
-      ]
+      ],
+      "renamed_to": "canonical/snapd"
     },
     {
       "repo": "homebrew/brew",
@@ -2769,7 +2778,7 @@
       ]
     },
     {
-      "repo": "obtainium/Obtainium",
+      "repo": "ImranR98/Obtainium",
       "category": "utilities",
       "tags": [
         "app-store",
@@ -2791,7 +2800,8 @@
       "tags": [
         "app-store",
         "android"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "RetroShare/RetroShare",
@@ -2827,7 +2837,8 @@
         "messaging",
         "offline",
         "p2p"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "simplex-chat/simplex-chat",
@@ -2897,7 +2908,8 @@
       "tags": [
         "cloud",
         "self-hosted"
-      ]
+      ],
+      "renamed_to": "linagora/cozy-stack"
     },
     {
       "repo": "cryptomator/cryptomator",
@@ -3111,7 +3123,8 @@
         "ai",
         "image-generation",
         "nodes"
-      ]
+      ],
+      "renamed_to": "Comfy-Org/ComfyUI"
     },
     {
       "repo": "AUTOMATIC1111/stable-diffusion-webui",
@@ -3145,7 +3158,8 @@
         "ai",
         "transcription",
         "cpp"
-      ]
+      ],
+      "renamed_to": "ggml-org/whisper.cpp"
     },
     {
       "repo": "SYSTRAN/faster-whisper",
@@ -3186,7 +3200,8 @@
       "category": "media",
       "tags": [
         "subtitles"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "SubtitleEdit/subtitleedit",
@@ -3265,12 +3280,13 @@
       ]
     },
     {
-      "repo": "vitalium/vitalium",
+      "repo": "mtytel/vital",
       "category": "media",
       "tags": [
         "audio",
         "synthesizer"
-      ]
+      ],
+      "name": "Vital"
     },
     {
       "repo": "MarkText/marktext",
@@ -3298,7 +3314,7 @@
       ]
     },
     {
-      "repo": "ghostwriter/ghostwriter",
+      "repo": "KDE/ghostwriter",
       "category": "productivity",
       "tags": [
         "writing",
@@ -3306,7 +3322,7 @@
       ]
     },
     {
-      "repo": "manuskript/manuskript",
+      "repo": "olivierkes/manuskript",
       "category": "productivity",
       "tags": [
         "writing",
@@ -3320,7 +3336,8 @@
       "tags": [
         "writing",
         "novel"
-      ]
+      ],
+      "renamed_to": "saga-soft/novelWriter"
     },
     {
       "repo": "gottcode/focuswriter",
@@ -3335,14 +3352,16 @@
       "category": "gaming",
       "tags": [
         "word-game"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "gottcode/connectagram",
       "category": "gaming",
       "tags": [
         "word-game"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "KDE/kpat",
@@ -3350,7 +3369,8 @@
       "tags": [
         "cards",
         "kde"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "gnome/gnome-mahjongg",
@@ -3358,7 +3378,8 @@
       "tags": [
         "puzzle",
         "gnome"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "gnome/gnome-sudoku",
@@ -3366,7 +3387,8 @@
       "tags": [
         "puzzle",
         "gnome"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "gnome/gnome-chess",
@@ -3374,7 +3396,8 @@
       "tags": [
         "board",
         "gnome"
-      ]
+      ],
+      "allow_low_stars": true
     },
     {
       "repo": "lichess-org/lila",
@@ -3666,7 +3689,8 @@
         "eda",
         "pcb",
         "electronics"
-      ]
+      ],
+      "renamed_to": "KiCad/kicad-source-mirror"
     },
     {
       "repo": "LibrePCB/LibrePCB",
@@ -3762,7 +3786,7 @@
       ]
     },
     {
-      "repo": "icestorm/icestorm",
+      "repo": "YosysHQ/icestorm",
       "category": "science",
       "tags": [
         "fpga",

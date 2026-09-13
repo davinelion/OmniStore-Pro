@@ -135,7 +135,7 @@ export function TrackPanel() {
 
   return (
     <div className="space-y-10">
-      {/* Obtanium banner */}
+      {/* Obtainium banner */}
       <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-2/10 p-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-white">
@@ -143,10 +143,10 @@ export function TrackPanel() {
           </div>
           <div>
             <p className="text-sm font-bold flex items-center gap-2">
-              New: Direct Updates Center — Obtanium Style
+              New: Direct Updates Center — Obtainium Style
               <span className="rounded-full bg-accent px-2 py-0.5 text-2xs text-white">NEW</span>
             </p>
-            <p className="text-xs text-muted">Track apps, get direct APK/EXE/DMG updates from GitHub, background checks, skip & rollback — like Obtanium but for all platforms.</p>
+            <p className="text-xs text-muted">Track apps, get direct APK/EXE/DMG updates from GitHub, background checks, skip & rollback — like Obtainium but for all platforms.</p>
           </div>
         </div>
         <Link href="/updates" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white shadow-glow">
@@ -163,7 +163,7 @@ export function TrackPanel() {
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-2xs font-medium text-success">
             <Sparkles className="h-3 w-3" />
-            Obtanium-style direct updates
+            Obtainium-style direct updates
           </span>
         </div>
 

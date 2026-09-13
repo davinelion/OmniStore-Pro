@@ -124,6 +124,7 @@
     "watchRemove": "取消关注",
     "breakingChanges": "可能包含破坏性变更",
     "source": "收录自 {source}",
+    "sourceLabel": "来源",
     "openSource": "开源",
     "activelyDeveloped": "活跃开发中",
     "installHandoff": "下载将转到上游发布主机。OmniStore 绝不镜像二进制文件。",

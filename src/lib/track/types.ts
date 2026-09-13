@@ -2,9 +2,9 @@ import type { Platform } from "@omnistore/shared-models";
 import type { SourceId } from "@/lib/sources";
 
 /**
- * A source the user tracks — now with Obtanium-style per-app settings.
+ * A source the user tracks — now with Obtainium-style per-app settings.
  *
- * Obtanium model: user follows upstream, OmniStore remembers installed version,
+ * Obtainium model: user follows upstream, OmniStore remembers installed version,
  * checks source directly for updates, notifies, allows direct download.
  *
  * Device-local, no account, same privacy as rest of library.
@@ -23,7 +23,7 @@ export interface TrackedApp {
   platforms: Platform[];
   /** Version the user has installed / last acknowledged. */
   seenVersion: string | null;
-  /** User-declared installed version (Obtanium: version on device). */
+  /** User-declared installed version (Obtainium: version on device). */
   installedVersion: string | null;
   /** Latest version OmniSource reported. */
   latestVersion: string | null;
@@ -33,14 +33,14 @@ export interface TrackedApp {
   /** True when source not yet in catalog. */
   pending: boolean;
 
-  // --- Obtanium-style per-app settings ---
-  /** Auto-update when new version found (like Obtanium background update). */
+  // --- Obtainium-style per-app settings ---
+  /** Auto-update when new version found (like Obtainium background update). */
   autoUpdate: boolean;
-  /** Include pre-releases / RCs (Obtanium: allow pre-release). */
+  /** Include pre-releases / RCs (Obtainium: allow pre-release). */
   includePrerelease: boolean;
   /** Version to skip — don't notify for this version. */
   skippedVersion: string | null;
-  /** Track only — don't show in updates, just track (Obtanium track-only). */
+  /** Track only — don't show in updates, just track (Obtainium track-only). */
   trackOnly: boolean;
   /** Allow downgrade / rollback — show older releases. */
   allowDowngrade: boolean;
@@ -48,7 +48,7 @@ export interface TrackedApp {
   wifiOnly: boolean;
   /** Update only while charging (preference). */
   chargingOnly: boolean;
-  /** Custom filter for release detection (Obtanium: version regex). */
+  /** Custom filter for release detection (Obtainium: version regex). */
   versionFilter: string | null;
   /** Last time user was notified about update. */
   lastNotifiedAt: string | null;

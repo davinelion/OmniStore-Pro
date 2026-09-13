@@ -129,6 +129,7 @@
     "watchRemove": "Stop watching",
     "breakingChanges": "May contain breaking changes",
     "source": "Indexed from {source}",
+    "sourceLabel": "Source",
     "openSource": "Open source",
     "activelyDeveloped": "Actively developed",
     "installHandoff": "You'll continue to the upstream release host to download. OmniStore never mirrors binaries.",

@@ -1,5 +1,5 @@
 /**
- * IndexedDB persistence for tracked sources — now with Obtanium features.
+ * IndexedDB persistence for tracked sources — now with Obtainium features.
  * Separate DB from personal library, memory fallback.
  */
 
@@ -163,7 +163,7 @@ export function isMemoryFallback(): boolean {
   return useMemory;
 }
 
-// Global settings (Obtanium-style)
+// Global settings (Obtainium-style)
 export interface GlobalUpdateSettings {
   id: string;
   checkIntervalHours: number;

@@ -26,7 +26,7 @@ import {
   Package
 } from "lucide-react";
 import { useTracked } from "@/lib/track/use-tracked";
-import { ObtaniumCard } from "./ObtaniumCard";
+import { ObtainiumCard } from "./ObtainiumCard";
 import type { TrackedApp } from "@/lib/track/types";
 import type { App } from "@omnistore/shared-models";
 import { cn } from "@/lib/utils";
@@ -88,7 +88,7 @@ export function UpdatesPanel() {
     return () => { cancelled = true; };
   }, [loaded, apps]);
 
-  // Background check interval — Obtanium style
+  // Background check interval — Obtainium style
   useEffect(() => {
     if (!globalSettings || !loaded) return;
     const intervalMs = globalSettings.checkIntervalHours * 60 * 60 * 1000;
@@ -164,7 +164,7 @@ export function UpdatesPanel() {
 
   const handleUpdateAll = useCallback(() => {
     // In web, we can't auto-install, but we can open all download links
-    // For Obtanium-style, we batch acknowledge + open downloads
+    // For Obtainium-style, we batch acknowledge + open downloads
     const updateApps = updates.filter(u => !u.app.trackOnly);
     if (updateApps.length === 0) return;
     
@@ -188,7 +188,7 @@ export function UpdatesPanel() {
     }
     const perm = await Notification.requestPermission();
     if (perm === "granted") {
-      setToast("Notifications enabled — like Obtanium");
+      setToast("Notifications enabled — like Obtainium");
       void updateGlobalSettings({ notificationsEnabled: true });
     } else {
       setToast("Notifications denied");
@@ -209,7 +209,7 @@ export function UpdatesPanel() {
 
   return (
     <div className="space-y-6">
-      {/* Header — Obtanium style */}
+      {/* Header — Obtainium style */}
       <div className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-surface via-surface to-accent-soft/30 p-6 sm:p-8">
         <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
         <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-accent-2/10 blur-3xl" />
@@ -224,7 +224,7 @@ export function UpdatesPanel() {
                   <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
                     Updates <span className="text-gradient-brand">Direct</span>
                   </h1>
-                  <p className="text-sm text-muted">Obtanium-style — get updates directly from source, no store middleman</p>
+                  <p className="text-sm text-muted">Obtainium-style — get updates directly from source, no store middleman</p>
                 </div>
               </div>
               
@@ -274,7 +274,7 @@ export function UpdatesPanel() {
             </div>
           </div>
 
-          {/* Obtanium features explainer */}
+          {/* Obtainium features explainer */}
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-line bg-surface-2/50 p-3 flex items-start gap-2.5">
               <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-accent-soft text-accent shrink-0">
@@ -282,7 +282,7 @@ export function UpdatesPanel() {
               </div>
               <div>
                 <p className="text-xs font-semibold">Direct from source</p>
-                <p className="text-2xs text-muted">GitHub, GitLab, F-Droid, etc. — no mirrors, like Obtanium</p>
+                <p className="text-2xs text-muted">GitHub, GitLab, F-Droid, etc. — no mirrors, like Obtainium</p>
               </div>
             </div>
             <div className="rounded-xl border border-line bg-surface-2/50 p-3 flex items-start gap-2.5">
@@ -356,12 +356,12 @@ export function UpdatesPanel() {
         </div>
       </div>
 
-      {/* Global Settings — Obtanium */}
+      {/* Global Settings — Obtainium */}
       {showGlobalSettings ? (
         <div className="card p-5 space-y-4">
           <h3 className="flex items-center gap-2 font-semibold">
             <Settings className="h-4 w-4 text-accent" />
-            Global Update Settings — Obtanium Style
+            Global Update Settings — Obtainium Style
           </h3>
           
           <div className="grid gap-4 sm:grid-cols-2">
@@ -374,7 +374,7 @@ export function UpdatesPanel() {
               >
                 <option value={1}>Every hour</option>
                 <option value={3}>Every 3 hours</option>
-                <option value={6}>Every 6 hours (Obtanium default)</option>
+                <option value={6}>Every 6 hours (Obtainium default)</option>
                 <option value={12}>Every 12 hours</option>
                 <option value={24}>Every 24 hours</option>
               </select>
@@ -429,13 +429,13 @@ export function UpdatesPanel() {
           <div className="rounded-xl bg-accent-soft/30 border border-accent/20 p-3">
             <p className="text-xs font-semibold flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5 text-accent" />
-              Obtanium features on web
+              Obtainium features on web
             </p>
             <ul className="mt-1.5 space-y-1 text-2xs text-muted list-disc list-inside">
               <li>Direct APK / EXE / DMG download from GitHub releases — no store</li>
               <li>Background checks even when tab closed (via visibility + interval)</li>
               <li>Per-app auto-update, skip version, track-only, rollback to previous</li>
-              <li>Import/export — share your tracked list like Obtanium</li>
+              <li>Import/export — share your tracked list like Obtainium</li>
               <li>Installed version tracking — tell OmniStore what you have</li>
             </ul>
           </div>
@@ -460,7 +460,7 @@ export function UpdatesPanel() {
           </h3>
           <p className="mt-1 text-sm text-muted max-w-md mx-auto">
             {apps.length === 0 
-              ? "Track apps from GitHub, GitLab, F-Droid etc. — OmniStore will check directly for updates like Obtanium, no Play Store needed."
+              ? "Track apps from GitHub, GitLab, F-Droid etc. — OmniStore will check directly for updates like Obtainium, no Play Store needed."
               : "Try different filter or search."}
           </p>
           {apps.length === 0 ? (
@@ -478,7 +478,7 @@ export function UpdatesPanel() {
       ) : (
         <div className="grid gap-3">
           {filtered.map(tracked => (
-            <ObtaniumCard
+            <ObtainiumCard
               key={tracked.key}
               tracked={tracked}
               app={tracked.appId ? appsData[tracked.appId] : null}
