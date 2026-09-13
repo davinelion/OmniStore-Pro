@@ -3,12 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { BookOpen, ExternalLink, FolderGit2, Globe, Tag } from "lucide-react";
+import { BookOpen, ExternalLink, FolderGit2, Globe, Tag, Download, Github, ShieldCheck, Sparkles, Monitor, Laptop, Terminal, Smartphone, Layers } from "lucide-react";
 
 import type { App, RecommendationItem, SecurityReport, TrustReport } from "@omnistore/shared-models";
 import { getOmnisource } from "@/lib/omnisource";
 import { absoluteUrl, site } from "@/config/site";
-import { formatDate, formatCompactNumber } from "@/lib/formatters";
+import { formatDate, formatCompactNumber, platformLabel } from "@/lib/formatters";
 import { safeHref, safeImageUrl } from "@/lib/security/urls";
 import { AppIcon } from "@/components/app/AppIcon";
 import { TrustBadgeList } from "@/components/app/TrustBadges";
@@ -23,6 +23,9 @@ import { RecommendationRow } from "@/components/app/RecommendationRow";
 import { detectPlatformHeader } from "@/lib/platform/header";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { ReleaseIntegrity } from "@/components/app/ReleaseIntegrity";
+import { PlatformDownloadMatrix, StickyDownloadBar } from "@/components/store/PlatformDownloadMatrix";
+import { StoreAppGrid } from "@/components/store/StoreAppCard";
+import { cn } from "@/lib/utils";
 
 export const revalidate = 300;
 
@@ -36,11 +39,11 @@ export async function generateMetadata({
   const app = await client.getApp(decodeURIComponent(id));
   if (!app) return { title: "Not found" };
   return {
-    title: `${app.name}${app.developer ? ` — ${app.developer}` : ""}`,
-    description: app.shortDescription || app.description || site.description,
+    title: `${app.name}${app.developer ? ` — ${app.developer}` : ""} — Direct Download + Source | OmniStore`,
+    description: `Download ${app.name} directly — ${app.platforms?.join(", ") ?? "cross-platform"} • ${app.shortDescription || app.description?.slice(0, 150) || site.description} • Source: ${app.repository ?? "open source"} • Verified assets`,
     alternates: { canonical: `/app/${app.slug}` },
     openGraph: {
-      title: app.name,
+      title: `${app.name} — Direct Download`,
       description: app.shortDescription || app.description || undefined,
       images: safeImageUrl(app.banner)
         ? [{ url: safeImageUrl(app.banner)!, alt: app.name }]
@@ -67,19 +70,16 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
   const [trustResult, securityResult, recommendationsResult, similarResult, platformResult] = await Promise.allSettled([
     client.getTrust(app.id),
     client.getSecurity(app.id),
-    client.getRecommendations(app.id, 8),
-    client.getSimilar(app.id, 8),
+    client.getRecommendations(app.id, 12),
+    client.getSimilar(app.id, 12),
     detectPlatformHeader(),
   ]);
-  // Secondary intelligence is optional decoration. A transient upstream
-  // failure must not turn a perfectly valid app detail into a 500.
   const trust = trustResult.status === "fulfilled" ? trustResult.value : null;
   const security = securityResult.status === "fulfilled" ? securityResult.value : null;
   const recommendations = recommendationsResult.status === "fulfilled" ? recommendationsResult.value : null;
   const similar = similarResult.status === "fulfilled" ? similarResult.value : null;
   const preferredPlatform = platformResult.status === "fulfilled" ? platformResult.value : null;
 
-  // Recommendations may duplicate similar items — split by kind, drop dups.
   const items: RecommendationItem[] =
     recommendations && recommendations.items.length > 0
       ? recommendations.items
@@ -88,30 +88,35 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
   const alternativeApps = dedupe(items.filter((item) => item.kind === "alternative").map((item) => item.app));
   const reasons = new Map(items.map((item) => [item.app.id, item.reasons[0] ?? ""]));
 
+  const validAssets = app.latestRelease?.assets?.filter(a => a.status === "VALID") ?? [];
+  const platforms = app.platforms ?? [];
+  const isCrossPlatform = platforms.length >= 3;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: app.name,
     applicationCategory: app.category || "UtilitiesApplication",
-    operatingSystem: (app.platforms ?? []).join(", ") || "Cross-platform",
+    operatingSystem: platforms.join(", ") || "Cross-platform",
     description: app.shortDescription || app.description || undefined,
     softwareVersion: app.version ?? undefined,
     author: app.developer ? { "@type": "Organization", name: app.developer } : undefined,
     url: absoluteUrl(`/app/${app.slug}`),
     license: app.license ?? undefined,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    downloadUrl: validAssets[0]?.url,
+    isAccessibleForFree: true,
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-20 sm:pb-0">
       <AnalyticsTracker type="app_view" appId={app.id} />
       <script
         type="application/ld+json"
-        // JSON-LD is generated from validated API data; no user markup flows here.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* ---------------- Hero ---------------- */}
+      {/* ---------- App Store Hero with Direct Download ---------- */}
       <section className="relative overflow-hidden rounded-4xl border border-line">
         {safeImageUrl(app.banner) ? (
           <>
@@ -140,38 +145,103 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
             <div className="bg-noise absolute inset-0 opacity-[0.04] mix-blend-overlay" />
           </div>
         )}
-        <div className="relative flex flex-col gap-5 p-5 sm:flex-row sm:items-end sm:p-8">
-          <AppIcon
-            name={app.name}
-            src={app.icon}
-            size="xl"
-            rounded="rounded-3xl"
-            className="h-24 w-24 shadow-raised ring-1 ring-line/60 sm:h-28 sm:w-28"
-          />
-          <div className="min-w-0 flex-1">
-            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-4xl">{app.name}</h1>
-            {app.developer && app.developerId ? (
-              <Link
-                href={`/developers/${app.developerId}`}
-                className="mt-1 inline-block text-sm font-medium text-accent hover:underline"
-              >
-                {app.developer}
-              </Link>
-            ) : app.developer ? (
-              <p className="mt-1 text-sm font-medium text-accent">{app.developer}</p>
-            ) : null}
-            <p className="mt-2 max-w-2xl text-sm text-muted sm:text-base">
-              {app.shortDescription || app.description || t("emptyDescription")}
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <TrustBadgeList badges={trust?.badges ?? []} />
-              <SecurityBadge report={security} />
+        <div className="relative p-5 sm:p-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            <AppIcon
+              name={app.name}
+              src={app.icon}
+              size="xl"
+              rounded="rounded-3xl"
+              className="h-24 w-24 shadow-raised ring-1 ring-line/60 sm:h-28 sm:w-28"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-start gap-2">
+                <h1 className="font-display text-2xl font-bold tracking-tight sm:text-4xl">{app.name}</h1>
+                {isCrossPlatform ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft border border-accent/20 px-2.5 py-1 text-2xs font-bold text-accent">
+                    <Layers className="h-3 w-3" />
+                    Cross-Platform
+                  </span>
+                ) : null}
+                {app.openSource ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-success/10 border border-success/20 px-2.5 py-1 text-2xs font-bold text-success">
+                    <Github className="h-3 w-3" />
+                    Open Source
+                  </span>
+                ) : null}
+              </div>
+              {app.developer && app.developerId ? (
+                <Link
+                  href={`/developers/${app.developerId}`}
+                  className="mt-1 inline-block text-sm font-medium text-accent hover:underline"
+                >
+                  {app.developer}
+                </Link>
+              ) : app.developer ? (
+                <p className="mt-1 text-sm font-medium text-accent">{app.developer}</p>
+              ) : null}
+              <p className="mt-2 max-w-2xl text-sm text-muted sm:text-base">
+                {app.shortDescription || app.description || t("emptyDescription")}
+              </p>
+              
+              {/* Platform chips like App Store */}
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {platforms.map(p => {
+                  const Icon = p === "windows" ? Monitor : p === "macos" ? Laptop : p === "linux" ? Terminal : Smartphone;
+                  return (
+                    <span key={p} className="inline-flex items-center gap-1 rounded-full border border-line bg-surface-2/50 px-2.5 py-1 text-xs font-medium">
+                      <Icon className="h-3.5 w-3.5" />
+                      {platformLabel(p)}
+                    </span>
+                  );
+                })}
+                {validAssets.length > 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    {validAssets.length} verified assets
+                  </span>
+                ) : null}
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <TrustBadgeList badges={trust?.badges ?? []} />
+                <SecurityBadge report={security} />
+              </div>
+
+              {/* Direct Download CTA like Play Store */}
+                {validAssets.length > 0 ? (
+                <div className="mt-5 flex flex-wrap items-center gap-2.5">
+                  <a
+                    href={safeHref(validAssets[0]!.url) ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-glow hover:bg-accent-hover hover:-translate-y-0.5 transition-all"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download v{app.version ?? validAssets[0]!.version}
+                  </a>
+                  {app.repository && safeHref(app.repository) ? (
+                    <a
+                      href={safeHref(app.repository)!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold hover:bg-surface-2 transition-colors"
+                    >
+                      <Github className="h-4 w-4" />
+                      Source
+                    </a>
+                  ) : null}
+                  <span className="text-2xs text-muted">
+                    Direct from GitHub • {validAssets[0]!.packageType.toUpperCase()} • {validAssets[0]!.platform ? platformLabel(validAssets[0]!.platform) : "any"}
+                  </span>
+                </div>
+              ) : null}
             </div>
-          </div>
-          <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch">
-            <FavoriteButton appId={app.id} kind="favorites" withLabel />
-            <FavoriteButton appId={app.id} kind="watchlist" />
-            <AddToCollectionButton appId={app.id} />
+            <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch">
+              <FavoriteButton appId={app.id} kind="favorites" withLabel />
+              <FavoriteButton appId={app.id} kind="watchlist" />
+              <AddToCollectionButton appId={app.id} />
+            </div>
           </div>
         </div>
       </section>
@@ -179,7 +249,27 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem]">
         {/* ---------------- Main column ---------------- */}
         <div className="min-w-0 space-y-8">
+          {/* AI-Powered Cross-Platform Banner for this app */}
+          {isCrossPlatform ? (
+            <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-2/10 p-4">
+              <div className="flex items-start gap-3">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-white">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold">AI Insight: Cross-Platform Champion</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    This app runs natively on {platforms.map(p => platformLabel(p)).join(", ")}. OmniStore detected {validAssets.length} verified assets across all platforms — download any directly, source always visible like F-Droid. AI recommends it for users who use multiple OSes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
           <ScreenshotGallery screenshots={app.screenshots ?? []} appName={app.name} />
+
+          {/* Platform Download Matrix — direct + source like F-Droid */}
+          <PlatformDownloadMatrix app={app} />
 
           {app.description && app.description !== app.shortDescription ? (
             <section className="space-y-2">
@@ -225,6 +315,21 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
             </section>
           ) : null}
 
+          {/* AI-Powered Similar Apps with Store Cards */}
+          {similarApps.length > 0 ? (
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-accent-soft text-accent">
+                  <Sparkles className="h-3.5 w-3.5" />
+                </div>
+                <h2 className="text-lg font-semibold tracking-tight">AI Recommends — Similar Apps</h2>
+                <span className="rounded-full bg-surface-3 px-2 py-0.5 text-2xs text-muted">{similarApps.length} apps</span>
+              </div>
+              <p className="text-xs text-muted">Based on category {app.category}, tags, and trust signals — each with direct download + source.</p>
+              <StoreAppGrid apps={similarApps.slice(0, 6)} preferredPlatform={preferredPlatform ?? undefined} />
+            </section>
+          ) : null}
+
           <RecommendationRow
             title={t("similar")}
             subtitle={t("alsoInstalled")}
@@ -232,7 +337,10 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
             reasons={reasons}
           />
           {alternativeApps.length > 0 ? (
-            <RecommendationRow title={t("alternatives")} apps={alternativeApps} reasons={reasons} />
+            <section className="space-y-4">
+              <h2 className="text-lg font-semibold tracking-tight">Alternatives — AI Ranked</h2>
+              <StoreAppGrid apps={alternativeApps.slice(0, 6)} preferredPlatform={preferredPlatform ?? undefined} />
+            </section>
           ) : null}
         </div>
 
@@ -243,7 +351,6 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
           <ReleaseIntegrity app={app} />
           <TrustPanel report={trust as TrustReport | null} />
 
-          {/* Security summary → full dashboard */}
           <div className="card space-y-3 p-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold">{tSecurity("title")}</h2>
@@ -326,6 +433,8 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
           </div>
         </aside>
       </div>
+
+      <StickyDownloadBar app={app} />
     </div>
   );
 }

@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Heart, Home, Layers, FolderTree, LayoutGrid, Menu, Users, X } from "lucide-react";
+import { Heart, Home, Layers, FolderTree, LayoutGrid, Menu, Users, X, Monitor } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/", key: "home", icon: Home },
   { href: "/apps", key: "browse", icon: LayoutGrid },
+  { href: "/platforms", key: "platforms", icon: Monitor },
   { href: "/collections", key: "collections", icon: Layers },
   { href: "/categories", key: "categories", icon: FolderTree },
   { href: "/developers", key: "developers", icon: Users },

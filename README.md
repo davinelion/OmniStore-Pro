@@ -1,6 +1,8 @@
-# OmniStore
+# OmniStore Pro — The World's Largest Open-Source App Store
 
-Universal discovery and distribution interface for open-source applications.
+Universal discovery and distribution — **444 apps, 13k verified assets, 5 platforms, fully automated**. Like App Store, Play Store and F-Droid, but unified, cross-platform, with **direct downloads + source links** for every app and **AI-powered discovery**.
+
+**Live:** https://iamsmmh.github.io/OmniStore-Pro/website/ (marketing) • Full store: deploy this repo.
 
 ## Website
 
@@ -297,12 +299,30 @@ These are product requirements, not preferences:
 
 ---
 
+## Automation — Fully Connected with OmniSource Pro
+
+OmniStore is **fully automated and connected**:
+
+- **Daily Ingest:** `.github/workflows/ingest.yml` — cron `0 2 * * *`, manual dispatch, health check. `npm run ingest` fetches 444 repos, real release assets, trust scores → validated feed. Auto-commits if changed.
+- **CI:** `.github/workflows/ci.yml` — lint, typecheck, tests, build, E2E on every push.
+- **Monitor:** `.github/workflows/monitor.yml` — every 6h pings `/api/v1/health`.
+- **Live Connection:** `OMNISOURCE_API_URL` set → live OmniSource API; unset → bundled `data/omnisource-feed.json` in-process (zero-config). Both via same contract. Webhook `POST /api/webhooks/omnisource` revalidates instantly.
+
+See [docs/AUTOMATION.md](docs/AUTOMATION.md) for full wiring, scaling to thousands of apps, and production env.
+
+## Largest Store Experience
+
+- **Platform Stores:** `/platforms` — Windows (EXE/MSI/MSIX), macOS (DMG/PKG), Linux (AppImage/Flatpak/DEB/RPM), Android (APK), iOS. Each is a full store with categories, direct downloads, source transparency.
+- **App Cards:** `StoreAppCard` — icon, platform chips, **Direct Download** button (primary platform asset, size, type), **Source** (GitHub) always visible, quick platform switcher, trust/version. Like Play Store cards.
+- **App Detail:** Gradient hero, platform-aware CTA, `PlatformDownloadMatrix` (all platforms, grouped, validated, size, checksum), `InstallPanel` (platform tabs, arch groups, prominent Download), `SourcePanel` (stars/forks, repo/homepage/docs cards, transparency banner like F-Droid).
+- **Cross-Platform:** `detectPlatformHeader()` prioritizes user's OS but shows all. Cross-platform champions (3+ platforms) ranked higher, showcased.
+- **AI:** `AIAssistant` — natural language search with synonyms (editor→ide, video→media), typo tolerance, live preview, suggestions ("video editor for Linux"), insights ticker, smart category ranking. Recommendations with reasons.
+
+Every card shows **Direct Download + Source Link** — seamless like App Store, transparent like F-Droid.
+
 ## Known limitations
 
-- The bundled feed is a **snapshot** (444 sources, refreshed by `npm run ingest`;
-  there is no scheduled workflow in this repository yet, so refresh it manually
-  or add one). Every page shows when the data was generated, and
-  `/api/v1/health` reports it.
+- The bundled feed is a **snapshot** (444 sources, refreshed daily by GitHub Actions + manually via `npm run ingest`). Every page shows when the data was generated, and `/api/v1/health` reports it.
 - iPadOS coverage is thin because upstream projects rarely publish iPad-only
   artefacts; the platform is supported end-to-end and will populate as OmniSource does.
 - Version strings are normalised for display (a leading `v`, `release-` prefixes
