@@ -2,10 +2,18 @@
 
 Universal discovery and distribution interface for open-source applications.
 
-> **Website** — the official marketing site lives in [`website/`](website/README.md):
-> a static, dependency-free page (real catalog data, no build step) for
-> GitHub Pages / Netlify / Vercel. Regenerate its data with
-> `node website/scripts/build-catalog.mjs`.
+## Website
+
+**[Visit the OmniStore Pro website →](https://iamsmmh.github.io/OmniStore-Pro/website/)**
+
+The published website introduces OmniStore Pro and previews real catalog data.
+It is a static marketing site, **not the full interactive store**. To use the
+store, follow the [quick start](#quick-start) below or the
+[deployment guide](docs/DEPLOYMENT.md) to host your own instance.
+
+Website source and maintenance instructions are in
+[`website/`](website/README.md). It has no dependencies or build step; regenerate
+its catalog data with `node website/scripts/build-catalog.mjs`.
 
 OmniStore is a **client of OmniSource**: OmniSource supplies metadata, validation,
 search and feeds; OmniStore presents them. This repository is the web client —
@@ -258,8 +266,9 @@ docker build -t omnistore .
 docker run -p 3000:3000 omnistore
 ```
 
-**Static hosting** is not supported: search, feeds, sitemap, reporting and
-caching are server-rendered by design.
+**Static hosting** is supported for the [marketing website](website/README.md)
+only. The full Next.js store requires a Node.js host: search, feeds, sitemap,
+reporting and caching are server-rendered by design.
 
 **Post-deploy checks**
 

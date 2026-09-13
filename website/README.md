@@ -1,5 +1,10 @@
 # OmniStore Pro — official website
 
+**[Visit the live website →](https://iamsmmh.github.io/OmniStore-Pro/website/)**
+
+This is the marketing site, not the full interactive store. To run the store,
+see the [quick start](../README.md#quick-start).
+
 Static marketing site for [OmniStore Pro](https://github.com/iamsmmh/OmniStore-Pro) —
 zero dependencies, zero build step. Plain HTML, CSS and vanilla JavaScript.
 
@@ -45,9 +50,13 @@ python3 -m http.server 8080 --directory website
 
 ## Deploy
 
-- **GitHub Pages** — point Pages at the `website/` directory (Settings → Pages →
-  Source: main branch, `/website`), or push `website/` to a
-  `gh-pages` branch. Relative asset URLs work as-is.
+- **GitHub Pages** — this repository publishes from `main`, `/(root)`
+  (Settings → Pages → Source: Deploy from a branch). The marketing site is
+  available at <https://iamsmmh.github.io/OmniStore-Pro/website/>; the root URL
+  currently shows the project README. GitHub Pages branch publishing supports
+  only `/(root)` or `/docs`, not `/website`. To publish the marketing site at
+  the root instead, use a GitHub Actions Pages workflow that uploads `website/`
+  as its site artifact. Relative asset URLs work as-is.
 - **Netlify / Vercel / Cloudflare Pages** — set the publish directory to
   `website/`. No build command needed.
 - **Any static host** — copy the folder, open `index.html`.
