@@ -2,6 +2,11 @@
 
 Universal discovery and distribution interface for open-source applications.
 
+> **Website** — the official marketing site lives in [`website/`](website/README.md):
+> a static, dependency-free page (real catalog data, no build step) for
+> GitHub Pages / Netlify / Vercel. Regenerate its data with
+> `node website/scripts/build-catalog.mjs`.
+
 OmniStore is a **client of OmniSource**: OmniSource supplies metadata, validation,
 search and feeds; OmniStore presents them. This repository is the web client —
 indexed, installable, accessible, and ready for native clients to reuse its
