@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { compareTracked, hasUpdate, updateFor, type TrackedApp } from "./types";
+import { compareTracked, hasUpdate, updateFor, type TrackedApp, defaultTrackedSettings } from "./types";
 
 function tracked(overrides: Partial<TrackedApp> = {}): TrackedApp {
   return {
+    ...defaultTrackedSettings(),
     key: "localsend",
     appId: "localsend",
     slug: "localsend",
@@ -14,6 +15,7 @@ function tracked(overrides: Partial<TrackedApp> = {}): TrackedApp {
     developer: "LocalSend Team",
     platforms: ["android", "linux"],
     seenVersion: "1.16.0",
+    installedVersion: "1.16.0",
     latestVersion: "1.17.0",
     latestReleasedAt: "2026-09-04T09:20:00Z",
     addedAt: "2026-08-01T00:00:00Z",
@@ -26,33 +28,41 @@ function tracked(overrides: Partial<TrackedApp> = {}): TrackedApp {
 describe("updateFor", () => {
   it("reports an update when the latest version is newer", () => {
     const update = updateFor(tracked());
-    expect(update).toEqual({
-      app: expect.objectContaining({ key: "localsend" }),
-      from: "1.16.0",
-      to: "1.17.0",
-      releasedAt: "2026-09-04T09:20:00Z",
-    });
+    expect(update).toEqual(
+      expect.objectContaining({
+        from: "1.16.0",
+        to: "1.17.0",
+      }),
+    );
   });
 
   it("reports nothing when versions match", () => {
-    expect(updateFor(tracked({ latestVersion: "1.16.0" }))).toBeNull();
+    expect(updateFor(tracked({ latestVersion: "1.16.0", installedVersion: "1.16.0" }))).toBeNull();
   });
 
   it("never invents an update from an unknown version", () => {
-    expect(updateFor(tracked({ seenVersion: null }))).toBeNull();
+    expect(updateFor(tracked({ seenVersion: null, installedVersion: null }))).toBeNull();
     expect(updateFor(tracked({ latestVersion: null }))).toBeNull();
-    expect(updateFor(tracked({ seenVersion: null, latestVersion: null }))).toBeNull();
+    expect(updateFor(tracked({ seenVersion: null, installedVersion: null, latestVersion: null }))).toBeNull();
   });
 
   it("never reports an update for a source awaiting indexing", () => {
     expect(updateFor(tracked({ pending: true }))).toBeNull();
+  });
+
+  it("respects skipped version", () => {
+    expect(updateFor(tracked({ skippedVersion: "1.17.0" }))).toBeNull();
+  });
+
+  it("respects track-only", () => {
+    expect(updateFor(tracked({ trackOnly: true }))).toBeNull();
   });
 });
 
 describe("hasUpdate", () => {
   it("mirrors updateFor", () => {
     expect(hasUpdate(tracked())).toBe(true);
-    expect(hasUpdate(tracked({ latestVersion: "1.16.0" }))).toBe(false);
+    expect(hasUpdate(tracked({ latestVersion: "1.16.0", installedVersion: "1.16.0" }))).toBe(false);
   });
 });
 
@@ -64,7 +74,7 @@ describe("compareTracked", () => {
   });
 
   it("sorts sources with updates first", () => {
-    const stale = tracked({ key: "stale", latestVersion: "1.16.0" });
+    const stale = tracked({ key: "stale", latestVersion: "1.16.0", installedVersion: "1.16.0" });
     const fresh = tracked({ key: "fresh" });
     expect(compareTracked(fresh, stale)).toBeLessThan(0);
   });

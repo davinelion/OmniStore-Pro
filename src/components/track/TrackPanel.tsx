@@ -13,6 +13,8 @@ import {
   RefreshCw,
   Search,
   Trash2,
+  Download,
+  Sparkles,
 } from "lucide-react";
 
 import type { App } from "@omnistore/shared-models";
@@ -54,11 +56,8 @@ export function TrackPanel() {
   const [issueUrl, setIssueUrl] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  // Refresh once on mount so the update badges reflect OmniSource now.
   useEffect(() => {
     if (loaded && apps.length > 0) void refresh();
-    // Intentionally keyed on `loaded` only — refreshing on every list change
-    // would loop, since refresh() itself rewrites the list.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
 
@@ -72,11 +71,9 @@ export function TrackPanel() {
     async (value: string) => {
       const trimmed = value.trim();
       if (!trimmed) return;
-
       setState({ status: "loading" });
       setSubmitState("idle");
       setIssueUrl(null);
-
       try {
         const response = await fetch(`/api/v1/sources/resolve?url=${encodeURIComponent(trimmed)}`);
         if (!response.ok) throw new Error("resolve failed");
@@ -113,7 +110,6 @@ export function TrackPanel() {
       const parsed = result.parsed;
       if (!parsed) return;
       const app = result.app;
-
       await track({
         appId: app?.id ?? null,
         slug: app?.slug ?? null,
@@ -139,12 +135,35 @@ export function TrackPanel() {
 
   return (
     <div className="space-y-10">
-      {/* ---------------- Lookup ---------------- */}
+      {/* Obtanium banner */}
+      <div className="rounded-2xl border border-accent/20 bg-gradient-to-br from-accent-soft to-accent-2/10 p-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-white">
+            <Bell className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-bold flex items-center gap-2">
+              New: Direct Updates Center — Obtanium Style
+              <span className="rounded-full bg-accent px-2 py-0.5 text-2xs text-white">NEW</span>
+            </p>
+            <p className="text-xs text-muted">Track apps, get direct APK/EXE/DMG updates from GitHub, background checks, skip & rollback — like Obtanium but for all platforms.</p>
+          </div>
+        </div>
+        <Link href="/updates" className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white shadow-glow">
+          <Download className="h-4 w-4" />
+          Open Updates Center →
+        </Link>
+      </div>
+
       <section className="card-glass overflow-hidden p-6 sm:p-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-2xs font-medium text-accent">
             <GitBranch className="h-3 w-3" aria-hidden />
             {t("sourcesSupported")}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-2xs font-medium text-success">
+            <Sparkles className="h-3 w-3" />
+            Obtanium-style direct updates
           </span>
         </div>
 
@@ -178,9 +197,7 @@ export function TrackPanel() {
               "text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50",
             )}
           >
-            {state.status === "loading" ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-            ) : null}
+            {state.status === "loading" ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : null}
             {t("submit")}
           </button>
         </form>
@@ -202,7 +219,6 @@ export function TrackPanel() {
           ))}
         </div>
 
-        {/* ---------------- Resolve result ---------------- */}
         {state.status === "error" ? (
           <p className="mt-5 rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
             {state.message}
@@ -223,9 +239,7 @@ export function TrackPanel() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold">{result.app.name}</p>
-                    <span className="chip">
-                      {result.parsed.label}
-                    </span>
+                    <span className="chip">{result.parsed.label}</span>
                     <span className="chip">{t("indexedTitle")}</span>
                   </div>
                   <p className="mt-1 line-clamp-2 text-sm text-muted">
@@ -255,9 +269,7 @@ export function TrackPanel() {
                     onClick={() => void onTrack(result)}
                     className={cn(
                       "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-opacity",
-                      resultTracked
-                        ? "bg-surface-3 text-muted"
-                        : "bg-brand-gradient text-white hover:opacity-90",
+                      resultTracked ? "bg-surface-3 text-muted" : "bg-brand-gradient text-white hover:opacity-90",
                     )}
                   >
                     {resultTracked ? (
@@ -312,9 +324,7 @@ export function TrackPanel() {
 
             {submitState === "failed" || issueUrl ? (
               <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-line pt-3 text-xs">
-                {submitState === "failed" ? (
-                  <span className="text-warning">{t("requestFailed")}</span>
-                ) : null}
+                {submitState === "failed" ? <span className="text-warning">{t("requestFailed")}</span> : null}
                 {issueUrl ? (
                   <a
                     href={issueUrl}
@@ -332,22 +342,27 @@ export function TrackPanel() {
         ) : null}
       </section>
 
-      {/* ---------------- Updates ---------------- */}
       <section>
         <SectionHeading
           icon={<Bell className="h-4 w-4" aria-hidden />}
           title={t("updatesTitle")}
           count={updateCount}
           action={
-            <button
-              type="button"
-              onClick={() => void refresh()}
-              disabled={refreshing || apps.length === 0}
-              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-2/60 px-3 py-1.5 text-xs text-muted transition-colors hover:border-accent/50 hover:text-fg disabled:opacity-50"
-            >
-              <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} aria-hidden />
-              {refreshing ? t("refreshing") : t("refresh")}
-            </button>
+            <div className="flex gap-2">
+              <Link href="/updates" className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-white">
+                <Download className="h-3.5 w-3.5" />
+                Open Updates Center
+              </Link>
+              <button
+                type="button"
+                onClick={() => void refresh()}
+                disabled={refreshing || apps.length === 0}
+                className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface-2/60 px-3 py-1.5 text-xs text-muted transition-colors hover:border-accent/50 hover:text-fg disabled:opacity-50"
+              >
+                <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} aria-hidden />
+                {refreshing ? t("refreshing") : t("refresh")}
+              </button>
+            </div>
           }
         />
 
@@ -358,19 +373,14 @@ export function TrackPanel() {
         ) : null}
 
         {updateCount === 0 ? (
-          <p className="mt-3 text-sm text-subtle">
-            {apps.length === 0 ? t("trackedEmpty") : t("updatesEmpty")}
-          </p>
+          <p className="mt-3 text-sm text-subtle">{apps.length === 0 ? t("trackedEmpty") : t("updatesEmpty")}</p>
         ) : (
           <ul className="mt-4 space-y-2">
             {apps.map((app) => {
               const update = updateFor(app);
               if (!update) return null;
               return (
-                <li
-                  key={`update-${app.key}`}
-                  className="card card-interactive flex flex-wrap items-center gap-3 p-3.5"
-                >
+                <li key={`update-${app.key}`} className="card card-interactive flex flex-wrap items-center gap-3 p-3.5">
                   <AppIcon name={app.name} src={app.icon} size="md" />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{app.name}</p>
@@ -408,7 +418,6 @@ export function TrackPanel() {
         )}
       </section>
 
-      {/* ---------------- Tracked list ---------------- */}
       {apps.length > 0 ? (
         <section>
           <SectionHeading icon={<GitBranch className="h-4 w-4" aria-hidden />} title={t("trackedTitle")} count={apps.length} />
@@ -420,13 +429,11 @@ export function TrackPanel() {
         </section>
       ) : null}
 
-      {/* Disclaimer */}
       <section className="rounded-2xl border border-line bg-surface-2/40 p-5">
         <h2 className="text-sm font-semibold">{t("disclaimerTitle")}</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">{t("disclaimerBody")}</p>
       </section>
 
-      {/* Toast */}
       <div aria-live="polite" className="sr-only">
         {toast}
       </div>
@@ -471,7 +478,6 @@ function SectionHeading({
 function TrackedRow({ app, onRemove }: { app: TrackedApp; onRemove: () => void }) {
   const t = useTranslations("track");
   const update = updateFor(app);
-
   return (
     <li className="card card-interactive flex items-center gap-3 p-3.5">
       <AppIcon name={app.name} src={app.icon} size="md" />
@@ -486,9 +492,7 @@ function TrackedRow({ app, onRemove }: { app: TrackedApp; onRemove: () => void }
             <span className="chip">{t("upToDate")}</span>
           )}
         </div>
-        <p className="mt-0.5 truncate text-xs text-subtle">
-          {app.sourceUrl.replace(/^https?:\/\//, "")}
-        </p>
+        <p className="mt-0.5 truncate text-xs text-subtle">{app.sourceUrl.replace(/^https?:\/\//, "")}</p>
         <p className="mt-1 font-mono text-2xs text-subtle">
           {app.latestVersion ?? t("noRelease")} · {t("added")} {relativeTime(app.addedAt)}
         </p>

@@ -6,6 +6,7 @@
   "nav": {
     "home": "Home",
     "browse": "Browse",
+    "platforms": "Platforms",
     "collections": "Collections",
     "categories": "Categories",
     "developers": "Developers",
@@ -21,7 +22,13 @@
     "language": "Language",
     "light": "Light",
     "dark": "Dark",
-    "system": "System"
+    "system": "System",
+    "updates": "Updates"
+  },
+  "platforms": {
+    "title": "Platforms",
+    "description": "Browse apps by platform",
+    "allPlatforms": "All Platforms"
   },
   "home": {
     "heroBadge": "Powered by OmniSource",

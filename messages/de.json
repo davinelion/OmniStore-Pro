@@ -21,7 +21,9 @@
     "system": "System",
     "track": "Track",
     "dashboard": "Developer dashboard",
-    "admin": "Admin portal"
+    "admin": "Admin portal",
+    "platforms": "Platforms",
+    "updates": "Updates"
   },
   "home": {
     "heroBadge": "Angetrieben von OmniSource",
@@ -448,5 +450,10 @@
     "noChecksum": "No SHA256 published by OmniSource",
     "noAssets": "OmniSource has not published release asset verification metadata for this app.",
     "storeNote": "Store metadata comes from the indexed release assets."
+  },
+  "platforms": {
+    "title": "Platforms",
+    "description": "Browse apps by platform",
+    "allPlatforms": "All Platforms"
   }
 }
