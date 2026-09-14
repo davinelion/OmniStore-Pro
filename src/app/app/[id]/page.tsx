@@ -259,9 +259,26 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
                   <Sparkles className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold">AI Insight: Cross-Platform Champion</p>
+                  <p className="text-sm font-bold">
+                    {validAssets.length > 0
+                      ? "Cross-Platform Champion"
+                      : "Cross-Platform — build from source"}
+                  </p>
                   <p className="mt-1 text-xs leading-relaxed text-muted">
-                    This app runs natively on {platforms.map(p => platformLabel(p)).join(", ")}. OmniStore detected {validAssets.length} verified assets across all platforms — download any directly, source always visible like F-Droid. AI recommends it for users who use multiple OSes.
+                    {validAssets.length > 0 ? (
+                      <>
+                        This app runs natively on {platforms.map((p) => platformLabel(p)).join(", ")}.
+                        OmniStore indexed {validAssets.length} validated{" "}
+                        {validAssets.length === 1 ? "asset" : "assets"} for the latest release —
+                        download any of them directly, with the source always visible like F-Droid.
+                      </>
+                    ) : (
+                      <>
+                        This app runs natively on {platforms.map((p) => platformLabel(p)).join(", ")},
+                        but its latest release publishes no installers OmniStore can validate. Use the
+                        source repository below for build instructions or official download channels.
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -270,7 +287,7 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
 
           <ScreenshotGallery screenshots={app.screenshots ?? []} appName={app.name} />
 
-          {/* Obtanium-style Direct Update Banner */}
+          {/* Obtainium-style Direct Update Banner */}
           <div className="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent-soft to-accent-2/10 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-start gap-3">
@@ -279,11 +296,11 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
                 </div>
                 <div>
                   <p className="text-sm font-bold flex items-center gap-2">
-                    Direct Updates — Like Obtanium
+                    Direct Updates — Like Obtainium
                     <span className="rounded-full bg-accent px-2 py-0.5 text-2xs text-white">NEW</span>
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-muted max-w-xl">
-                    Track this app and get updates directly from {app.repository ? new URL(app.repository).hostname : "GitHub"} — no store middleman. Background checks every 6h, notifications, skip version, rollback, import/export. Like Obtanium for Android but for all platforms.
+                    Track this app and get updates directly from {app.repository ? new URL(app.repository).hostname : "GitHub"} — no store middleman. Background checks every 6h, notifications, skip version, rollback, import/export. Like Obtainium for Android but for all platforms.
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     <span className="rounded-full bg-surface-3 px-2 py-0.5 text-2xs">Direct APK/EXE/DMG</span>
@@ -411,7 +428,7 @@ export default async function AppPage({ params }: { params: Promise<{ id: string
               label={t("downloads")}
               value={app.downloadCount != null ? formatCompactNumber(app.downloadCount) : null}
             />
-            <MetaRow label={t("source")} value={app.source} />
+            <MetaRow label={t("sourceLabel")} value={app.source} />
             <div className="flex items-center justify-between gap-3 px-4 py-2.5">
               <span className="shrink-0 text-xs text-muted">{t("category")}</span>
               {app.category ? (

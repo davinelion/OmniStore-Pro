@@ -19,7 +19,7 @@ const ICONS: Record<SourceId, typeof Github> = {
 /**
  * Where this app's releases come from.
  *
- * Obtanium's whole premise is that the source is visible and verifiable, so
+ * Obtainium's whole premise is that the source is visible and verifiable, so
  * the upstream is surfaced on every card — not buried on the detail page.
  */
 export function SourceBadge({

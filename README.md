@@ -69,8 +69,15 @@ signals, and writes a feed validated against the shared zod schemas in
 credentials, network failure, a high 404 rate) refuses to overwrite a good feed
 unless you pass `--force`.
 
-The committed `data/omnisource-feed.json` currently holds **444 apps, 1,891
-releases and 13,357 validated assets**.
+The committed `data/omnisource-feed.json` currently holds **444 apps, 1,907
+releases and 13,444 validated assets**.
+
+Every source is identity-checked during ingest. A repository that resolves to a
+different `full_name` than requested is rejected unless the entry declares
+`"renamed_to": "Owner/repo"`, and a repository under 100 stars is rejected as a
+likely name-squat unless the entry sets `"allow_low_stars": true`. This is what
+keeps an unrelated 3-star project from being published under a well-known app's
+name.
 
 Useful flags: `--only=owner/repo` re-ingests one source, `--limit=N` smoke-tests
 the first N, `--out=path.json` writes elsewhere, `--concurrency=N` tunes
@@ -159,7 +166,7 @@ native-client contract.
 
 ## Tracking sources
 
-OmniStore can watch any upstream the way Obtanium does.
+OmniStore can watch any upstream the way Obtainium does.
 
 Paste a repository or package URL on [`/track`](/track) — `owner/name`,
 `https://github.com/owner/name`, `git@host:owner/name.git`, or a
@@ -310,16 +317,16 @@ OmniStore is **fully automated and connected**:
 
 See [docs/AUTOMATION.md](docs/AUTOMATION.md) for full wiring, scaling to thousands of apps, and production env.
 
-## Largest Store Experience + Obtanium Direct Updates
+## Largest Store Experience + Obtainium Direct Updates
 
 - **Platform Stores:** `/platforms` — Windows (EXE/MSI/MSIX), macOS (DMG/PKG), Linux (AppImage/Flatpak/DEB/RPM), Android (APK), iOS. Each is a full store with categories, direct downloads, source transparency.
 - **App Cards:** `StoreAppCard` — icon, platform chips, **Direct Download** button (primary platform asset, size, type), **Source** (GitHub) always visible, quick platform switcher, trust/version. Like Play Store cards.
 - **App Detail:** Gradient hero, platform-aware CTA, `PlatformDownloadMatrix` (all platforms, grouped, validated, size, checksum), `InstallPanel` (platform tabs, arch groups, prominent Download), `SourcePanel` (stars/forks, repo/homepage/docs cards, transparency banner like F-Droid).
 - **Cross-Platform:** `detectPlatformHeader()` prioritizes user's OS but shows all. Cross-platform champions (3+ platforms) ranked higher, showcased.
 - **AI:** `AIAssistant` — natural language search with synonyms (editor→ide, video→media), typo tolerance, live preview, suggestions ("video editor for Linux"), insights ticker, smart category ranking. Recommendations with reasons.
-- **Obtanium Direct Updates:** `/updates` — Get app updates directly from source (GitHub, GitLab, F-Droid etc.), background checks every 6h, notifications, per-app auto-update, skip version, track-only, rollback to previous releases, import/export, installed version tracking. Like Obtanium for Android but for all platforms. See [docs/OBTANIUM.md](docs/OBTANIUM.md).
+- **Obtainium Direct Updates:** `/updates` — Get app updates directly from source (GitHub, GitLab, F-Droid etc.), background checks every 6h, notifications, per-app auto-update, skip version, track-only, rollback to previous releases, import/export, installed version tracking. Like Obtainium for Android but for all platforms. See [docs/OBTAINIUM.md](docs/OBTAINIUM.md).
 
-Every card shows **Direct Download + Source Link** — seamless like App Store, transparent like F-Droid, with Obtanium-style direct updates.
+Every card shows **Direct Download + Source Link** — seamless like App Store, transparent like F-Droid, with Obtainium-style direct updates.
 
 ## Known limitations
 

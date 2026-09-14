@@ -3,7 +3,7 @@
  *
  * Resolves a pasted repository / package URL to a catalog app, if OmniSource
  * has already indexed it. This is what makes the Track page behave like
- * Obtanium: paste any source URL and get back the app, its latest version and
+ * Obtainium: paste any source URL and get back the app, its latest version and
  * its download assets — or an honest "not indexed yet" instead of a guess.
  */
 

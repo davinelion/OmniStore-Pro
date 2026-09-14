@@ -124,6 +124,7 @@
     "watchRemove": "إيقاف المراقبة",
     "breakingChanges": "قد يحتوي تغييرات كاسرة",
     "source": "مفهرس من {source}",
+    "sourceLabel": "المصدر",
     "openSource": "مصدر مفتوح",
     "activelyDeveloped": "قيد التطوير النشط",
     "installHandoff": "ستنتقل إلى مضيف الإصدارات الأصلي للتنزيل. أومني ستور لا ينسخ الملفات التنفيذية أبدًا.",

@@ -95,7 +95,7 @@ export function Footer() {
             </ul>
           </nav>
 
-          {/* Where the catalog actually comes from — the Obtanium promise. */}
+          {/* Where the catalog actually comes from — the Obtainium promise. */}
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-wider text-fg">{t("sources")}</h2>
             <ul className="mt-4 flex flex-wrap gap-1.5">

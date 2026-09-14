@@ -124,6 +124,7 @@
     "watchRemove": "ウォッチ解除",
     "breakingChanges": "破壊的変更を含む可能性",
     "source": "{source} から収録",
+    "sourceLabel": "ソース",
     "openSource": "オープンソース",
     "activelyDeveloped": "活発に開発中",
     "installHandoff": "ダウンロードは上流のリリースホストへ移動します。OmniStore がバイナリをミラーすることはありません。",
